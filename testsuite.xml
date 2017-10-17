@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite thread-count="3" verbose="2" name="Test Suite" parallel="methods" data-provider-thread-count="2">
+  <test name="Mobile Test">
+    <classes>
+      <class name="com.github.test.demo.WebTest"/>
+    </classes>
+  </test> <!-- Mobile Test -->
+</suite> <!-- Test Suite -->

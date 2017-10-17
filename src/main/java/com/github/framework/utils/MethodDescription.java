@@ -2,7 +2,7 @@ package com.github.framework.utils;
 
 import org.testng.IInvokedMethod;
 
-import com.github.framework.annotation.values.Author;
+import com.github.framework.annotations.Author;
 
 /**
  *

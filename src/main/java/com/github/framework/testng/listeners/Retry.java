@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
-import com.github.framework.annotation.values.RetryCount;
+import com.github.framework.annotations.RetryCount;
 import com.github.framework.context.RunTimeContext;
 
 public class Retry implements IRetryAnalyzer 

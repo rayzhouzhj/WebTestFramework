@@ -12,7 +12,7 @@ import org.testng.annotations.Test;
 
 import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.Status;
-import com.github.framework.annotation.values.Author;
+import com.github.framework.annotations.Author;
 import com.github.framework.utils.MethodDescription;
 import com.github.framework.utils.ScreenShotManager;
 

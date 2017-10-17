@@ -1,4 +1,4 @@
-package com.github.framework.annotation.values;
+package com.github.framework.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

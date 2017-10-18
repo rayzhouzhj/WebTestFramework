@@ -1,5 +1,4 @@
 # WebTestFramework
-Selenium + TestNG through Docker
 
 ## Description:
 Test framework for Web testing integrated with TestNG and Extent Report.

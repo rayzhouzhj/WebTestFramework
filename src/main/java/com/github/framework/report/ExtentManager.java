@@ -17,7 +17,7 @@ import com.github.framework.context.RunTimeContext;
 public class ExtentManager 
 {
 	private static ExtentReports extent;
-	private static String filePath = System.getProperty("user.dir") + File.separator + "target" + File.separator + "MobileTestReport.html";
+	private static String filePath = System.getProperty("user.dir") + File.separator + "target" + File.separator + "WebTestReport.html";
 	private static String extentXML = System.getProperty("user.dir") + File.separator + "extent.xml";
 
 	public synchronized static ExtentReports getExtent() 

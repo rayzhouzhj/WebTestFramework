@@ -154,7 +154,7 @@ public class ReportManager
 		{
 			classAndMethod = e.getClassName() + "," + e.getMethodName();
 
-			if(e.getClassName().startsWith("com.scmp.test") && e.getMethodName().startsWith("test"))
+			if(e.getMethodName().startsWith("test"))
 			{
 				classAndMethod = e.getClassName().substring(e.getClassName().lastIndexOf(".") + 1) + "," + e.getMethodName();
 

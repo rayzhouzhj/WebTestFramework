@@ -69,8 +69,8 @@ public class ExtentManager
 		htmlReporter.config().setChartVisibilityOnOpen(true);
 
 		// report title
-		htmlReporter.config().setDocumentTitle("SCMP Mobile Test Report");
-		htmlReporter.config().setReportName("SCMP Mobile Test Report");
+		htmlReporter.config().setDocumentTitle("WEB Test Report");
+		htmlReporter.config().setReportName("WEB Test Report");
 		htmlReporter.config().setTestViewChartLocation(ChartLocation.TOP);
 		htmlReporter.config().setTheme(Theme.STANDARD);
 

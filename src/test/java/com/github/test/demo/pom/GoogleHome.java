@@ -9,9 +9,14 @@ import org.openqa.selenium.support.PageFactory;
 public class GoogleHome extends BasePage
 {
 	public static final String URL = "https://www.google.com";
+	
 	@CacheLookup
 	@FindBy(id = "lst-ib")
 	public WebElement SearchInputBox;
+	
+	@CacheLookup
+	@FindBy(name = "btnK")
+	public WebElement SearchButton;
 	
 	public GoogleHome(RemoteWebDriver driver) 
 	{

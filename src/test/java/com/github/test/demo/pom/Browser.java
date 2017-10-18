@@ -8,6 +8,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 public class Browser 
 {
 	public GoogleHome GoogleHome;
+	public GoogleSearchResult GoogleSearchResult;
 	private RemoteWebDriver driver;
 	
 	public Browser(RemoteWebDriver driver)

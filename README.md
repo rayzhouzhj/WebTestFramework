@@ -5,7 +5,7 @@ Test framework for Web testing integrated with TestNG and Extent Report.
 
 ### Run Below command to create docker containers before test execution:
 ```
-docker-compose scale selenium-chrome=5 selenium-firefox=3
+docker-compose up --scale selenium-chrome=5 --scale selenium-firefox=3
 ```
 
 ### Config below properties to setup the test framework(config.properties):

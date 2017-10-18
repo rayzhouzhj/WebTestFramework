@@ -85,7 +85,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener
 		switch (browserType) 
 		{
 		case "chrome": browser = DesiredCapabilities.chrome(); break;
-		case "firefox": browser = DesiredCapabilities.chrome(); break;
+		case "firefox": browser = DesiredCapabilities.firefox(); break;
 		default:
 			break;
 		}

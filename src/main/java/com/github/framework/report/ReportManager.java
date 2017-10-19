@@ -99,7 +99,7 @@ public class ReportManager
 		MethodDescription methodDescription = new MethodDescription(invokedMethod, description);
 		boolean authorNamePresent = methodDescription.isAuthorNamePresent();
 		String descriptionMethodName = methodDescription.getDescriptionMethodName();
-		String category = "";
+		String category = invokedMethod.getTestMethod().getXmlTest().getParameter("browser");
 
 		String testName = dataProvider == null ? descriptionMethodName : descriptionMethodName + "[" + dataProvider + "]";
 		if (authorNamePresent)

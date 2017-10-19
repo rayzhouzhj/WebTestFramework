@@ -79,7 +79,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener
 
 	private void setupDriverForTest(IInvokedMethod method) 
 	{
-		String browserType = RunTimeContext.getInstance().getProperty("BROWSER_TYPE").toLowerCase();
+		String browserType = method.getTestMethod().getXmlTest().getParameter("browser");
 		DesiredCapabilities browser = null;
 
 		switch (browserType) 

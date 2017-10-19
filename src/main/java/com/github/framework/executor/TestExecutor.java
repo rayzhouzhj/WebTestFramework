@@ -11,6 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -29,10 +34,9 @@ import com.github.framework.utils.PackageUtil;
 public class TestExecutor 
 {
 	private final RunTimeContext context;
-	private List<String> suiteFiles = new ArrayList<>();
 	private ArrayList<String> items = new ArrayList<String>();
 	private List<Class> testcases;
-	
+
 	public TestExecutor() throws IOException
 	{
 		context = RunTimeContext.getInstance();
@@ -50,11 +54,6 @@ public class TestExecutor
 
 	public boolean triggerTest(String pack, List<String> tests) throws Exception 
 	{
-		return parallelExecution(pack, tests);
-	}
-
-	public boolean parallelExecution(String pack, List<String> tests) throws Exception 
-	{
 		System.out.println("***************************************************");
 
 		testcases = new ArrayList<Class>();
@@ -71,12 +70,12 @@ public class TestExecutor
 				}
 			});
 
-			hasFailures = this.runMethod(tests, pack);
+			hasFailures = this.execute(tests, pack);
 		}
 
 		return hasFailures;
 	}
-	
+
 	/**
 	 * 
 	 * @param test test classes
@@ -84,7 +83,7 @@ public class TestExecutor
 	 * @return
 	 * @throws Exception
 	 */
-	public boolean runMethod(List<String> test, String pack) throws Exception 
+	public boolean execute(List<String> test, String pack) throws Exception 
 	{
 		URL testClassUrl = null;
 		List<URL> testClassUrls = new ArrayList<>();
@@ -105,25 +104,57 @@ public class TestExecutor
 
 		Map<String, List<Method>> methods = createTestsMap(resources);
 
+		ExecutorService executor = Executors.newCachedThreadPool();
+		List<FutureTask<Boolean>> list = new ArrayList<>();
 
-		constructXmlSuite(pack, test, methods);
-		boolean	hasFailure = runMethods();
+		String[] browsers = RunTimeContext.getInstance().getProperty("BROWSER_TYPE").split(",");
+		for(String browser : browsers)
+		{
+			XmlSuite suite = constructXmlSuite(browser, pack, test, methods);
+			String suiteFile = writeTestNGFile(suite, "testsuite"  + "-" + browser);
+
+			FutureTask<Boolean> futureTask = new FutureTask<>(new TestExecutorService(suiteFile));
+			list.add(futureTask);
+
+			executor.submit(futureTask);
+		}
+
+		// Wait for the test completion
+		while(true)
+		{
+			boolean isDone = true;
+			for(FutureTask<Boolean> futureTask : list)
+			{
+				isDone = isDone && futureTask.isDone();
+			}
+
+			if(isDone)
+			{
+				// Shutdown executor service
+				executor.shutdown();
+				break;
+			}
+			else
+			{
+				TimeUnit.SECONDS.sleep(1);
+			}
+		}
+
+		boolean	hasFailure = false;
+		//  Get the result
+		for(FutureTask<Boolean> result : list)
+		{
+			hasFailure = hasFailure || result.get();
+		}
+
+
 
 		Figlet.print("Test Completed");
 
 		return hasFailure;
 	}
 
-	public boolean runMethods() 
-	{
-		TestNG testNG = new TestNG();
-		testNG.setTestSuites(suiteFiles);
-		testNG.run();
-
-		return testNG.hasFailure();
-	}
-
-	public XmlSuite constructXmlSuite(String pack, List<String> tests, Map<String, List<Method>> methods) 
+	public XmlSuite constructXmlSuite(String browser, String pack, List<String> tests, Map<String, List<Method>> methods) 
 	{
 		ArrayList<String> listeners = new ArrayList<>();
 		ArrayList<String> groupsInclude = new ArrayList<>();
@@ -155,6 +186,7 @@ public class TestExecutor
 		// Initialize the XML Test Suite
 		XmlTest test = new XmlTest(suite);
 		test.setName("Web Test");
+		test.addParameter("browser", browser);
 		test.setIncludedGroups(groupsInclude);
 		test.setExcludedGroups(groupsExclude);
 
@@ -162,9 +194,6 @@ public class TestExecutor
 		List<XmlClass> xmlClasses = new ArrayList<>();
 		writeXmlClass(tests, methods, xmlClasses);
 		test.setXmlClasses(xmlClasses);
-
-		System.out.println(suite.toXml());
-		writeTestNGFile(suite, "testsuite");
 
 		return suite;
 	}
@@ -198,13 +227,14 @@ public class TestExecutor
 		}
 	}
 
-	private void writeTestNGFile(XmlSuite suite, String fileName)
+	private String writeTestNGFile(XmlSuite suite, String fileName)
 	{
+		// Print out Suite XML
+		System.out.println(suite.toXml());
+		String suiteXML = System.getProperty("user.dir") + "/target/" + fileName + ".xml";
+
 		try 
 		{
-			String suiteXML = System.getProperty("user.dir") + "/target/" + fileName + ".xml";
-			suiteFiles.add(suiteXML);
-
 			FileWriter writer = new FileWriter(new File(suiteXML));
 			writer.write(suite.toXml());
 			writer.flush();
@@ -214,6 +244,8 @@ public class TestExecutor
 		{
 			e.printStackTrace();
 		}
+
+		return suiteXML;
 	}
 
 	public void include(ArrayList<String> groupsInclude, String include) 
@@ -227,7 +259,6 @@ public class TestExecutor
 			Collections.addAll(groupsInclude, System.getenv(include).split("\\s*,\\s*"));
 		}
 	}
-
 
 	private XmlClass createClass(String className, List<Method> methods)
 	{
@@ -257,6 +288,30 @@ public class TestExecutor
 		});
 
 		return testsMap;
+	}
+
+}
+
+class TestExecutorService implements Callable<Boolean>
+{
+	private String suite;
+
+	public TestExecutorService(String file) 
+	{
+		suite = file;
+	}
+
+	@Override
+	public Boolean call() throws Exception
+	{
+		List<String> suiteFiles = new ArrayList<>();
+		suiteFiles.add(suite);
+
+		TestNG testNG = new TestNG();
+		testNG.setTestSuites(suiteFiles);
+		testNG.run();
+
+		return testNG.hasFailure();
 	}
 
 }

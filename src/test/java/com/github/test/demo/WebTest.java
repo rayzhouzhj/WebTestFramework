@@ -1,7 +1,5 @@
 package com.github.test.demo;
 
-import java.net.MalformedURLException;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
@@ -23,63 +21,65 @@ public class WebTest
 	}
 	
 	@Test(groups = "DEBUG")
-	public void testGoogleSearch1() throws InterruptedException
+	public void testGoogleSearchPassCase1() throws InterruptedException
 	{
 		init("testGoogleSearch1");
 		
 		Browser.GoogleHome.launch();
-		Thread.sleep(5000);  // Let the user actually see something!
+		Thread.sleep(2000);  // Let the user actually see something!
 		Browser.GoogleHome.SearchInputBox.sendKeys("selenium");
-		Thread.sleep(5000);  // Let the user actually see something!
+		Browser.GoogleHome.GoogleLogo.click(); // Dismiss fast forward search
+		Thread.sleep(2000);  // Let the user actually see something!
 		Browser.GoogleHome.SearchButton.click();
 		Browser.GoogleSearchResult.waitForPageLoad();
-		Thread.sleep(5000);  // Let the user actually see something!
+		Thread.sleep(2000);  // Let the user actually see something!
 	}
 	
-	@Test
-	public void testGoogleSearch2() throws InterruptedException 
+	@Test(groups = "DEBUG")
+	public void testGoogleSearchPassCase2() throws InterruptedException 
 	{
 		init("testGoogleSearch2");
 		
 		Browser.GoogleHome.launch();
-		Thread.sleep(5000);  // Let the user actually see something!
+		Thread.sleep(2000);  // Let the user actually see something!
 		Browser.GoogleHome.SearchInputBox.sendKeys("selenium");
+		Browser.GoogleHome.GoogleLogo.click(); // Dismiss fast forward search
 		Browser.GoogleHome.SearchButton.click();
 		Browser.GoogleSearchResult.waitForPageLoad();
-		Thread.sleep(5000);  // Let the user actually see something!
+		Thread.sleep(2000);  // Let the user actually see something!
 		
 		System.out.println("testGoogleSearch2 Completed");
 	}
 	
-	@Test
-	public void testGoogleSearch3() throws InterruptedException 
+	@Test(groups = "DEBUG")
+	public void testGoogleSearchFailCase1() throws InterruptedException 
 	{
-		System.out.println("testGoogleSearch3");
+		System.out.println("testGoogleSearchFailCase1");
 		WebDriver driver = WebDriverManager.getDriver();
 		System.out.println("testGoogleSearch3 Receive Driver, start testing");
 		
-		driver.get("https://www.google.com");
-		Thread.sleep(5000);  // Let the user actually see something!
+		driver.get("https://www.yahoo.com");
+		Thread.sleep(2000);  // Let the user actually see something!
 		driver.findElement(By.id("lst-ib")).sendKeys("selenium");
-		Thread.sleep(5000);  // Let the user actually see something!
+		Thread.sleep(2000);  // Let the user actually see something!
 		
-		System.out.println("testGoogleSearch3 Completed");
+		System.out.println("testGoogleSearchFailCase1 Completed");
 	}
 	
-	@Test
-	public void testGoogleSearch4() throws InterruptedException
+	@Test(groups = "DEBUG")
+	public void testGoogleSearchFailCase2() throws InterruptedException
 	{
-		System.out.println("testGoogleSearch4");
+		System.out.println("testGoogleSearchFailCase2");
 		
 		WebDriver driver = WebDriverManager.getDriver();
 		System.out.println("testGoogleSearch4 Receive Driver, start testing");
 		
-		driver.get("https://www.google.com");
-		Thread.sleep(5000);  // Let the user actually see something!
+		driver.get("https://www.facebook.com");
+		Thread.sleep(2000);  // Let the user actually see something!
 		driver.findElement(By.id("lst-ib")).sendKeys("selenium");
-		Thread.sleep(5000);  // Let the user actually see something!
+		Thread.sleep(2000);  // Let the user actually see something!
 		
-		System.out.println("testGoogleSearch4 Completed");
+		System.out.println("testGoogleSearchFailCase2 Completed");
 	}
 	
 }

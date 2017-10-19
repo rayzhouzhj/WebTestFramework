@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite thread-count="3" verbose="2" name="Test Suite" parallel="methods" data-provider-thread-count="3">
+  <listeners>
+    <listener class-name="com.github.framework.testng.listeners.InvokedMethodListener"/>
+    <listener class-name="com.github.framework.testng.listeners.RetryListener"/>
+  </listeners>
+  <test name="Web Test">
+    <parameter name="browser" value="chrome"/>
+    <groups>
+      <run>
+        <include name="DEBUG"/>
+      </run>
+    </groups>
+    <classes>
+      <class name="com.github.test.demo.WebTest"/>
+    </classes>
+  </test> <!-- Web Test -->
+</suite> <!-- Test Suite -->

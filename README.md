@@ -15,7 +15,9 @@ ENVIRONMENT=UAT
 SELENIUM_JAVA_VERSION=3.6.0
 
 ############################## WEB ##########################################
-BROWSER_TYPE=firefox
+# If more than one browser is provided in BROWSER_TYPE
+# test will be run different browser on parallel thread
+BROWSER_TYPE=firefox,chrome
 # Selenium hub in docker server
 HOST_URL=http://localhost:4444/wd/hub
 

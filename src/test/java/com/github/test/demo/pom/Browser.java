@@ -14,7 +14,7 @@ public class Browser
 	public Browser(RemoteWebDriver driver)
 	{
 		this.driver = driver;
-
+		
 		Field[] fields = this.getClass().getDeclaredFields();
 		for(Field field : fields)
 		{

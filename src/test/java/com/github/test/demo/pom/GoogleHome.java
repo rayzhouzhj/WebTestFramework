@@ -18,6 +18,10 @@ public class GoogleHome extends BasePage
 	@FindBy(name = "btnK")
 	public WebElement SearchButton;
 	
+	@CacheLookup
+	@FindBy(id = "hplogo")
+	public WebElement GoogleLogo;
+	
 	public GoogleHome(RemoteWebDriver driver) 
 	{
 		super(driver);

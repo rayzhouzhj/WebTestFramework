@@ -15,9 +15,15 @@ selenium-chrome:
   stdin_open: true
   links:
     - selenium-hub:hub
+  #ports:
+  # Expose local machine port 5555 to docker machine port 5900
+  #  - "5555:5900" 
 #selenium-firefox equivalent to manually running the command docker run -d --link selenium-hub:hub -P --name firefox selenium/node-firefox-debug
 selenium-firefox:
   restart: always
   image: selenium/node-firefox-debug
   links:
     - selenium-hub:hub
+  #ports:
+  # Expose local machine port 5556 to docker machine port 5900
+  #  - "5556:5900"

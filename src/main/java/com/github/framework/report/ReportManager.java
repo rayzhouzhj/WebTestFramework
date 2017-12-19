@@ -13,7 +13,6 @@ import org.testng.annotations.Test;
 import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.Status;
 import com.github.framework.annotations.Author;
-import com.github.framework.utils.MethodDescription;
 import com.github.framework.utils.ScreenShotManager;
 
 /**
@@ -96,7 +95,7 @@ public class ReportManager
 		}
 
 
-		MethodDescription methodDescription = new MethodDescription(invokedMethod, description);
+		ExtentTestDescription methodDescription = new ExtentTestDescription(invokedMethod, description);
 		boolean authorNamePresent = methodDescription.isAuthorNamePresent();
 		String descriptionMethodName = methodDescription.getDescriptionMethodName();
 		String category = invokedMethod.getTestMethod().getXmlTest().getParameter("browser");

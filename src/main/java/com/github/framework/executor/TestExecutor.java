@@ -179,8 +179,8 @@ public class TestExecutor
 		suite.setVerbose(2);
 
 		// Add listeners
-		listeners.add("com.github.framework.testng.listeners.InvokedMethodListener");
-		listeners.add("com.github.framework.testng.listeners.RetryListener");
+		listeners.add(com.github.framework.testng.listeners.InvokedMethodListener.class.getName());
+		listeners.add(com.github.framework.testng.listeners.RetryListener.class.getName());
 		suite.setListeners(listeners);
 
 		// Initialize the XML Test Suite

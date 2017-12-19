@@ -1,4 +1,4 @@
-package com.github.framework.utils;
+package com.github.framework.report;
 
 import org.testng.IInvokedMethod;
 
@@ -7,14 +7,14 @@ import com.github.framework.annotations.Author;
 /**
  *
  */
-public class MethodDescription 
+public class ExtentTestDescription 
 {
     private IInvokedMethod methodName;
     private String description;
     private boolean authorNamePresent;
     private String descriptionMethodName;
 
-    public MethodDescription(IInvokedMethod methodName, String description) 
+    public ExtentTestDescription(IInvokedMethod methodName, String description) 
     {
         this.methodName = methodName;
         this.description = description;

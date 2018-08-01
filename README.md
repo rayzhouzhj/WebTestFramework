@@ -1,5 +1,7 @@
 # WebTestFramework
 
+[![](https://jitpack.io/v/rayzhouzhj/WebTestFramework.svg)](https://jitpack.io/#rayzhouzhj/WebTestFramework)
+
 ## Description:
 Test framework for Web testing integrated with TestNG and Extent Report.
 

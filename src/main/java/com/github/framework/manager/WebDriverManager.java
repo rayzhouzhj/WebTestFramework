@@ -2,12 +2,17 @@ package com.github.framework.manager;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.BrowserType;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -38,6 +43,10 @@ public class WebDriverManager
 		RemoteWebDriver currentDriverSession;
 		try 
 		{
+	        LoggingPreferences logPrefs = new LoggingPreferences();
+	        logPrefs.enable(LogType.BROWSER, Level.INFO);
+	        browser.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+	        
 			// For Execution Mode
 			if("OFF".equalsIgnoreCase(RunTimeContext.getInstance().getProperty("DEBUG_MODE", "OFF")))
 			{
@@ -52,13 +61,19 @@ public class WebDriverManager
 				{
 					System.out.println("Launch local Chrome Browser");
 					System.setProperty("webdriver.chrome.driver", driverHome + "/chromedriver");
-					currentDriverSession = new ChromeDriver();
+			        ChromeOptions options = new ChromeOptions();
+			        options.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+			        
+					currentDriverSession = new ChromeDriver(options);
 				}
 				else
 				{
 					System.out.println("Launch local Firefox Browser");
 					System.setProperty("webdriver.gecko.driver", driverHome + "/geckodriver");
-					currentDriverSession = new FirefoxDriver();
+					FirefoxOptions options = new FirefoxOptions();
+			        options.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+			        
+					currentDriverSession = new FirefoxDriver(options);
 				}
 			}
 

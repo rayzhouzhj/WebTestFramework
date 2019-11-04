@@ -11,11 +11,11 @@ public class GoogleHome extends BasePage
 	public static final String URL = "https://www.google.com";
 	
 	@CacheLookup
-	@FindBy(id = "lst-ib")
+	@FindBy(css = "input[name='q']")
 	public WebElement SearchInputBox;
 	
 	@CacheLookup
-	@FindBy(name = "btnK")
+	@FindBy(css = "input[name='btnK']")
 	public WebElement SearchButton;
 	
 	@CacheLookup

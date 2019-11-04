@@ -3,13 +3,19 @@ package com.github.framework.testng.listeners;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener;
 import org.testng.ITestResult;
 import org.testng.annotations.Test;
 
+import com.github.framework.annotations.ChromeArguments;
 import com.github.framework.annotations.Description;
+import com.github.framework.annotations.HeadlessMode;
+import com.github.framework.annotations.screens.Mobile;
 import com.github.framework.manager.WebDriverManager;
 import com.github.framework.report.ExtentManager;
 import com.github.framework.report.ReportManager;
@@ -69,27 +75,57 @@ public final class InvokedMethodListener implements IInvokedMethodListener
 		{
 			return;
 		}
-
+		
 		System.out.println("[INFO] Start running test [" + methodName + "]");
 		resetReporter(method, testResult);
-		setupDriverForTest(method);
+		setupDriverForTest(method, refMethod);
 		
 	}
 
-	private void setupDriverForTest(IInvokedMethod method) 
+	private void setupDriverForTest(IInvokedMethod method, Method refMethod) 
 	{
 		String browserType = method.getTestMethod().getXmlTest().getParameter("browser");
 		DesiredCapabilities browser = null;
 
 		switch (browserType) 
 		{
-		case "chrome": browser = DesiredCapabilities.chrome(); break;
-		case "firefox": browser = DesiredCapabilities.firefox(); break;
+		case "chrome": {
+			browser = DesiredCapabilities.chrome();
+			ChromeOptions options = new ChromeOptions();
+			
+			// Get Chrome options/arguments
+			ChromeArguments chromeArguments = refMethod.getAnnotation(ChromeArguments.class);
+			options.addArguments(chromeArguments.options());
+			
+			HeadlessMode headlessMode = refMethod.getAnnotation(HeadlessMode.class);
+			// headless mode
+			options.setHeadless(headlessMode == null? false : true);
+			browser.merge(options);
+			
+			break;
+		}
+		case "firefox": {
+			browser = DesiredCapabilities.firefox();
+			FirefoxOptions options = new FirefoxOptions();
+			HeadlessMode headlessMode = refMethod.getAnnotation(HeadlessMode.class);
+			// headless mode
+			options.setHeadless(headlessMode == null? false : true);
+			browser.merge(options);
+			
+			break;
+		}
 		default:
 			break;
 		}
 
-		driverManager.startDriverInstance(browser);
+		// Check the mobile screen size preference
+		Mobile mobileAnnotationData = refMethod.getAnnotation(Mobile.class);
+		Dimension mobileDimension = null;
+		if(mobileAnnotationData != null)
+		{
+			mobileDimension = new Dimension(mobileAnnotationData.width(), mobileAnnotationData.height());
+		}
+		driverManager.startDriverInstance(browser, mobileDimension);
 		
 		try 
 		{

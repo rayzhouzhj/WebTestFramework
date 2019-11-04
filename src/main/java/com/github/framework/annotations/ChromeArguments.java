@@ -7,7 +7,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE, ElementType.METHOD}) 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Author 
-{
-    String name() default "";
+public @interface ChromeArguments {
+	String[] options();
 }

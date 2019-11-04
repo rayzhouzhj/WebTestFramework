@@ -4,6 +4,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 
+import com.github.framework.annotations.ChromeArguments;
+import com.github.framework.annotations.HeadlessMode;
+import com.github.framework.annotations.screens.DeviceName;
+import com.github.framework.annotations.screens.Mobile;
 import com.github.framework.manager.WebDriverManager;
 import com.github.test.demo.pom.Browser;
 
@@ -15,11 +19,15 @@ public class WebTest
 	{
 		System.out.println(methodName);
 		
+		// Init a browser instance using webdriver
 		Browser = new Browser(WebDriverManager.getDriver());
 		
 		System.out.println(methodName + " Receive Driver, start testing");
 	}
 	
+	@Mobile(width=768, height=1024)
+	@HeadlessMode
+	@ChromeArguments(options={"--incognito"})
 	@Test(groups = "DEBUG")
 	public void testGoogleSearchPassCase1() throws InterruptedException
 	{
@@ -35,6 +43,7 @@ public class WebTest
 		Thread.sleep(2000);  // Let the user actually see something!
 	}
 	
+	@Mobile(name=DeviceName.iPhoneX)
 	@Test(groups = "DEBUG")
 	public void testGoogleSearchPassCase2() throws InterruptedException 
 	{

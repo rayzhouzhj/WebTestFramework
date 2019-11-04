@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -38,7 +39,7 @@ public class WebDriverManager
 		remoteWebDriver.set(driver);
 	}
 
-	public void startDriverInstance(DesiredCapabilities browser) 
+	public void startDriverInstance(DesiredCapabilities browser, Dimension mobileDimension) 
 	{
 		RemoteWebDriver currentDriverSession;
 		try 
@@ -61,24 +62,27 @@ public class WebDriverManager
 				{
 					System.out.println("Launch local Chrome Browser");
 					System.setProperty("webdriver.chrome.driver", driverHome + "/chromedriver");
-			        ChromeOptions options = new ChromeOptions();
-			        options.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-			        
-					currentDriverSession = new ChromeDriver(options);
+					currentDriverSession = new ChromeDriver(browser);
 				}
 				else
 				{
 					System.out.println("Launch local Firefox Browser");
 					System.setProperty("webdriver.gecko.driver", driverHome + "/geckodriver");
-					FirefoxOptions options = new FirefoxOptions();
-			        options.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-			        
-					currentDriverSession = new FirefoxDriver(options);
+					currentDriverSession = new FirefoxDriver(browser);
 				}
 			}
 
 			currentDriverSession.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 			WebDriverManager.setDriver(currentDriverSession);
+			
+			// If dimension is not specific, then maximize the window by default
+			if(mobileDimension == null) {
+				currentDriverSession.manage().window().maximize();
+			} else {
+				currentDriverSession.manage().window().setSize(mobileDimension);
+			}
+			
+			
 		}
 		catch (MalformedURLException e) 
 		{

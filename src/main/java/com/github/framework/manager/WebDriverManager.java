@@ -2,7 +2,6 @@ package com.github.framework.manager;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.Dimension;
@@ -53,13 +52,13 @@ public class WebDriverManager
 				{
 					System.out.println("Launch local Chrome Browser");
 					System.setProperty("webdriver.chrome.driver", driverHome + "/chromedriver");
-					currentDriverSession = new ChromeDriver();
+					currentDriverSession = new ChromeDriver(browser);
 				}
 				else
 				{
 					System.out.println("Launch local Firefox Browser");
 					System.setProperty("webdriver.gecko.driver", driverHome + "/geckodriver");
-					currentDriverSession = new FirefoxDriver();
+					currentDriverSession = new FirefoxDriver(browser);
 				}
 			}
 

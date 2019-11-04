@@ -3,6 +3,7 @@ package com.github.framework.testng.listeners;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener;
@@ -10,7 +11,7 @@ import org.testng.ITestResult;
 import org.testng.annotations.Test;
 
 import com.github.framework.annotations.Description;
-import com.github.framework.context.RunTimeContext;
+import com.github.framework.annotations.screens.Mobile;
 import com.github.framework.manager.WebDriverManager;
 import com.github.framework.report.ExtentManager;
 import com.github.framework.report.ReportManager;
@@ -71,13 +72,21 @@ public final class InvokedMethodListener implements IInvokedMethodListener
 			return;
 		}
 
+		// Check the mobile screen size preference
+		Mobile mobileAnnotationData = refMethod.getAnnotation(Mobile.class);
+		Dimension mobileDimension = null;
+		if(mobileAnnotationData != null)
+		{
+			mobileDimension = new Dimension(mobileAnnotationData.width(), mobileAnnotationData.height());
+		}
+				
 		System.out.println("[INFO] Start running test [" + methodName + "]");
 		resetReporter(method, testResult);
-		setupDriverForTest(method);
+		setupDriverForTest(method, mobileDimension);
 		
 	}
 
-	private void setupDriverForTest(IInvokedMethod method) 
+	private void setupDriverForTest(IInvokedMethod method, Dimension mobileDimension) 
 	{
 		String browserType = method.getTestMethod().getXmlTest().getParameter("browser");
 		DesiredCapabilities browser = null;
@@ -90,7 +99,8 @@ public final class InvokedMethodListener implements IInvokedMethodListener
 			break;
 		}
 
-		driverManager.startDriverInstance(browser);
+		
+		driverManager.startDriverInstance(browser, mobileDimension);
 		
 		try 
 		{

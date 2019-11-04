@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.BrowserType;
@@ -33,7 +34,7 @@ public class WebDriverManager
 		remoteWebDriver.set(driver);
 	}
 
-	public void startDriverInstance(DesiredCapabilities browser) 
+	public void startDriverInstance(DesiredCapabilities browser, Dimension mobileDimension) 
 	{
 		RemoteWebDriver currentDriverSession;
 		try 
@@ -64,6 +65,15 @@ public class WebDriverManager
 
 			currentDriverSession.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 			WebDriverManager.setDriver(currentDriverSession);
+			
+			// If dimension is not specific, then maximize the window by default
+			if(mobileDimension == null) {
+				currentDriverSession.manage().window().maximize();
+			} else {
+				currentDriverSession.manage().window().setSize(mobileDimension);
+			}
+			
+			
 		}
 		catch (MalformedURLException e) 
 		{

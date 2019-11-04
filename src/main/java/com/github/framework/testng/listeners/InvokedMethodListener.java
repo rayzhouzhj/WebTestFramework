@@ -2,7 +2,6 @@ package com.github.framework.testng.listeners;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.chrome.ChromeOptions;

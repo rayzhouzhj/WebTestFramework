@@ -28,6 +28,12 @@ public class ScreenShotManager
 
     public String captureScreenShot(int status, String className, String methodName) throws IOException, InterruptedException 
     {
+    	// If driver is not setup properly
+    	if(WebDriverManager.getDriver() == null)
+    	{
+    		return "";
+    	}
+    	
         File scrFile = ((TakesScreenshot) WebDriverManager.getDriver()).getScreenshotAs(OutputType.FILE);
         String screenShotNameWithTimeStamp = currentDateAndTime();
         

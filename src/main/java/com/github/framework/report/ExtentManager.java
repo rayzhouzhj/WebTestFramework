@@ -31,15 +31,11 @@ public class ExtentManager
 				extent.attachReporter(getExtentXReporter());
 			}
 
-			String selenium_java_version = RunTimeContext.getInstance().getProperty("SELENIUM_JAVA_VERSION");
-			String environment = RunTimeContext.getInstance().getProperty("ENVIRONMENT");
 			String executionMode = RunTimeContext.getInstance().getProperty("RUNNER");
 			String platform = RunTimeContext.getInstance().getProperty("Platform");
 			String build = RunTimeContext.getInstance().getProperty("BuildNumber");
 			if(build == null) build = "";
 			
-			extent.setSystemInfo("Selenium Java Version", selenium_java_version);
-			extent.setSystemInfo("Environment", environment);
 			extent.setSystemInfo("Runner", executionMode);
 			extent.setSystemInfo("Platform", platform);
 			extent.setSystemInfo("Build", build);

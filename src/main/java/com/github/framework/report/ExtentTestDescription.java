@@ -4,9 +4,6 @@ import org.testng.IInvokedMethod;
 
 import com.github.framework.annotations.Author;
 
-/**
- *
- */
 public class ExtentTestDescription 
 {
     private IInvokedMethod methodName;

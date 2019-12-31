@@ -3,6 +3,7 @@ package com.github.framework.testng.listeners;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
+import com.github.framework.annotations.AcceptUntrustedCertificates;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
@@ -90,26 +91,40 @@ public final class InvokedMethodListener implements IInvokedMethodListener
 		switch (browserType) 
 		{
 		case "chrome": {
+
 			browser = DesiredCapabilities.chrome();
 			ChromeOptions options = new ChromeOptions();
 			
 			// Get Chrome options/arguments
 			ChromeArguments chromeArguments = refMethod.getAnnotation(ChromeArguments.class);
-			options.addArguments(chromeArguments.options());
+			if(chromeArguments != null && chromeArguments.options().length > 0) {
+				options.addArguments(chromeArguments.options());
+			}
 			
 			HeadlessMode headlessMode = refMethod.getAnnotation(HeadlessMode.class);
 			// headless mode
 			options.setHeadless(headlessMode == null? false : true);
+
+			AcceptUntrustedCertificates acceptUntrustedCertificates = refMethod.getAnnotation(AcceptUntrustedCertificates.class);
+			// Accept untrusted certificates
+			options.setAcceptInsecureCerts(acceptUntrustedCertificates == null? false : true);
+
 			browser.merge(options);
 			
 			break;
 		}
 		case "firefox": {
+
 			browser = DesiredCapabilities.firefox();
 			FirefoxOptions options = new FirefoxOptions();
 			HeadlessMode headlessMode = refMethod.getAnnotation(HeadlessMode.class);
 			// headless mode
 			options.setHeadless(headlessMode == null? false : true);
+
+			AcceptUntrustedCertificates acceptUntrustedCertificates = refMethod.getAnnotation(AcceptUntrustedCertificates.class);
+			// Accept untrusted certificates
+			options.setAcceptInsecureCerts(acceptUntrustedCertificates == null? false : true);
+
 			browser.merge(options);
 			
 			break;

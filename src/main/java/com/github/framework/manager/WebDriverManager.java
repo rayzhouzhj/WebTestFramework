@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -24,7 +25,7 @@ public class WebDriverManager
 	private static ThreadLocal<RemoteWebDriver> remoteWebDriver = new ThreadLocal<>();
 	private RunTimeContext context;
 
-	public WebDriverManager() throws Exception 
+	public WebDriverManager()
 	{
 		context = RunTimeContext.getInstance();
 	}
@@ -39,7 +40,7 @@ public class WebDriverManager
 		remoteWebDriver.set(driver);
 	}
 
-	public void startDriverInstance(DesiredCapabilities browser, Dimension mobileDimension) 
+	public void startDriverInstance(MutableCapabilities browser, Dimension mobileDimension)
 	{
 		RemoteWebDriver currentDriverSession;
 		try 
@@ -62,13 +63,13 @@ public class WebDriverManager
 				{
 					System.out.println("Launch local Chrome Browser");
 					System.setProperty("webdriver.chrome.driver", driverHome + "/chromedriver");
-					currentDriverSession = new ChromeDriver(browser);
+					currentDriverSession = new ChromeDriver((ChromeOptions) browser);
 				}
 				else
 				{
 					System.out.println("Launch local Firefox Browser");
 					System.setProperty("webdriver.gecko.driver", driverHome + "/geckodriver");
-					currentDriverSession = new FirefoxDriver(browser);
+					currentDriverSession = new FirefoxDriver((FirefoxOptions)browser);
 				}
 			}
 

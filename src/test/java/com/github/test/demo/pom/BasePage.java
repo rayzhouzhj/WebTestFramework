@@ -7,17 +7,15 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.github.framework.report.TestLogger;
+import com.github.framework.report.TestLogManager;
 
 public abstract class BasePage 
 {
-	public TestLogger logger;
 	public RemoteWebDriver driver;
 	
 	public BasePage(RemoteWebDriver driver) 
 	{
 		this.driver = driver;
-		logger = new TestLogger();
 	}
 	
 	public abstract void launch();

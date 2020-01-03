@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
+import com.aventstack.extentreports.Status;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -26,7 +27,7 @@ public class ScreenShotManager
     {
     }
 
-    public String captureScreenShot(int status, String className, String methodName) throws IOException, InterruptedException 
+    public String captureScreenShot(Status status, String className, String methodName) throws IOException, InterruptedException
     {
     	// If driver is not setup properly
     	if(WebDriverManager.getDriver() == null)
@@ -44,7 +45,7 @@ public class ScreenShotManager
     {
         String className = new Exception().getStackTrace()[1].getClassName();
         
-        return captureScreenShot(1, className, screenShotName);
+        return captureScreenShot(Status.INFO, className, screenShotName);
     }
 
     private String currentDateAndTime()
@@ -54,25 +55,24 @@ public class ScreenShotManager
         return now.truncatedTo(ChronoUnit.SECONDS).format(dtf).replace(":", "-");
     }
 
-    private String copyscreenShotToTarget(int status,
+    private String copyscreenShotToTarget(Status status,
                                     File scrFile, String methodName,
                                     String className, String screenShotNameWithTimeStamp) 
     {
     	String filePath = RunTimeContext.getInstance().getLogPath("screenshot", className, methodName);
-    	
-        String failedScreen = filePath + File.separator + screenShotNameWithTimeStamp + "_" + methodName + "_failed.png";
-        String capturedScreen = filePath + File.separator  + screenShotNameWithTimeStamp + "_" + methodName + "_results.png";
 
         try 
         {
-            if (status == ITestResult.FAILURE)
+            if (status == Status.FAIL)
             {
+                String failedScreen = filePath + File.separator + screenShotNameWithTimeStamp + "_" + methodName + "_failed.png";
                 FileUtils.copyFile(scrFile, new File(failedScreen.trim()));
                 
                 return failedScreen.trim();
             } 
             else
             {
+                String capturedScreen = filePath + File.separator  + screenShotNameWithTimeStamp + "_" + methodName + "_results.png";
                 FileUtils.copyFile(scrFile, new File(capturedScreen.trim()));
                 
                 return capturedScreen.trim();

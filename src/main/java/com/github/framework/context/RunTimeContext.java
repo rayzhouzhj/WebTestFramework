@@ -44,7 +44,11 @@ public class RunTimeContext
 		
 		return value;
 	}
-	
+
+	public String getURL(){
+		return this.getProperty("URL", "");
+	}
+
 	public synchronized String getLogPath(String category, String className, String methodName)
 	{
 		String path = System.getProperty("user.dir")

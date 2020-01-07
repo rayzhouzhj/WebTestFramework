@@ -1,5 +1,6 @@
 package com.github.test.demo.pom;
 
+import com.github.framework.context.RunTimeContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.CacheLookup;
@@ -8,7 +9,7 @@ import org.openqa.selenium.support.PageFactory;
 
 public class GoogleHome extends BasePage
 {
-	public static final String URL = "https://www.google.com";
+	public static final String URL = RunTimeContext.getInstance().getURL();
 	
 	@CacheLookup
 	@FindBy(css = "input[name='q']")

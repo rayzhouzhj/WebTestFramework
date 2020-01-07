@@ -12,10 +12,6 @@ docker-compose up --scale selenium-chrome=5 --scale selenium-firefox=3
 
 ### Config below properties to setup the test framework(config.properties):
 ```
-####################### SYSTEM INFO #########################################
-ENVIRONMENT=UAT
-SELENIUM_JAVA_VERSION=3.6.0
-
 ############################## WEB ##########################################
 # If more than one browser is provided in BROWSER_TYPE
 # test will be run on different browsers in parallel thread
@@ -44,5 +40,5 @@ DEBUG_MODE=OFF
 
 ### Run below command to start test execution:
 ```
-mvn clean test -Dtest=WebRunner
+URL=<your testing url> mvn clean test -Dtest=WebRunner
 ```

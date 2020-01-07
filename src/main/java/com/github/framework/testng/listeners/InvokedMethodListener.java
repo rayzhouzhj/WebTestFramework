@@ -1,14 +1,14 @@
 package com.github.framework.testng.listeners;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 
+import com.github.framework.annotations.screens.DeviceName;
 import com.github.framework.testng.model.TestInfo;
+import com.github.framework.annotations.AcceptUntrustedCertificates;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener;
 import org.testng.ITestResult;
@@ -21,6 +21,7 @@ import com.github.framework.annotations.screens.Mobile;
 import com.github.framework.manager.WebDriverManager;
 import com.github.framework.report.ExtentManager;
 import com.github.framework.report.ReportManager;
+
 
 public final class InvokedMethodListener implements IInvokedMethodListener {
     private WebDriverManager driverManager;
@@ -69,33 +70,43 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 
     private void setupDriverForTest(TestInfo testInfo, ITestResult testResult) {
         String browserType = testInfo.getInvokedMethod().getTestMethod().getXmlTest().getParameter("browser");
-        MutableCapabilities browser = null;
 
         resetReporter(testInfo.getInvokedMethod(), testResult);
 
+        MutableCapabilities browserOptions;
         switch (browserType) {
             case "chrome": {
-                browser = DesiredCapabilities.chrome();
                 ChromeOptions options = new ChromeOptions();
 
                 // Get Chrome options/arguments
                 ChromeArguments chromeArguments = testInfo.getDeclaredMethod().getAnnotation(ChromeArguments.class);
-                options.addArguments(chromeArguments.options());
+                if (chromeArguments != null && chromeArguments.options().length > 0) {
+                    options.addArguments(chromeArguments.options());
+                }
 
                 HeadlessMode headlessMode = testInfo.getDeclaredMethod().getAnnotation(HeadlessMode.class);
                 // headless mode
                 options.setHeadless(headlessMode != null);
-                browser.merge(options);
+
+                AcceptUntrustedCertificates acceptUntrustedCertificates = testInfo.getDeclaredMethod().getAnnotation(AcceptUntrustedCertificates.class);
+                // Accept untrusted certificates
+                options.setAcceptInsecureCerts(acceptUntrustedCertificates != null);
+
+                browserOptions = options;
 
                 break;
             }
             case "firefox": {
-                browser = DesiredCapabilities.firefox();
                 FirefoxOptions options = new FirefoxOptions();
                 HeadlessMode headlessMode = testInfo.getDeclaredMethod().getAnnotation(HeadlessMode.class);
                 // headless mode
                 options.setHeadless(headlessMode != null);
-                browser.merge(options);
+
+                AcceptUntrustedCertificates acceptUntrustedCertificates = testInfo.getDeclaredMethod().getAnnotation(AcceptUntrustedCertificates.class);
+                // Accept untrusted certificates
+                options.setAcceptInsecureCerts(acceptUntrustedCertificates != null);
+
+                browserOptions = options;
 
                 break;
             }
@@ -105,11 +116,17 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 
         // Check the mobile screen size preference
         Mobile mobileAnnotationData = testInfo.getDeclaredMethod().getAnnotation(Mobile.class);
-        Dimension mobileDimension = null;
+        Dimension deviceDimension;
         if (mobileAnnotationData != null) {
-            mobileDimension = new Dimension(mobileAnnotationData.width(), mobileAnnotationData.height());
+            int width = mobileAnnotationData.device() == DeviceName.OtherDevice? mobileAnnotationData.width() : mobileAnnotationData.device().width;
+            int height = mobileAnnotationData.device() == DeviceName.OtherDevice? mobileAnnotationData.height() : mobileAnnotationData.device().height;
+            deviceDimension = new Dimension(width, height);
+        } else {
+            // If device dimension is not specified, use desktop by default
+            deviceDimension = new Dimension(DeviceName.DeskTopHD.width, DeviceName.DeskTopHD.height);
         }
-        driverManager.startDriverInstance(browser, mobileDimension);
+
+        driverManager.startDriverInstance(browserOptions, deviceDimension);
 
         try {
             // Update Author and set category

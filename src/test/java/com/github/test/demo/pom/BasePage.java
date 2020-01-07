@@ -7,8 +7,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.github.framework.report.TestLogManager;
-
 public abstract class BasePage 
 {
 	public RemoteWebDriver driver;
@@ -34,12 +32,12 @@ public abstract class BasePage
 	
     public abstract boolean waitForPageLoad();
     
-    public boolean waitForVisibility(WebElement element)
+    public boolean waitForVisible(WebElement element)
     {
-    	return waitForVisibility(element, 60);
+    	return waitForVisible(element, 60);
     }
     
-    public boolean waitForVisibility(WebElement element, long seconds)
+    public boolean waitForVisible(WebElement element, long seconds)
     {
     	try
     	{
@@ -51,6 +49,20 @@ public abstract class BasePage
     	{
     		return false;
     	}
+    }
+
+    public boolean waitForElementToBeClickable(WebElement element, long seconds)
+    {
+        try
+        {
+            new WebDriverWait(driver, seconds).until(ExpectedConditions.elementToBeClickable(element));
+
+            return true;
+        }
+        catch(Exception e)
+        {
+            return false;
+        }
     }
     
     public boolean waitForPageToLoad(WebElement element) 

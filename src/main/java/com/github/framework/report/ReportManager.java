@@ -1,7 +1,9 @@
 package com.github.framework.report;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
@@ -110,35 +112,108 @@ public class ReportManager {
         }
     }
 
+    public String getImagePath(String imageName) {
+        String[] classAndMethod = getTestClassNameAndMethodName().split(",");
+        try {
+            return ScreenshotManager.getScreenshotPath(classAndMethod[0], classAndMethod[1], imageName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public void logInfo(String message) {
         this.CurrentTestMethod.get().log(Status.INFO, message);
+    }
+
+    public String logScreenshot() {
+        return this.logScreenshot(Status.INFO);
+    }
+
+    public String logScreenshot(Status status) {
+        try {
+            String[] classAndMethod = getTestClassNameAndMethodName().split(",");
+            String screenShotAbsolutePath = ScreenshotManager.captureScreenShot(Status.INFO, classAndMethod[0], classAndMethod[1]);
+            String screenShotRelativePath = getRelativePathToReport(screenShotAbsolutePath);
+            this.CurrentTestMethod.get().log(status,
+                    "<img data-featherlight=" + screenShotRelativePath + " width=\"10%\" src=" + screenShotRelativePath + " data-src=" + screenShotRelativePath + ">");
+
+            return screenShotAbsolutePath;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
+
+    public void logInfoWithScreenshot(String message) {
+        try {
+            this.CurrentTestMethod.get().log(Status.INFO, message);
+            this.logScreenshot();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void logPass(String message) {
         this.CurrentTestMethod.get().log(Status.PASS, message);
     }
 
+    public void logPassWithScreenshot(String message) {
+        this.CurrentTestMethod.get().log(Status.PASS, message);
+        this.logScreenshot(Status.PASS);
+    }
+
     public void logFail(String message) {
-        String[] classAndMethod = getTestClassNameAndMethodName().split(",");
+
+        this.CurrentTestMethod.get().log(Status.FAIL, message);
+        this.logScreenshot(Status.FAIL);
+    }
+
+    public void logFailWithoutScreenshot(String message) {
         try {
-            String screenShot = ScreenshotManager.captureScreenShot(Status.FAIL, classAndMethod[0], classAndMethod[1]);
             this.CurrentTestMethod.get().log(Status.FAIL, message);
-            this.CurrentTestMethod.get().addScreenCaptureFromPath(screenShot);
             this.TestResult.get().setStatus(ITestResult.FAILURE);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void logInfoWithScreenShot(String message) {
+    public void logFailWithImage(String message, String imagePath) {
+        imagePath = getRelativePathToReport(imagePath);
         try {
-            String[] classAndMethod = getTestClassNameAndMethodName().split(",");
-            String screenShot = ScreenshotManager.captureScreenShot(Status.INFO, classAndMethod[0], classAndMethod[1]);
-            this.CurrentTestMethod.get().log(Status.INFO, message);
-            this.CurrentTestMethod.get().addScreenCaptureFromPath(screenShot);
+            this.CurrentTestMethod.get().log(Status.FAIL, message);
+            this.CurrentTestMethod.get().log(Status.FAIL,
+                    "<img data-featherlight=" + imagePath + " width=\"10%\" src=" + imagePath + " data-src=" + imagePath + ">");
+            this.TestResult.get().setStatus(ITestResult.FAILURE);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public String captureScreenShot() {
+        try {
+            String[] classAndMethod = getTestClassNameAndMethodName().split(",");
+            return ScreenshotManager.captureScreenShot(Status.INFO, classAndMethod[0], classAndMethod[1]);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public void attachImage(String image) {
+        try {
+            this.CurrentTestMethod.get().addScreenCaptureFromPath(image);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getRelativePathToReport(String file) {
+        Path path = new File(file).toPath();
+        Path targetPath = new File(System.getProperty("user.dir") + File.separator + "target").toPath();
+        return targetPath.relativize(path).toString();
     }
 
     private String getTestClassNameAndMethodName() {

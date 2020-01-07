@@ -23,7 +23,7 @@ public class GoogleSearchResult extends BasePage
 	@Override
 	public boolean waitForPageLoad() 
 	{
-		return this.waitForVisibility(ResultStats, 5);
+		return this.waitForVisible(ResultStats, 5);
 	}
 
 	@Override

@@ -21,6 +21,10 @@ public class GoogleHome extends BasePage
 	@CacheLookup
 	@FindBy(id = "hplogo")
 	public WebElement GoogleLogo;
+
+	@CacheLookup
+	@FindBy(css = "div#SIvCob")
+	public WebElement GoogleLanguageSupport;
 	
 	public GoogleHome(RemoteWebDriver driver) 
 	{
@@ -31,7 +35,7 @@ public class GoogleHome extends BasePage
 	@Override
 	public boolean waitForPageLoad() 
 	{
-		return this.waitForVisibility(SearchInputBox, 1);
+		return this.waitForElementToBeClickable(GoogleLanguageSupport, 1);
 	}
 
 	@Override

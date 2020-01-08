@@ -42,3 +42,21 @@ DEBUG_MODE=OFF
 ```
 URL=<your testing url> mvn clean test -Dtest=WebRunner
 ```
+
+### Visual Testing
+#### Install pixelmatch
+```
+npm install pixelmatch
+```
+
+#### How to use it
+```java
+PixelMatch.PixelMatchResult matchResult = new PixelMatch().match(actualScreenPNG, expectedResultPNG, outputPNGFile);
+
+if (matchResult.IsMatched) {
+    logger.logPassWithScreenshot("Passed");
+} else {
+    logger.logFailWithImage("error in visual testing", output);
+}
+```
+

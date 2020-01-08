@@ -51,7 +51,8 @@ npm install pixelmatch
 
 #### How to use it
 ```java
-PixelMatch.PixelMatchResult matchResult = new PixelMatch().match(actualScreenPNG, expectedResultPNG, outputPNGFile);
+PixelMatch.PixelMatchResult matchResult = new PixelMatch()
+                                             .match(actualScreenPNG, expectedResultPNG, outputPNGFile);
 
 if (matchResult.IsMatched) {
     logger.logPassWithScreenshot("Passed");
@@ -59,4 +60,6 @@ if (matchResult.IsMatched) {
     logger.logFailWithImage("error in visual testing", output);
 }
 ```
+#### Pixelmatch result in report
+<img src="https://github.com/rayzhouzhj/WebTestFramework/blob/master/for-readme/report.png" width="300" style="padding-left: 50px"><img src="https://github.com/rayzhouzhj/WebTestFramework/blob/master/for-readme/pixelmatchresult.png" width="300">
 

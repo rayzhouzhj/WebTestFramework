@@ -103,4 +103,9 @@ public class ExtentManager
 
 		return extentx;
 	}
+
+	public static void flush()
+	{
+		extent.flush();
+	}
 }

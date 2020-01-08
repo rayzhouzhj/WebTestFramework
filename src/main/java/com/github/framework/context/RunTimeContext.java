@@ -1,6 +1,7 @@
 package com.github.framework.context;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import com.github.framework.utils.ConfigFileReader;
 
@@ -43,12 +44,16 @@ public class RunTimeContext
 		
 		return value;
 	}
-	
+
+	public String getURL(){
+		return this.getProperty("URL", "");
+	}
+
 	public synchronized String getLogPath(String category, String className, String methodName)
 	{
-		String path = System.getProperty("user.dir") 
+		String path = System.getProperty("user.dir")
 		+ File.separator + "target"
-		+ File.separator + category 
+		+ File.separator + category
 		+ File.separator + className 
 		+ File.separator + methodName;
 		
@@ -67,4 +72,5 @@ public class RunTimeContext
 		
 		return path;
 	}
+
 }

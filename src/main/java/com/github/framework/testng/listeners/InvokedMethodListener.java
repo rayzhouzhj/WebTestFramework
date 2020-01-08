@@ -1,197 +1,172 @@
 package com.github.framework.testng.listeners;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 
+import com.github.framework.annotations.screens.DeviceName;
+import com.github.framework.testng.model.TestInfo;
 import com.github.framework.annotations.AcceptUntrustedCertificates;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener;
 import org.testng.ITestResult;
 import org.testng.annotations.Test;
 
 import com.github.framework.annotations.ChromeArguments;
-import com.github.framework.annotations.Description;
+import com.github.framework.annotations.TestDescription;
 import com.github.framework.annotations.HeadlessMode;
 import com.github.framework.annotations.screens.Mobile;
 import com.github.framework.manager.WebDriverManager;
 import com.github.framework.report.ExtentManager;
 import com.github.framework.report.ReportManager;
 
-public final class InvokedMethodListener implements IInvokedMethodListener
-{
-	private WebDriverManager driverManager;
 
-	public InvokedMethodListener() throws Exception 
-	{
-		try 
-		{
-			driverManager = new WebDriverManager();
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-		}
-	}
+public final class InvokedMethodListener implements IInvokedMethodListener {
+    private WebDriverManager driverManager;
 
-	private void resetReporter(IInvokedMethod method, ITestResult testResult)
-	{
-		Method refMethod = method.getTestMethod().getConstructorOrMethod().getMethod();
-		String className = refMethod.getDeclaringClass().getSimpleName();
+    public InvokedMethodListener() throws Exception {
+        driverManager = new WebDriverManager();
+    }
 
-		// Create test node for test class in test report
-		try 
-		{
-			String testDescription = "";
-			if (testResult.getTestClass().getClass().getAnnotation(Description.class) != null) 
-			{
-				testDescription = getClass().getAnnotation(Description.class).value();
-			}
+    private void resetReporter(IInvokedMethod method, ITestResult testResult) {
+        Method refMethod = method.getTestMethod().getConstructorOrMethod().getMethod();
+        String className = refMethod.getDeclaringClass().getSimpleName();
 
-			// Create test node at test class level
-			ReportManager.getInstance().createParentNodeExtent(className, testDescription);
-			ReportManager.getInstance().setTestResult(testResult);
-		}
-		catch (Exception e) 
-		{
-			e.printStackTrace();
-		}
-	}
+        // Create test node for test class in test report
+        try {
+            String testDescription = "";
+            if (testResult.getTestClass().getClass().getAnnotation(TestDescription.class) != null) {
+                testDescription = getClass().getAnnotation(TestDescription.class).value();
+            }
 
-	/**
-	 * Before each method invocation
-	 * Initialize Web Driver and Report Manager
-	 */
-	@Override
-	public void beforeInvocation(IInvokedMethod method, ITestResult testResult) 
-	{
-		Method refMethod = method.getTestMethod().getConstructorOrMethod().getMethod();
-		String methodName = refMethod.getName();
+            // Create test node at test class level
+            ReportManager.getInstance().setupReportForTestSet(className, testDescription);
+            ReportManager.getInstance().setTestResult(testResult);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-		// Skip beforeInvocation if current method is not with Annotation Test
-		if(refMethod.getAnnotation(Test.class) == null)
-		{
-			return;
-		}
-		
-		System.out.println("[INFO] Start running test [" + methodName + "]");
-		resetReporter(method, testResult);
-		setupDriverForTest(method, refMethod);
-		
-	}
+    /**
+     * Before each method invocation
+     * Initialize Web Driver and Report Manager
+     */
+    @Override
+    public void beforeInvocation(IInvokedMethod method, ITestResult testResult) {
 
-	private void setupDriverForTest(IInvokedMethod method, Method refMethod) 
-	{
-		String browserType = method.getTestMethod().getXmlTest().getParameter("browser");
-		DesiredCapabilities browser = null;
+        TestInfo testInfo = new TestInfo(method);
 
-		switch (browserType) 
-		{
-		case "chrome": {
+        // Skip beforeInvocation if current method is not with Annotation Test
+        if (!testInfo.isTestMethod()) {
+            return;
+        }
 
-			browser = DesiredCapabilities.chrome();
-			ChromeOptions options = new ChromeOptions();
-			
-			// Get Chrome options/arguments
-			ChromeArguments chromeArguments = refMethod.getAnnotation(ChromeArguments.class);
-			if(chromeArguments != null && chromeArguments.options().length > 0) {
-				options.addArguments(chromeArguments.options());
-			}
-			
-			HeadlessMode headlessMode = refMethod.getAnnotation(HeadlessMode.class);
-			// headless mode
-			options.setHeadless(headlessMode == null? false : true);
+        System.out.println("[INFO] Start running test [" + testInfo.getMethodName() + "]");
+        setupDriverForTest(testInfo, testResult);
 
-			AcceptUntrustedCertificates acceptUntrustedCertificates = refMethod.getAnnotation(AcceptUntrustedCertificates.class);
-			// Accept untrusted certificates
-			options.setAcceptInsecureCerts(acceptUntrustedCertificates == null? false : true);
+    }
 
-			browser.merge(options);
-			
-			break;
-		}
-		case "firefox": {
+    private void setupDriverForTest(TestInfo testInfo, ITestResult testResult) {
+        String browserType = testInfo.getInvokedMethod().getTestMethod().getXmlTest().getParameter("browser");
 
-			browser = DesiredCapabilities.firefox();
-			FirefoxOptions options = new FirefoxOptions();
-			HeadlessMode headlessMode = refMethod.getAnnotation(HeadlessMode.class);
-			// headless mode
-			options.setHeadless(headlessMode == null? false : true);
+        resetReporter(testInfo.getInvokedMethod(), testResult);
 
-			AcceptUntrustedCertificates acceptUntrustedCertificates = refMethod.getAnnotation(AcceptUntrustedCertificates.class);
-			// Accept untrusted certificates
-			options.setAcceptInsecureCerts(acceptUntrustedCertificates == null? false : true);
+        MutableCapabilities browserOptions;
+        switch (browserType) {
+            case "chrome": {
+                ChromeOptions options = new ChromeOptions();
 
-			browser.merge(options);
-			
-			break;
-		}
-		default:
-			break;
-		}
+                // Get Chrome options/arguments
+                ChromeArguments chromeArguments = testInfo.getDeclaredMethod().getAnnotation(ChromeArguments.class);
+                if (chromeArguments != null && chromeArguments.options().length > 0) {
+                    options.addArguments(chromeArguments.options());
+                }
 
-		// Check the mobile screen size preference
-		Mobile mobileAnnotationData = refMethod.getAnnotation(Mobile.class);
-		Dimension mobileDimension = null;
-		if(mobileAnnotationData != null)
-		{
-			mobileDimension = new Dimension(mobileAnnotationData.width(), mobileAnnotationData.height());
-		}
-		driverManager.startDriverInstance(browser, mobileDimension);
-		
-		try 
-		{
-			// Update Author and set category
-			ReportManager.getInstance().setAuthorName(method);
-		} 
-		catch (Exception e) 
-		{
-			e.printStackTrace();
-		}
-	}
+                HeadlessMode headlessMode = testInfo.getDeclaredMethod().getAnnotation(HeadlessMode.class);
+                // headless mode
+                options.setHeadless(headlessMode != null);
 
-	/**
-	 * After each method invocation
-	 * Update test result to report manager and stop Web Driver
-	 */
-	@Override
-	public void afterInvocation(IInvokedMethod method, ITestResult testResult) 
-	{
-		Method refMethod = method.getTestMethod().getConstructorOrMethod().getMethod();
-		String methodName = refMethod.getName();
+                AcceptUntrustedCertificates acceptUntrustedCertificates = testInfo.getDeclaredMethod().getAnnotation(AcceptUntrustedCertificates.class);
+                // Accept untrusted certificates
+                options.setAcceptInsecureCerts(acceptUntrustedCertificates != null);
 
-		System.out.println("[INFO] Completed running test [" + methodName + "]");
+                browserOptions = options;
 
-		// Skip afterInvocation if current method is not with Annotation Test
-		if(refMethod.getAnnotation(Test.class) == null)
-		{
-			return;
-		}
+                break;
+            }
+            case "firefox": {
+                FirefoxOptions options = new FirefoxOptions();
+                HeadlessMode headlessMode = testInfo.getDeclaredMethod().getAnnotation(HeadlessMode.class);
+                // headless mode
+                options.setHeadless(headlessMode != null);
 
-		try 
-		{
-			if (testResult.getStatus() == ITestResult.SUCCESS || testResult.getStatus() == ITestResult.FAILURE) 
-			{
-				ReportManager.getInstance().endLogTestResults(testResult);
-				ExtentManager.getExtent().flush();
-			}
-			else if (testResult.getStatus() == ITestResult.SKIP) 
-			{
-				ExtentManager.getExtent().flush();
+                AcceptUntrustedCertificates acceptUntrustedCertificates = testInfo.getDeclaredMethod().getAnnotation(AcceptUntrustedCertificates.class);
+                // Accept untrusted certificates
+                options.setAcceptInsecureCerts(acceptUntrustedCertificates != null);
 
-				// Remove previous log data for retry test
-				ReportManager.getInstance().removeTest();
-			}
+                browserOptions = options;
 
-			driverManager.stopWebDriver();
-		}
-		catch (Exception e) 
-		{
-			e.printStackTrace();
-		}
+                break;
+            }
+            default:
+                throw new RuntimeException("Unsupported browser: " + browserType);
+        }
 
-	}
+        // Check the mobile screen size preference
+        Mobile mobileAnnotationData = testInfo.getDeclaredMethod().getAnnotation(Mobile.class);
+        Dimension deviceDimension;
+        if (mobileAnnotationData != null) {
+            int width = mobileAnnotationData.device() == DeviceName.OtherDevice? mobileAnnotationData.width() : mobileAnnotationData.device().width;
+            int height = mobileAnnotationData.device() == DeviceName.OtherDevice? mobileAnnotationData.height() : mobileAnnotationData.device().height;
+            deviceDimension = new Dimension(width, height);
+        } else {
+            // If device dimension is not specified, use desktop by default
+            deviceDimension = new Dimension(DeviceName.DeskTopHD.width, DeviceName.DeskTopHD.height);
+        }
+
+        driverManager.startDriverInstance(browserOptions, deviceDimension);
+
+        try {
+            // Update Author and set category
+            ReportManager.getInstance().setAuthorName(testInfo.getInvokedMethod());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * After each method invocation
+     * Update test result to report manager and stop Web Driver
+     */
+    @Override
+    public void afterInvocation(IInvokedMethod method, ITestResult testResult) {
+        Method refMethod = method.getTestMethod().getConstructorOrMethod().getMethod();
+        String methodName = refMethod.getName();
+
+        System.out.println("[INFO] Completed running test [" + methodName + "]");
+
+        // Skip afterInvocation if current method is not with Annotation Test
+        if (refMethod.getAnnotation(Test.class) == null) {
+            return;
+        }
+
+        try {
+            if (testResult.getStatus() == ITestResult.SUCCESS || testResult.getStatus() == ITestResult.FAILURE) {
+                ReportManager.getInstance().endLogTestResults(testResult);
+                ExtentManager.getExtent().flush();
+            } else if (testResult.getStatus() == ITestResult.SKIP) {
+                ExtentManager.getExtent().flush();
+
+                // Remove previous log data for retry test
+                ReportManager.getInstance().removeTest();
+            }
+
+            driverManager.stopWebDriver();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 }

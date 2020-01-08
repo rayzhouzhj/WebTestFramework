@@ -1,5 +1,6 @@
 package com.github.test.demo.pom;
 
+import com.github.framework.context.RunTimeContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.CacheLookup;
@@ -8,7 +9,7 @@ import org.openqa.selenium.support.PageFactory;
 
 public class GoogleHome extends BasePage
 {
-	public static final String URL = "https://www.google.com";
+	public static final String URL = RunTimeContext.getInstance().getURL();
 	
 	@CacheLookup
 	@FindBy(css = "input[name='q']")
@@ -21,6 +22,10 @@ public class GoogleHome extends BasePage
 	@CacheLookup
 	@FindBy(id = "hplogo")
 	public WebElement GoogleLogo;
+
+	@CacheLookup
+	@FindBy(css = "div#SIvCob")
+	public WebElement GoogleLanguageSupport;
 	
 	public GoogleHome(RemoteWebDriver driver) 
 	{
@@ -31,7 +36,7 @@ public class GoogleHome extends BasePage
 	@Override
 	public boolean waitForPageLoad() 
 	{
-		return this.waitForVisibility(SearchInputBox, 1);
+		return this.waitForElementToBeClickable(GoogleLanguageSupport, 1);
 	}
 
 	@Override

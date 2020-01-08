@@ -11,14 +11,15 @@ import com.github.framework.utils.ScreenShotManager;
 /**
  *
  */
-public class TestLogger 
+public class TestLogManager
 {
 	private ScreenShotManager screenShotManager;
 
-	public TestLogger() 
+	public TestLogManager()
 	{
 		screenShotManager = new ScreenShotManager();
 	}
+
 
 	public void endLog(ITestResult result, ThreadLocal<ExtentTest> test) throws IOException, InterruptedException 
 	{
@@ -90,7 +91,7 @@ public class TestLogger
 			try
 			{
 				String screenShotPath = screenShotManager.captureScreenShot(
-						result.getStatus(),
+						Status.FAIL,
 						result.getInstance().getClass().getSimpleName(),
 						result.getMethod().getMethodName());
 

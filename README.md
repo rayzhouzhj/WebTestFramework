@@ -44,7 +44,7 @@ URL=<your testing url> mvn clean test -Dtest=WebRunner
 ```
 
 ### Visual Testing
-#### Install pixelmatch
+#### Install [pixelmatch](https://github.com/mapbox/pixelmatch)
 ```
 npm install pixelmatch
 ```

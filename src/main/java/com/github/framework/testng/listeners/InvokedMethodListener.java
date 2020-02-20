@@ -2,9 +2,9 @@ package com.github.framework.testng.listeners;
 
 import java.lang.reflect.Method;
 
+import com.github.framework.annotations.*;
 import com.github.framework.annotations.screens.DeviceName;
 import com.github.framework.testng.model.TestInfo;
-import com.github.framework.annotations.AcceptUntrustedCertificates;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -14,9 +14,6 @@ import org.testng.IInvokedMethodListener;
 import org.testng.ITestResult;
 import org.testng.annotations.Test;
 
-import com.github.framework.annotations.ChromeArguments;
-import com.github.framework.annotations.TestDescription;
-import com.github.framework.annotations.HeadlessMode;
 import com.github.framework.annotations.screens.Mobile;
 import com.github.framework.manager.WebDriverManager;
 import com.github.framework.report.ExtentManager;
@@ -84,12 +81,18 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
                     options.addArguments(chromeArguments.options());
                 }
 
-                HeadlessMode headlessMode = testInfo.getDeclaredMethod().getAnnotation(HeadlessMode.class);
+                // private mode
+                IncognitoPrivateMode privateMode = testInfo.getDeclaredMethod().getAnnotation(IncognitoPrivateMode.class);
+                if (privateMode != null) {
+                    options.addArguments("--incognito");
+                }
+
                 // headless mode
+                HeadlessMode headlessMode = testInfo.getDeclaredMethod().getAnnotation(HeadlessMode.class);
                 options.setHeadless(headlessMode != null);
 
-                AcceptUntrustedCertificates acceptUntrustedCertificates = testInfo.getDeclaredMethod().getAnnotation(AcceptUntrustedCertificates.class);
                 // Accept untrusted certificates
+                AcceptUntrustedCertificates acceptUntrustedCertificates = testInfo.getDeclaredMethod().getAnnotation(AcceptUntrustedCertificates.class);
                 options.setAcceptInsecureCerts(acceptUntrustedCertificates != null);
 
                 browserOptions = options;
@@ -98,12 +101,24 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
             }
             case "firefox": {
                 FirefoxOptions options = new FirefoxOptions();
-                HeadlessMode headlessMode = testInfo.getDeclaredMethod().getAnnotation(HeadlessMode.class);
+                // Get Firefox options/arguments
+                FirefoxArguments firefoxArguments = testInfo.getDeclaredMethod().getAnnotation(FirefoxArguments.class);
+                if (firefoxArguments != null && firefoxArguments.options().length > 0) {
+                    options.addArguments(firefoxArguments.options());
+                }
+
+                // private mode
+                IncognitoPrivateMode privateMode = testInfo.getDeclaredMethod().getAnnotation(IncognitoPrivateMode.class);
+                if (privateMode != null) {
+                    options.addArguments("-private");
+                }
+
                 // headless mode
+                HeadlessMode headlessMode = testInfo.getDeclaredMethod().getAnnotation(HeadlessMode.class);
                 options.setHeadless(headlessMode != null);
 
-                AcceptUntrustedCertificates acceptUntrustedCertificates = testInfo.getDeclaredMethod().getAnnotation(AcceptUntrustedCertificates.class);
                 // Accept untrusted certificates
+                AcceptUntrustedCertificates acceptUntrustedCertificates = testInfo.getDeclaredMethod().getAnnotation(AcceptUntrustedCertificates.class);
                 options.setAcceptInsecureCerts(acceptUntrustedCertificates != null);
 
                 browserOptions = options;
@@ -118,8 +133,8 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
         Mobile mobileAnnotationData = testInfo.getDeclaredMethod().getAnnotation(Mobile.class);
         Dimension deviceDimension;
         if (mobileAnnotationData != null) {
-            int width = mobileAnnotationData.device() == DeviceName.OtherDevice? mobileAnnotationData.width() : mobileAnnotationData.device().width;
-            int height = mobileAnnotationData.device() == DeviceName.OtherDevice? mobileAnnotationData.height() : mobileAnnotationData.device().height;
+            int width = mobileAnnotationData.device() == DeviceName.OtherDevice ? mobileAnnotationData.width() : mobileAnnotationData.device().width;
+            int height = mobileAnnotationData.device() == DeviceName.OtherDevice ? mobileAnnotationData.height() : mobileAnnotationData.device().height;
             deviceDimension = new Dimension(width, height);
         } else {
             // If device dimension is not specified, use desktop by default

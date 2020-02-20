@@ -168,6 +168,7 @@ public class ReportManager {
 
         this.CurrentTestMethod.get().log(Status.FAIL, message);
         this.logScreenshot(Status.FAIL);
+        this.TestResult.get().setStatus(ITestResult.FAILURE);
     }
 
     public void logFailWithoutScreenshot(String message) {

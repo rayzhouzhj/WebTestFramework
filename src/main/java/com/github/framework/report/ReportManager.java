@@ -80,7 +80,7 @@ public class ReportManager {
         return parent;
     }
 
-    public void setAuthorName(IInvokedMethod invokedMethod) throws Exception {
+    public void setTestInfo(IInvokedMethod invokedMethod) throws Exception {
         String authorName;
         String dataProvider = null;
         ArrayList<String> listeners = new ArrayList<>();
@@ -110,6 +110,10 @@ public class ReportManager {
             child.assignCategory(category);
             CurrentTestMethod.set(child);
         }
+
+        // Update groups to category
+        String[] groups = invokedMethod.getTestMethod().getGroups();
+        CurrentTestMethod.get().assignCategory(groups);
     }
 
     public String getImagePath(String imageName) {

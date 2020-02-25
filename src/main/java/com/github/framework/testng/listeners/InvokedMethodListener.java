@@ -145,7 +145,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 
         try {
             // Update Author and set category
-            ReportManager.getInstance().setAuthorName(testInfo.getInvokedMethod());
+            ReportManager.getInstance().setTestInfo(testInfo.getInvokedMethod());
         } catch (Exception e) {
             e.printStackTrace();
         }

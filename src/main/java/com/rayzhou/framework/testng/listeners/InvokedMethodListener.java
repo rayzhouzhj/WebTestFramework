@@ -180,6 +180,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
         } catch (Exception ex1) {
             if(!RunTimeContext.getInstance().isDebugMode()) {
                 try {
+                    driverManager.stopWebDriver();
                     // Wait 30 seconds and retry driver setup
                     Thread.sleep(30000);
                     // Setup web driver
@@ -187,8 +188,9 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
                 } catch (Exception ex2) {
                     throw ex2;
                 }
+            } else {
+                throw ex1;
             }
-            throw ex1;
         }
 
         return browserType;

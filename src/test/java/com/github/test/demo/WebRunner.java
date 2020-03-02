@@ -6,7 +6,7 @@ import java.util.List;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.github.framework.executor.TestExecutor;
+import com.rayzhou.framework.executor.TestExecutor;
 
 public class WebRunner 
 {

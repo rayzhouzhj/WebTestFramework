@@ -1,6 +1,6 @@
 package com.github.test.demo.pom;
 
-import com.github.framework.context.RunTimeContext;
+import com.rayzhou.framework.context.RunTimeContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.CacheLookup;

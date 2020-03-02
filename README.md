@@ -15,6 +15,8 @@ docker-compose up --scale selenium-chrome=5 --scale selenium-firefox=3
 ############################## WEB ##########################################
 # If more than one browser is provided in BROWSER_TYPE
 # test will be run on different browsers in parallel thread
+# if `random` is set, chrome and firefox will be random assigned unless
+# the test is annotated by FirefoxOnly or ChromeOnly
 BROWSER_TYPE=firefox,chrome
 # Selenium hub in docker server
 HOST_URL=http://localhost:4444/wd/hub

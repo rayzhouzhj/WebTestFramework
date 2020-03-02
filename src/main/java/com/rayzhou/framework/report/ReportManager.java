@@ -87,11 +87,9 @@ public class ReportManager {
         ExtentTestDescription methodDescription = new ExtentTestDescription(invokedMethod, description);
         boolean authorNamePresent = methodDescription.isAuthorNamePresent();
         String descriptionMethodName = methodDescription.getDescriptionMethodName();
-        String category = invokedMethod.getTestMethod().getXmlTest().getParameter("browser");
 
         String testName = dataProvider == null ? descriptionMethodName : descriptionMethodName + "[" + dataProvider + "]";
-        ExtentTest child = ParentTestClass.get().createNode(testName, category);
-        child.assignCategory(category);
+        ExtentTest child = ParentTestClass.get().createNode(testName, description);
         CurrentTestMethod.set(child);
 
         if (authorNamePresent) {

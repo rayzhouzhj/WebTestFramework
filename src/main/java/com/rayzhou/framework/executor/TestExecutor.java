@@ -39,7 +39,7 @@ public class TestExecutor
 	private ArrayList<String> items = new ArrayList<String>();
 	private List<Class> testcases;
 
-	public TestExecutor() throws IOException
+	public TestExecutor()
 	{
 		context = RunTimeContext.getInstance();
 	}
@@ -109,10 +109,12 @@ public class TestExecutor
 		ExecutorService executor = Executors.newCachedThreadPool();
 		List<FutureTask<Boolean>> list = new ArrayList<>();
 
+		// Available browser types
+		// Chrome, Firefox, Random (if random, either chrome or firefox will be assigned)
 		String[] browsers = RunTimeContext.getInstance().getProperty("BROWSER_TYPE").split(",");
 		for(String browser : browsers)
 		{
-			XmlSuite suite = constructXmlSuite(browser, pack, test, methods);
+			XmlSuite suite = constructXmlSuite(browser, test, methods);
 			String suiteFile = writeTestNGFile(suite, "testsuite"  + "-" + browser);
 
 			FutureTask<Boolean> futureTask = new FutureTask<>(new TestExecutorService(suiteFile));
@@ -156,7 +158,7 @@ public class TestExecutor
 		return hasFailure;
 	}
 
-	public XmlSuite constructXmlSuite(String browser, String pack, List<String> tests, Map<String, List<Method>> methods) 
+	public XmlSuite constructXmlSuite(String browser, List<String> tests, Map<String, List<Method>> methods)
 	{
 		ArrayList<String> listeners = new ArrayList<>();
 		ArrayList<String> groupsInclude = new ArrayList<>();
@@ -216,7 +218,7 @@ public class TestExecutor
 					{
 						for (int j = 0; j < items.size(); j++)
 						{
-							String testName = items.get(j).concat("." + s).toString();
+							String testName = items.get(j).concat("." + s);
 							if (testName.equals(className)) 
 							{
 								xmlClasses.add(createClass(className, methods.get(className)));

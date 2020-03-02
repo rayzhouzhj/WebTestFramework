@@ -21,7 +21,7 @@ import com.rayzhou.framework.report.ReportManager;
 public final class InvokedMethodListener implements IInvokedMethodListener {
     private WebDriverManager driverManager;
 
-    public InvokedMethodListener() throws Exception {
+    public InvokedMethodListener() {
         driverManager = new WebDriverManager();
     }
 
@@ -60,9 +60,10 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 
         System.out.println("[INFO] Start running test [" + testInfo.getMethodName() + "]");
         try {
-            setupDriverForTest(testInfo, testResult);
+            String browserType = setupDriverForTest(testInfo, testResult);
             // Update Author and set categories
             ReportManager.getInstance().setTestInfo(testInfo.getInvokedMethod());
+            ReportManager.getInstance().addTag(browserType.toUpperCase());
             ReportManager.getInstance().setSetupStatus(true);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -71,9 +72,22 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
         }
     }
 
-    private void setupDriverForTest(TestInfo testInfo, ITestResult testResult) throws Exception {
+    private String setupDriverForTest(TestInfo testInfo, ITestResult testResult) throws Exception {
+
         String browserType = testInfo.getInvokedMethod().getTestMethod().getXmlTest().getParameter("browser");
 
+        // Override browser type
+        FirefoxOnly firefoxOnly = testInfo.getDeclaredMethod().getAnnotation(FirefoxOnly.class);
+        ChromeOnly chromeOnly = testInfo.getDeclaredMethod().getAnnotation(ChromeOnly.class);
+        if(firefoxOnly != null) {
+            browserType = "firefox";
+        } else if (chromeOnly != null) {
+            browserType = "chrome";
+        } else if ("random".equalsIgnoreCase(browserType)){
+            browserType = Math.round(Math.random()) == 1? "chrome" : "firefox";
+        }
+
+        // Reset report data
         resetReporter(testInfo.getInvokedMethod(), testResult);
 
         MutableCapabilities browserOptions;
@@ -153,6 +167,8 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
         } catch (Exception ex) {
             throw ex;
         }
+
+        return browserType;
     }
 
     /**

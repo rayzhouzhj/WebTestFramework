@@ -72,4 +72,7 @@ public class RunTimeContext
 		return path;
 	}
 
+	public boolean isDebugMode() {
+		return "ON".equalsIgnoreCase(RunTimeContext.getInstance().getProperty("DEBUG_MODE", "OFF"));
+	}
 }

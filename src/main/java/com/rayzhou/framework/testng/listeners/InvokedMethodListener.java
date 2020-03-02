@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 
 import com.rayzhou.framework.annotations.*;
 import com.rayzhou.framework.annotations.screens.DeviceName;
+import com.rayzhou.framework.context.RunTimeContext;
 import com.rayzhou.framework.testng.model.TestInfo;
 import com.rayzhou.framework.annotations.screens.Mobile;
 import com.rayzhou.framework.manager.WebDriverManager;
@@ -74,18 +75,30 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 
     private String setupDriverForTest(TestInfo testInfo, ITestResult testResult) throws Exception {
 
+        // Get browser type from retry method
+        String retryBrowserType = "";
+        IRetryAnalyzer analyzer = testResult.getMethod().getRetryAnalyzer();
+        if (analyzer instanceof RetryAnalyzer) {
+            retryBrowserType = ((RetryAnalyzer) analyzer).getRetryMethod(testResult).getBrowserType();
+        }
+
         String browserType = testInfo.getInvokedMethod().getTestMethod().getXmlTest().getParameter("browser");
 
         // Override browser type
         FirefoxOnly firefoxOnly = testInfo.getDeclaredMethod().getAnnotation(FirefoxOnly.class);
         ChromeOnly chromeOnly = testInfo.getDeclaredMethod().getAnnotation(ChromeOnly.class);
-        if(firefoxOnly != null) {
+        if (!retryBrowserType.isEmpty()) {
+            browserType = retryBrowserType;
+        } else if (firefoxOnly != null) {
             browserType = "firefox";
         } else if (chromeOnly != null) {
             browserType = "chrome";
-        } else if ("random".equalsIgnoreCase(browserType)){
-            browserType = Math.round(Math.random()) == 1? "chrome" : "firefox";
+        } else if ("random".equalsIgnoreCase(browserType)) {
+            browserType = Math.round(Math.random()) == 1 ? "chrome" : "firefox";
         }
+
+        // Update browser type to retry method
+        ((RetryAnalyzer) analyzer).getRetryMethod(testResult).setBrowserType(browserType);
 
         // Reset report data
         resetReporter(testInfo.getInvokedMethod(), testResult);
@@ -164,8 +177,18 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
         try {
             // Setup web driver
             driverManager.startDriverInstance(browserOptions, deviceDimension);
-        } catch (Exception ex) {
-            throw ex;
+        } catch (Exception ex1) {
+            if(!RunTimeContext.getInstance().isDebugMode()) {
+                try {
+                    // Wait 30 seconds and retry driver setup
+                    Thread.sleep(30000);
+                    // Setup web driver
+                    driverManager.startDriverInstance(browserOptions, deviceDimension);
+                } catch (Exception ex2) {
+                    throw ex2;
+                }
+            }
+            throw ex1;
         }
 
         return browserType;
@@ -198,8 +221,8 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
             if (testResult.getStatus() == ITestResult.SUCCESS || testResult.getStatus() == ITestResult.FAILURE) {
 
                 IRetryAnalyzer analyzer = testResult.getMethod().getRetryAnalyzer();
-                if(analyzer instanceof RetryAnalyzer) {
-                    if(((RetryAnalyzer) analyzer).isRetryMethod(testResult) ||
+                if (analyzer instanceof RetryAnalyzer) {
+                    if (((RetryAnalyzer) analyzer).isRetryMethod(testResult) ||
                             testResult.getStatus() == ITestResult.FAILURE) {
                         ReportManager.getInstance().addTag("RETRIED");
                     }

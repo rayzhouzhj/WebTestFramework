@@ -43,7 +43,7 @@ public class WebDriverManager {
         browser.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
 
         // For Execution Mode
-        if ("OFF".equalsIgnoreCase(RunTimeContext.getInstance().getProperty("DEBUG_MODE", "OFF"))) {
+        if (!RunTimeContext.getInstance().isDebugMode()) {
             currentDriverSession = new RemoteWebDriver(new URL(context.getProperty("HOST_URL")), browser);
         }
         // For Debug Mode, launch local driver

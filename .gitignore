@@ -5,3 +5,5 @@
 target/**
 .project
 .classpath
+main.iml
+test.iml

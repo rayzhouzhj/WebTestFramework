@@ -6,9 +6,10 @@ import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.concurrent.ConcurrentHashMap;
 
+import com.github.framework.testng.listeners.RetryAnalyzer;
 import org.testng.IInvokedMethod;
+import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 import org.testng.annotations.Test;
 
@@ -28,8 +29,6 @@ public class ReportManager {
     public ThreadLocal<ITestResult> TestResult = new ThreadLocal<>();
     public ScreenShotManager ScreenshotManager = new ScreenShotManager();
 
-    private ConcurrentHashMap<String, Boolean> retryMap = new ConcurrentHashMap<>();
-
     public static ReportManager getInstance() {
         return manager;
     }
@@ -42,21 +41,6 @@ public class ReportManager {
         ExtentTestManager.removeTest(CurrentTestMethod.get());
 
     }
-
-    public boolean isRetryMethod(String methodName, String className) {
-        String key = className + ":" + methodName + Thread.currentThread().getId();
-        if (!this.retryMap.containsKey(key)) {
-            this.retryMap.put(key, false);
-        }
-
-        return this.retryMap.get(key);
-    }
-
-    public void setMethodRetryStatus(String methodName, String className, boolean status) {
-        String key = className + ":" + methodName + Thread.currentThread().getId();
-        this.retryMap.put(key, status);
-    }
-
 
     public void endLogTestResults(ITestResult result) throws IOException, InterruptedException {
         testLogger.endLog(result, CurrentTestMethod);
@@ -73,17 +57,17 @@ public class ReportManager {
         this.TestResult.set(testResult);
     }
 
-    public ExtentTest setupReportForTestSet(String className, String classDescription) throws Exception {
+    public ExtentTest setupReportForTestSet(String className, String classDescription) {
         ExtentTest parent = ExtentTestManager.createTest(className, classDescription);
         ParentTestClass.set(parent);
 
         return parent;
     }
 
-    public void setTestInfo(IInvokedMethod invokedMethod) throws Exception {
+    public void setTestInfo(IInvokedMethod invokedMethod) {
         String authorName;
         String dataProvider = null;
-        ArrayList<String> listeners = new ArrayList<>();
+        ArrayList<String> authors = new ArrayList<>();
         Method method = invokedMethod.getTestMethod().getConstructorOrMethod().getMethod();
         String description = method.getAnnotation(Test.class).description();
         Object dataParameter = invokedMethod.getTestResult().getParameters();
@@ -99,21 +83,23 @@ public class ReportManager {
         String category = invokedMethod.getTestMethod().getXmlTest().getParameter("browser");
 
         String testName = dataProvider == null ? descriptionMethodName : descriptionMethodName + "[" + dataProvider + "]";
+        ExtentTest child = ParentTestClass.get().createNode(testName, category);
+        child.assignCategory(category);
+        CurrentTestMethod.set(child);
+
         if (authorNamePresent) {
             authorName = method.getAnnotation(Author.class).name();
-            Collections.addAll(listeners, authorName.split("\\s*,\\s*"));
-            ExtentTest child = ParentTestClass.get().createNode(testName, category).assignAuthor(String.valueOf(listeners));
-            child.assignCategory(category);
-            CurrentTestMethod.set(child);
-        } else {
-            ExtentTest child = ParentTestClass.get().createNode(testName, category);
-            child.assignCategory(category);
-            CurrentTestMethod.set(child);
+            Collections.addAll(authors, authorName.split("\\s*,\\s*"));
+            CurrentTestMethod.get().assignAuthor(String.valueOf(authors));
         }
 
         // Update groups to category
         String[] groups = invokedMethod.getTestMethod().getGroups();
         CurrentTestMethod.get().assignCategory(groups);
+    }
+
+    public void addTag(String tag){
+        this.CurrentTestMethod.get().assignCategory(tag);
     }
 
     public String getImagePath(String imageName) {

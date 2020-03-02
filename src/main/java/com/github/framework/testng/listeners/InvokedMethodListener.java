@@ -11,6 +11,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.testng.IInvokedMethod;
 import org.testng.IInvokedMethodListener;
+import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 import org.testng.annotations.Test;
 
@@ -169,8 +170,18 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 
         try {
             if (testResult.getStatus() == ITestResult.SUCCESS || testResult.getStatus() == ITestResult.FAILURE) {
+
+                IRetryAnalyzer analyzer = testResult.getMethod().getRetryAnalyzer();
+                if(analyzer instanceof RetryAnalyzer) {
+                    if(((RetryAnalyzer) analyzer).isRetryMethod(testResult) ||
+                            testResult.getStatus() == ITestResult.FAILURE) {
+                        ReportManager.getInstance().addTag("RETRIED");
+                    }
+                }
+
                 ReportManager.getInstance().endLogTestResults(testResult);
                 ExtentManager.getExtent().flush();
+
             } else if (testResult.getStatus() == ITestResult.SKIP) {
                 ExtentManager.getExtent().flush();
 

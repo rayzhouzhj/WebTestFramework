@@ -17,13 +17,19 @@ public class RetryAnalyzer implements IRetryAnalyzer
 	{
 	}
 
+	public boolean isRetryMethod(ITestResult iTestResult) {
+		String methodName = iTestResult.getMethod().getMethodName();
+		String key = methodName + Thread.currentThread().getId();
+
+		return this.retryMap.containsKey(key);
+	}
+
 	@Override 
 	public boolean retry(ITestResult iTestResult)
 	{
 		if (iTestResult.getStatus() == ITestResult.FAILURE) 
 		{
 			RetryMethod method = getRetryMethod(iTestResult);
-			
 			System.out.println("Test Failed - " + method.methodName);
 			if (method.needRetry()) 
 			{

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import com.rayzhou.framework.annotations.Author;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.testng.IInvokedMethod;
 import org.testng.ITestResult;
 import org.testng.annotations.Test;
@@ -22,10 +23,11 @@ import com.rayzhou.framework.utils.ScreenShotManager;
 public class ReportManager {
     private TestLogManager testLogger;
     private static ReportManager manager = new ReportManager();
-    public ThreadLocal<ExtentTest> ParentTestClass = new ThreadLocal<>();
-    public ThreadLocal<ExtentTest> CurrentTestMethod = new ThreadLocal<>();
-    public ThreadLocal<ITestResult> TestResult = new ThreadLocal<>();
-    public ScreenShotManager ScreenshotManager = new ScreenShotManager();
+    private ThreadLocal<ExtentTest> ParentTestClass = new ThreadLocal<>();
+    private ThreadLocal<ExtentTest> CurrentTestMethod = new ThreadLocal<>();
+    private ThreadLocal<ITestResult> TestResult = new ThreadLocal<>();
+    private ThreadLocal<Boolean> SetupStatus = new ThreadLocal<>();
+    private ScreenShotManager ScreenshotManager = new ScreenShotManager();
 
     public static ReportManager getInstance() {
         return manager;
@@ -55,6 +57,14 @@ public class ReportManager {
         this.TestResult.set(testResult);
     }
 
+    public void setSetupStatus(boolean status) {
+        this.SetupStatus.set(status);
+    }
+
+    public boolean getSetupStatus() {
+        return this.SetupStatus.get();
+    }
+
     public ExtentTest setupReportForTestSet(String className, String classDescription) {
         ExtentTest parent = ExtentTestManager.createTest(className, classDescription);
         ParentTestClass.set(parent);
@@ -73,7 +83,6 @@ public class ReportManager {
         if (((Object[]) dataParameter).length > 0) {
             dataProvider = (String) ((Object[]) dataParameter)[0];
         }
-
 
         ExtentTestDescription methodDescription = new ExtentTestDescription(invokedMethod, description);
         boolean authorNamePresent = methodDescription.isAuthorNamePresent();

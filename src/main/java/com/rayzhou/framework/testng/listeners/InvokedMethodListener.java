@@ -11,10 +11,7 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.testng.IInvokedMethod;
-import org.testng.IInvokedMethodListener;
-import org.testng.IRetryAnalyzer;
-import org.testng.ITestResult;
+import org.testng.*;
 import org.testng.annotations.Test;
 
 import com.rayzhou.framework.report.ExtentManager;
@@ -62,11 +59,19 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
         }
 
         System.out.println("[INFO] Start running test [" + testInfo.getMethodName() + "]");
-        setupDriverForTest(testInfo, testResult);
-
+        try {
+            setupDriverForTest(testInfo, testResult);
+            // Update Author and set categories
+            ReportManager.getInstance().setTestInfo(testInfo.getInvokedMethod());
+            ReportManager.getInstance().setSetupStatus(true);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            ReportManager.getInstance().setSetupStatus(false);
+            Assert.fail("Fails to setup test driver.");
+        }
     }
 
-    private void setupDriverForTest(TestInfo testInfo, ITestResult testResult) {
+    private void setupDriverForTest(TestInfo testInfo, ITestResult testResult) throws Exception {
         String browserType = testInfo.getInvokedMethod().getTestMethod().getXmlTest().getParameter("browser");
 
         resetReporter(testInfo.getInvokedMethod(), testResult);
@@ -142,13 +147,11 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
             deviceDimension = new Dimension(DeviceName.DeskTopHD.width, DeviceName.DeskTopHD.height);
         }
 
-        driverManager.startDriverInstance(browserOptions, deviceDimension);
-
         try {
-            // Update Author and set category
-            ReportManager.getInstance().setTestInfo(testInfo.getInvokedMethod());
-        } catch (Exception e) {
-            e.printStackTrace();
+            // Setup web driver
+            driverManager.startDriverInstance(browserOptions, deviceDimension);
+        } catch (Exception ex) {
+            throw ex;
         }
     }
 
@@ -165,6 +168,13 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 
         // Skip afterInvocation if current method is not with Annotation Test
         if (refMethod.getAnnotation(Test.class) == null) {
+            return;
+        }
+
+        // If fails to setup test
+        if (!ReportManager.getInstance().getSetupStatus()) {
+            driverManager.stopWebDriver();
+
             return;
         }
 
@@ -193,6 +203,5 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 }

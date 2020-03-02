@@ -1,15 +1,12 @@
 package com.rayzhou.framework.report;
 
 import java.io.File;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.reporter.ExtentHtmlReporter;
-import com.aventstack.extentreports.reporter.ExtentXReporter;
 import com.aventstack.extentreports.reporter.configuration.ChartLocation;
 import com.aventstack.extentreports.reporter.configuration.Theme;
 import com.rayzhou.framework.context.RunTimeContext;
@@ -26,10 +23,6 @@ public class ExtentManager
 		{
 			extent = new ExtentReports();
 			extent.attachReporter(getHtmlReporter());
-			if (System.getenv("ExtentX") != null && System.getenv("ExtentX").equalsIgnoreCase("true")) 
-			{
-				extent.attachReporter(getExtentXReporter());
-			}
 
 			String executionMode = RunTimeContext.getInstance().getProperty("RUNNER");
 			String platform = RunTimeContext.getInstance().getProperty("Platform");
@@ -71,37 +64,6 @@ public class ExtentManager
 		htmlReporter.config().setTheme(Theme.STANDARD);
 
 		return htmlReporter;
-	}
-
-	private static ExtentXReporter getExtentXReporter() 
-	{
-		String host = RunTimeContext.getInstance().getProperty("MONGODB_SERVER");
-		Integer port = Integer.parseInt(RunTimeContext.getInstance().getProperty("MONGODB_PORT"));
-		ExtentXReporter extentx = new ExtentXReporter(host, port);
-
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
-
-		String product = RunTimeContext.getInstance().getProperty("Product");
-		String platform = RunTimeContext.getInstance().getProperty("Platform");
-		String testType = RunTimeContext.getInstance().getProperty("TestType");
-		String buildNum = RunTimeContext.getInstance().getProperty("BuildNumber");
-		String projectName = (product == null)? platform + "_Test" : product + "_" + platform;
-		String reportName = (buildNum == null)? formatter.format(LocalDateTime.now()) : buildNum;
-		
-		// project name
-		extentx.config().setProjectName(projectName);
-		// report or build name
-		extentx.config().setReportName(reportName);
-
-		// server URL
-		// ! must provide this to be able to upload snapshots
-		String url = host + ":" + port;
-		if (!url.isEmpty()) 
-		{
-			extentx.config().setServerUrl(url);
-		}
-
-		return extentx;
 	}
 
 	public static void flush()

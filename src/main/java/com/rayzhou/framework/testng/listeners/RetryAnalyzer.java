@@ -15,11 +15,8 @@ public class RetryAnalyzer implements IRetryAnalyzer {
     public RetryAnalyzer() {
     }
 
-    public boolean isRetryMethod(ITestResult iTestResult) {
-        String methodName = iTestResult.getMethod().getMethodName();
-        String key = methodName + Thread.currentThread().getId();
-
-        return this.retryMap.containsKey(key);
+    public boolean isRetriedMethod(ITestResult iTestResult) {
+        return this.getRetryMethod(iTestResult).isRetried();
     }
 
     @Override
@@ -75,10 +72,11 @@ public class RetryAnalyzer implements IRetryAnalyzer {
     }
 
     class RetryMethod {
-        int retryCount = 0;
-        int maxRetryCount = 0;
-        String methodName = "";
-        String browserType = "";
+        private int retryCount = 0;
+        private int maxRetryCount = 0;
+        private String methodName = "";
+        private String browserType = "";
+        private boolean isRetried = false;
 
         public RetryMethod(int retryCount, int maxRetryCount, String methodName) {
             this.retryCount = retryCount;
@@ -91,6 +89,7 @@ public class RetryAnalyzer implements IRetryAnalyzer {
         }
 
         public void increaseRetryCount() {
+            isRetried = true;
             retryCount++;
         }
 
@@ -104,6 +103,14 @@ public class RetryAnalyzer implements IRetryAnalyzer {
 
         public String getBrowserType() {
             return this.browserType;
+        }
+
+        public void setRetried(boolean status) {
+            this.isRetried = status;
+        }
+
+        public boolean isRetried() {
+            return this.isRetried;
         }
     }
 }

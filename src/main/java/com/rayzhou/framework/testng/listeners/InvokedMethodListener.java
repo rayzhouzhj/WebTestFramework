@@ -224,7 +224,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 
                 IRetryAnalyzer analyzer = testResult.getMethod().getRetryAnalyzer();
                 if (analyzer instanceof RetryAnalyzer) {
-                    if (((RetryAnalyzer) analyzer).isRetryMethod(testResult) ||
+                    if (((RetryAnalyzer) analyzer).isRetriedMethod(testResult) ||
                             testResult.getStatus() == ITestResult.FAILURE) {
                         ReportManager.getInstance().addTag("RETRIED");
                     }

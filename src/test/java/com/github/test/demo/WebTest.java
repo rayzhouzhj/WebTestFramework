@@ -1,6 +1,6 @@
 package com.github.test.demo;
 
-import com.rayzhou.framework.annotations.screens.Mobile;
+import com.rayzhou.framework.annotations.screens.Device;
 import com.rayzhou.framework.test.BaseTest;
 import com.rayzhou.framework.utils.PixelMatch;
 import org.openqa.selenium.By;
@@ -73,7 +73,7 @@ public class WebTest extends BaseTest {
         }
     }
 
-    @Mobile(width = 768, height = 1024)
+    @Device(width = 768, height = 1024)
     @HeadlessMode
     @ChromeArguments(options = {"--incognito"})
     @Test(groups = "DEBUG")
@@ -90,7 +90,7 @@ public class WebTest extends BaseTest {
         Thread.sleep(2000);  // Let the user actually see something!
     }
 
-    @Mobile(device = DeviceName.iPhoneX)
+    @Device(device = DeviceName.iPhoneX)
     @Test(groups = "DEBUG")
     public void testGoogleSearchPassCase2() throws InterruptedException {
         init("testGoogleSearch2");

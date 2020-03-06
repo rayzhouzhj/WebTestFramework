@@ -6,7 +6,7 @@ import com.rayzhou.framework.annotations.*;
 import com.rayzhou.framework.annotations.screens.DeviceName;
 import com.rayzhou.framework.context.RunTimeContext;
 import com.rayzhou.framework.testng.model.TestInfo;
-import com.rayzhou.framework.annotations.screens.Mobile;
+import com.rayzhou.framework.annotations.screens.Device;
 import com.rayzhou.framework.manager.WebDriverManager;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
@@ -163,11 +163,11 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
         }
 
         // Check the mobile screen size preference
-        Mobile mobileAnnotationData = testInfo.getDeclaredMethod().getAnnotation(Mobile.class);
+        Device deviceAnnotationData = testInfo.getDeclaredMethod().getAnnotation(Device.class);
         Dimension deviceDimension;
-        if (mobileAnnotationData != null) {
-            int width = mobileAnnotationData.device() == DeviceName.OtherDevice ? mobileAnnotationData.width() : mobileAnnotationData.device().width;
-            int height = mobileAnnotationData.device() == DeviceName.OtherDevice ? mobileAnnotationData.height() : mobileAnnotationData.device().height;
+        if (deviceAnnotationData != null) {
+            int width = deviceAnnotationData.device() == DeviceName.OtherDevice ? deviceAnnotationData.width() : deviceAnnotationData.device().width;
+            int height = deviceAnnotationData.device() == DeviceName.OtherDevice ? deviceAnnotationData.height() : deviceAnnotationData.device().height;
             deviceDimension = new Dimension(width, height);
         } else {
             // If device dimension is not specified, use desktop by default

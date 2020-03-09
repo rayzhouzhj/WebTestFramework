@@ -29,6 +29,7 @@ DATAPROVIDER_THREAD_COUNT=3
 MONGODB_SERVER=localhost
 MONGODB_PORT=27017
 MAX_RETRY_COUNT=0
+REMOVE_FAILED_TEST_B4_RETRY=true
 
 ######################## TEST ###############################################
 #EXCLUDE_GROUPS=Installation

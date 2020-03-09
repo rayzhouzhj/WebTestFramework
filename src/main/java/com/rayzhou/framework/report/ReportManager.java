@@ -8,8 +8,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import com.rayzhou.framework.annotations.Author;
+import com.rayzhou.framework.context.RunTimeContext;
+import com.rayzhou.framework.testng.listeners.RetryAnalyzer;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.testng.IInvokedMethod;
+import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 import org.testng.annotations.Test;
 
@@ -39,18 +42,34 @@ public class ReportManager {
 
     public void removeTest() {
         ExtentTestManager.removeTest(CurrentTestMethod.get());
+    }
 
+    public void skipTest() {
+        CurrentTestMethod.get().getModel().setStatus(Status.SKIP);
     }
 
     public void endLogTestResults(ITestResult result) throws IOException, InterruptedException {
         testLogger.endLog(result, CurrentTestMethod);
 
-        ExtentManager.flush();
+        IRetryAnalyzer analyzer = result.getMethod().getRetryAnalyzer();
+        if (analyzer instanceof RetryAnalyzer) {
+            if (((RetryAnalyzer) analyzer).isRetriedMethod(result) ||
+                    result.getStatus() == ITestResult.FAILURE) {
+                this.addTag("RETRIED");
+            }
+
+            if (RunTimeContext.getInstance().removeFailedTestB4Retry()
+                    && result.getStatus() == ITestResult.FAILURE
+                    && ((RetryAnalyzer) analyzer).isRetriedRequired(result)) {
+                this.removeTest();
+            }
+        }
 
         if (result.getStatus() == ITestResult.SKIP) {
-            // Remove previous log data for retry test
-            this.removeTest();
+            this.skipTest();
         }
+
+        ExtentManager.flush();
     }
 
     public void setTestResult(ITestResult testResult) {

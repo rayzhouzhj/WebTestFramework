@@ -75,4 +75,8 @@ public class RunTimeContext
 	public boolean isDebugMode() {
 		return "ON".equalsIgnoreCase(RunTimeContext.getInstance().getProperty("DEBUG_MODE", "OFF"));
 	}
+
+	public boolean removeFailedTestB4Retry() {
+		return "true".equalsIgnoreCase(RunTimeContext.getInstance().getProperty("REMOVE_FAILED_TEST_B4_RETRY", "false"));
+	}
 }

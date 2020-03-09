@@ -19,6 +19,10 @@ public class RetryAnalyzer implements IRetryAnalyzer {
         return this.getRetryMethod(iTestResult).isRetried();
     }
 
+    public boolean isRetriedRequired(ITestResult iTestResult) {
+        return this.getRetryMethod(iTestResult).needRetry();
+    }
+
     @Override
     public boolean retry(ITestResult iTestResult) {
         if (iTestResult.getStatus() == ITestResult.FAILURE) {

@@ -25,6 +25,11 @@ public class WebTest extends BaseTest {
         System.out.println(methodName + " Receive Driver, start testing");
     }
 
+    @Test(groups = "RETRY")
+    public void testRetry() {
+        assert 1 == 2;
+    }
+
     @Test(groups = "DEBUG1")
     public void testPixelMatchPassedCase() {
         init("testPixelMatchPassedCase");

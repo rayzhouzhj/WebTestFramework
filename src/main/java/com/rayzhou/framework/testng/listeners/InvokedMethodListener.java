@@ -2,6 +2,7 @@ package com.rayzhou.framework.testng.listeners;
 
 import java.lang.reflect.Method;
 
+import com.aventstack.extentreports.Status;
 import com.rayzhou.framework.annotations.*;
 import com.rayzhou.framework.annotations.screens.DeviceName;
 import com.rayzhou.framework.context.RunTimeContext;
@@ -221,14 +222,6 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 
         try {
             if (testResult.getStatus() == ITestResult.SUCCESS || testResult.getStatus() == ITestResult.FAILURE) {
-
-                IRetryAnalyzer analyzer = testResult.getMethod().getRetryAnalyzer();
-                if (analyzer instanceof RetryAnalyzer) {
-                    if (((RetryAnalyzer) analyzer).isRetriedMethod(testResult) ||
-                            testResult.getStatus() == ITestResult.FAILURE) {
-                        ReportManager.getInstance().addTag("RETRIED");
-                    }
-                }
 
                 ReportManager.getInstance().endLogTestResults(testResult);
                 ExtentManager.getExtent().flush();

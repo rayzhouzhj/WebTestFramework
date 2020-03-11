@@ -10,7 +10,6 @@ import java.util.Collections;
 import com.rayzhou.framework.annotations.Author;
 import com.rayzhou.framework.context.RunTimeContext;
 import com.rayzhou.framework.testng.listeners.RetryAnalyzer;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.testng.IInvokedMethod;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;

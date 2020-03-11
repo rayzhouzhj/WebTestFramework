@@ -1,5 +1,6 @@
 package com.github.test.demo;
 
+import com.rayzhou.framework.annotations.Author;
 import com.rayzhou.framework.annotations.screens.Device;
 import com.rayzhou.framework.test.BaseTest;
 import com.rayzhou.framework.utils.PixelMatch;
@@ -15,7 +16,7 @@ import com.github.test.demo.pom.Browser;
 
 public class WebTest extends BaseTest {
     Browser Browser;
-
+    static int value = 1;
     private void init(String methodName) {
         System.out.println(methodName);
 
@@ -25,9 +26,16 @@ public class WebTest extends BaseTest {
         System.out.println(methodName + " Receive Driver, start testing");
     }
 
-    @Test(groups = "RETRY")
-    public void testRetry() {
-        assert 1 == 2;
+    @Test(groups = {"RETRY"}, description = "Test Description")
+    @Author(name = "Ray")
+    public void testRetry1() {
+        assert 1 == 1;
+    }
+
+    @Test(groups = "RETRY", description = "Test Description", dependsOnMethods = "testRetry1")
+    @Author(name = "Ray")
+    public void testRetry2() {
+        assert 2 == value++;
     }
 
     @Test(groups = "DEBUG1")

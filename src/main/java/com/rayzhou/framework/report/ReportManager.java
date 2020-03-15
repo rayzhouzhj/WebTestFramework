@@ -4,13 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
 
-import com.rayzhou.framework.annotations.Author;
+import com.rayzhou.framework.annotations.Authors;
 import com.rayzhou.framework.context.RunTimeContext;
 import com.rayzhou.framework.testng.listeners.RetryAnalyzer;
-import org.testng.IInvokedMethod;
+import com.rayzhou.framework.testng.model.TestInfo;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 import org.testng.annotations.Test;
@@ -83,42 +81,29 @@ public class ReportManager {
         return this.SetupStatus.get();
     }
 
-    public ExtentTest setupReportForTestSet(String className, String classDescription) {
-        ExtentTest parent = ExtentTestManager.createTest(className, classDescription);
+    public ExtentTest setupReportForTestSet(TestInfo testInfo) {
+        ExtentTest parent = ExtentTestManager.createTest(testInfo.getClassName(), testInfo.getClassDescription());
+        if(testInfo.getClassGroups() != null) {
+            parent.assignCategory(testInfo.getClassGroups());
+        }
+
         ParentTestClass.set(parent);
 
         return parent;
     }
 
-    public void setTestInfo(IInvokedMethod invokedMethod) {
-        String authorName;
-        String dataProvider = null;
-        ArrayList<String> authors = new ArrayList<>();
-        Method method = invokedMethod.getTestMethod().getConstructorOrMethod().getMethod();
-        String description = method.getAnnotation(Test.class).description();
-        Object dataParameter = invokedMethod.getTestResult().getParameters();
+    public void setTestInfo(TestInfo testInfo) {
 
-        if (((Object[]) dataParameter).length > 0) {
-            dataProvider = (String) ((Object[]) dataParameter)[0];
-        }
-
-        ExtentTestDescription methodDescription = new ExtentTestDescription(invokedMethod, description);
-        boolean authorNamePresent = methodDescription.isAuthorNamePresent();
-        String descriptionMethodName = methodDescription.getDescriptionMethodName();
-
-        String testName = dataProvider == null ? descriptionMethodName : descriptionMethodName + "[" + dataProvider + "]";
-        ExtentTest child = ParentTestClass.get().createNode(testName, description);
+        ExtentTest child = ParentTestClass.get().createNode(testInfo.getTestName(), testInfo.getTestMethodDescription());
         CurrentTestMethod.set(child);
 
-        if (authorNamePresent) {
-            authorName = method.getAnnotation(Author.class).name();
-            Collections.addAll(authors, authorName.split("\\s*,\\s*"));
-            CurrentTestMethod.get().assignAuthor(String.valueOf(authors));
+        // Update authors
+        if (testInfo.getAuthorNames() != null) {
+            CurrentTestMethod.get().assignAuthor(testInfo.getAuthorNames());
         }
 
         // Update groups to category
-        String[] groups = invokedMethod.getTestMethod().getGroups();
-        CurrentTestMethod.get().assignCategory(groups);
+        CurrentTestMethod.get().assignCategory(testInfo.getTestGroups());
     }
 
     public void addTag(String tag){

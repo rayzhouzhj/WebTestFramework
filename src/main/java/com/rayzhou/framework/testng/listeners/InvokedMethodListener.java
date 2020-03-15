@@ -63,7 +63,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
         System.out.println("[INFO] Start running test [" + testInfo.getMethodName() + "]");
         try {
             String browserType = setupDriverForTest(testInfo, testResult);
-            // Update Author and set categories
+            // Update Authors and set categories
             ReportManager.getInstance().setTestInfo(testInfo.getInvokedMethod());
             ReportManager.getInstance().addTag(browserType.toUpperCase());
             ReportManager.getInstance().setSetupStatus(true);

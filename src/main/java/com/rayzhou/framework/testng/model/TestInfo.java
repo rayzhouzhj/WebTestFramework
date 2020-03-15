@@ -2,7 +2,7 @@ package com.rayzhou.framework.testng.model;
 
 import java.lang.reflect.Method;
 
-import com.rayzhou.framework.annotations.Author;
+import com.rayzhou.framework.annotations.Authors;
 import com.rayzhou.framework.annotations.ClassDescription;
 import org.testng.IInvokedMethod;
 import org.testng.annotations.Test;
@@ -44,8 +44,8 @@ public class TestInfo {
         return this.declaredMethod.getAnnotation(Test.class) != null;
     }
 
-    public String getAuthorName() {
-        return declaredMethod.getAnnotation(Author.class) == null ? null : declaredMethod.getAnnotation(Author.class).name();
+    public String[] getAuthorName() {
+        return declaredMethod.getAnnotation(Authors.class) == null ? null : declaredMethod.getAnnotation(Authors.class).name();
     }
 
     public String getTestName() {

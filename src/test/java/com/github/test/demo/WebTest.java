@@ -1,6 +1,6 @@
 package com.github.test.demo;
 
-import com.rayzhou.framework.annotations.Author;
+import com.rayzhou.framework.annotations.Authors;
 import com.rayzhou.framework.annotations.screens.Device;
 import com.rayzhou.framework.test.BaseTest;
 import com.rayzhou.framework.utils.PixelMatch;
@@ -27,13 +27,13 @@ public class WebTest extends BaseTest {
     }
 
     @Test(groups = {"RETRY"}, description = "Test Description")
-    @Author(name = "Ray")
+    @Authors(name = {"Ray", "Ray Zhou"})
     public void testRetry1() {
         assert 1 == 1;
     }
 
     @Test(groups = "RETRY", description = "Test Description", dependsOnMethods = "testRetry1")
-    @Author(name = "Ray")
+    @Authors(name = "Ray")
     public void testRetry2() {
         assert 2 == value++;
     }

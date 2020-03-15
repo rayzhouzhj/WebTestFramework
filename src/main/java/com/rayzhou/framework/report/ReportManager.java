@@ -4,10 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 
-import com.rayzhou.framework.annotations.Author;
+import com.rayzhou.framework.annotations.Authors;
 import com.rayzhou.framework.context.RunTimeContext;
 import com.rayzhou.framework.testng.listeners.RetryAnalyzer;
 import org.testng.IInvokedMethod;
@@ -85,16 +84,19 @@ public class ReportManager {
 
     public ExtentTest setupReportForTestSet(String className, String classDescription) {
         ExtentTest parent = ExtentTestManager.createTest(className, classDescription);
+
+        // TODO Add categories for parent class
+
         ParentTestClass.set(parent);
 
         return parent;
     }
 
     public void setTestInfo(IInvokedMethod invokedMethod) {
-        String authorName;
+
         String dataProvider = null;
-        ArrayList<String> authors = new ArrayList<>();
         Method method = invokedMethod.getTestMethod().getConstructorOrMethod().getMethod();
+        String methodName = invokedMethod.getTestMethod().getMethodName();
         String description = method.getAnnotation(Test.class).description();
         Object dataParameter = invokedMethod.getTestResult().getParameters();
 
@@ -102,18 +104,13 @@ public class ReportManager {
             dataProvider = (String) ((Object[]) dataParameter)[0];
         }
 
-        ExtentTestDescription methodDescription = new ExtentTestDescription(invokedMethod, description);
-        boolean authorNamePresent = methodDescription.isAuthorNamePresent();
-        String descriptionMethodName = methodDescription.getDescriptionMethodName();
-
-        String testName = dataProvider == null ? descriptionMethodName : descriptionMethodName + "[" + dataProvider + "]";
+        String testName = dataProvider == null ? methodName : methodName + " [" + dataProvider + "]";
         ExtentTest child = ParentTestClass.get().createNode(testName, description);
         CurrentTestMethod.set(child);
 
-        if (authorNamePresent) {
-            authorName = method.getAnnotation(Author.class).name();
-            Collections.addAll(authors, authorName.split("\\s*,\\s*"));
-            CurrentTestMethod.get().assignAuthor(String.valueOf(authors));
+        Authors authors = invokedMethod.getTestMethod().getConstructorOrMethod().getMethod().getAnnotation(Authors.class);
+        if (authors != null) {
+            CurrentTestMethod.get().assignAuthor(authors.name());
         }
 
         // Update groups to category

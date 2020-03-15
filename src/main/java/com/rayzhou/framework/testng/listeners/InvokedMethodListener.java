@@ -27,19 +27,10 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
         driverManager = new WebDriverManager();
     }
 
-    private void resetReporter(IInvokedMethod method, ITestResult testResult) {
-        Method refMethod = method.getTestMethod().getConstructorOrMethod().getMethod();
-        String className = refMethod.getDeclaringClass().getSimpleName();
-
+    private void resetReporter(TestInfo testInfo, ITestResult testResult) {
         // Create test node for test class in test report
         try {
-            String testDescription = "";
-            if (testResult.getTestClass().getClass().getAnnotation(TestDescription.class) != null) {
-                testDescription = getClass().getAnnotation(TestDescription.class).value();
-            }
-
-            // Create test node at test class level
-            ReportManager.getInstance().setupReportForTestSet(className, testDescription);
+            ReportManager.getInstance().setupReportForTestSet(testInfo);
             ReportManager.getInstance().setTestResult(testResult);
         } catch (Exception e) {
             e.printStackTrace();
@@ -64,7 +55,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
         try {
             String browserType = setupDriverForTest(testInfo, testResult);
             // Update Authors and set categories
-            ReportManager.getInstance().setTestInfo(testInfo.getInvokedMethod());
+            ReportManager.getInstance().setTestInfo(testInfo);
             ReportManager.getInstance().addTag(browserType.toUpperCase());
             ReportManager.getInstance().setSetupStatus(true);
         } catch (Exception ex) {
@@ -102,7 +93,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
         ((RetryAnalyzer) analyzer).getRetryMethod(testResult).setBrowserType(browserType);
 
         // Reset report data
-        resetReporter(testInfo.getInvokedMethod(), testResult);
+        resetReporter(testInfo, testResult);
 
         MutableCapabilities browserOptions;
         switch (browserType) {

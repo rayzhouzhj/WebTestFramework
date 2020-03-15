@@ -4,12 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
-import java.util.Collections;
 
 import com.rayzhou.framework.annotations.Authors;
 import com.rayzhou.framework.context.RunTimeContext;
 import com.rayzhou.framework.testng.listeners.RetryAnalyzer;
-import org.testng.IInvokedMethod;
+import com.rayzhou.framework.testng.model.TestInfo;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 import org.testng.annotations.Test;
@@ -82,40 +81,29 @@ public class ReportManager {
         return this.SetupStatus.get();
     }
 
-    public ExtentTest setupReportForTestSet(String className, String classDescription) {
-        ExtentTest parent = ExtentTestManager.createTest(className, classDescription);
-
-        // TODO Add categories for parent class
+    public ExtentTest setupReportForTestSet(TestInfo testInfo) {
+        ExtentTest parent = ExtentTestManager.createTest(testInfo.getClassName(), testInfo.getClassDescription());
+        if(testInfo.getClassGroups() != null) {
+            parent.assignCategory(testInfo.getClassGroups());
+        }
 
         ParentTestClass.set(parent);
 
         return parent;
     }
 
-    public void setTestInfo(IInvokedMethod invokedMethod) {
+    public void setTestInfo(TestInfo testInfo) {
 
-        String dataProvider = null;
-        Method method = invokedMethod.getTestMethod().getConstructorOrMethod().getMethod();
-        String methodName = invokedMethod.getTestMethod().getMethodName();
-        String description = method.getAnnotation(Test.class).description();
-        Object dataParameter = invokedMethod.getTestResult().getParameters();
-
-        if (((Object[]) dataParameter).length > 0) {
-            dataProvider = (String) ((Object[]) dataParameter)[0];
-        }
-
-        String testName = dataProvider == null ? methodName : methodName + " [" + dataProvider + "]";
-        ExtentTest child = ParentTestClass.get().createNode(testName, description);
+        ExtentTest child = ParentTestClass.get().createNode(testInfo.getTestName(), testInfo.getTestMethodDescription());
         CurrentTestMethod.set(child);
 
-        Authors authors = invokedMethod.getTestMethod().getConstructorOrMethod().getMethod().getAnnotation(Authors.class);
-        if (authors != null) {
-            CurrentTestMethod.get().assignAuthor(authors.name());
+        // Update authors
+        if (testInfo.getAuthorNames() != null) {
+            CurrentTestMethod.get().assignAuthor(testInfo.getAuthorNames());
         }
 
         // Update groups to category
-        String[] groups = invokedMethod.getTestMethod().getGroups();
-        CurrentTestMethod.get().assignCategory(groups);
+        CurrentTestMethod.get().assignCategory(testInfo.getTestGroups());
     }
 
     public void addTag(String tag){

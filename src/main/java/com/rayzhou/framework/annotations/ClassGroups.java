@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE, ElementType.METHOD}) 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Authors
+public @interface ClassGroups
 {
-    String[] name() default "";
+    String[] groups() default "";
 }

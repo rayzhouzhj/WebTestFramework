@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.rayzhouzhj</groupId>
 	<artifactId>WebTestFramework</artifactId>
-	<version>3.2.0</version>
+	<version>3.2.1</version>
 	<packaging>jar</packaging>
 
     <properties>
@@ -47,7 +47,7 @@
 		<dependency>
 			<groupId>com.github.rayzhouzhj</groupId>
 			<artifactId>extentreports-java</artifactId>
-			<version>7a5b216b55</version>
+			<version>3.2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.reflections</groupId>

@@ -81,7 +81,7 @@ public class ReportManager {
         return this.SetupStatus.get();
     }
 
-    public ExtentTest setupReportForTestSet(TestInfo testInfo) {
+    public synchronized ExtentTest setupReportForTestSet(TestInfo testInfo) {
         ExtentTest parent = ExtentTestManager.createTest(testInfo.getClassName(), testInfo.getClassDescription());
         if(testInfo.getClassGroups() != null) {
             parent.assignCategory(testInfo.getClassGroups());
@@ -92,7 +92,7 @@ public class ReportManager {
         return parent;
     }
 
-    public void setTestInfo(TestInfo testInfo) {
+    public synchronized void setTestInfo(TestInfo testInfo) {
 
         ExtentTest child = ParentTestClass.get().createNode(testInfo.getTestName(), testInfo.getTestMethodDescription());
         CurrentTestMethod.set(child);

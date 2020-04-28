@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * This annotation will only work on chrome
  */
-@Target({ElementType.TYPE, ElementType.METHOD}) 
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CaptureNetworkTraffic4Chrome {
 }

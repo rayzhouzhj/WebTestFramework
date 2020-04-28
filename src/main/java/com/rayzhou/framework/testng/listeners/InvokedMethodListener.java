@@ -2,17 +2,11 @@ package com.rayzhou.framework.testng.listeners;
 
 import java.lang.reflect.Method;
 
-import com.aventstack.extentreports.Status;
-import com.rayzhou.framework.annotations.*;
-import com.rayzhou.framework.annotations.screens.DeviceName;
 import com.rayzhou.framework.context.RunTimeContext;
 import com.rayzhou.framework.testng.model.TestInfo;
-import com.rayzhou.framework.annotations.screens.Device;
 import com.rayzhou.framework.manager.WebDriverManager;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.firefox.FirefoxOptions;
 import org.testng.*;
 import org.testng.annotations.Test;
 
@@ -27,11 +21,21 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
         driverManager = new WebDriverManager();
     }
 
-    private void resetReporter(TestInfo testInfo, ITestResult testResult) {
-        // Create test node for test class in test report
+    /**
+     * Setup reporter in report manager
+     *
+     * @param testInfo
+     */
+    private void setupReporterForTest(TestInfo testInfo) {
         try {
+            // Create test node for test class in test report
             ReportManager.getInstance().setupReportForTestSet(testInfo);
-            ReportManager.getInstance().setTestResult(testResult);
+            ReportManager.getInstance().setTestResult(testInfo.getTestResult());
+
+            // Create test case in test report
+            ReportManager.getInstance().setTestInfo(testInfo);
+            ReportManager.getInstance().addTag(testInfo.getBrowserType().getName());
+            ReportManager.getInstance().setSetupStatus(true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -44,7 +48,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
     @Override
     public void beforeInvocation(IInvokedMethod method, ITestResult testResult) {
 
-        TestInfo testInfo = new TestInfo(method);
+        TestInfo testInfo = new TestInfo(method, testResult);
 
         // Skip beforeInvocation if current method is not with Annotation Test
         if (!testInfo.isTestMethod()) {
@@ -53,11 +57,8 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 
         System.out.println("[INFO] Start running test [" + testInfo.getMethodName() + "]");
         try {
-            String browserType = setupDriverForTest(testInfo, testResult);
-            // Update Authors and set categories
-            ReportManager.getInstance().setTestInfo(testInfo);
-            ReportManager.getInstance().addTag(browserType.toUpperCase());
-            ReportManager.getInstance().setSetupStatus(true);
+            setupDriverForTest(testInfo);
+            setupReporterForTest(testInfo);
         } catch (Exception ex) {
             ex.printStackTrace();
             ReportManager.getInstance().setSetupStatus(false);
@@ -65,112 +66,22 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
         }
     }
 
-    private String setupDriverForTest(TestInfo testInfo, ITestResult testResult) throws Exception {
+    /**
+     * Setup web driver for current test
+     *
+     * @param testInfo
+     * @throws Exception
+     */
+    private void setupDriverForTest(TestInfo testInfo) throws Exception {
 
-        // Get browser type from retry method
-        String retryBrowserType = "";
-        IRetryAnalyzer analyzer = testResult.getMethod().getRetryAnalyzer();
-        if (analyzer instanceof RetryAnalyzer) {
-            retryBrowserType = ((RetryAnalyzer) analyzer).getRetryMethod(testResult).getBrowserType();
-        }
-
-        String browserType = testInfo.getInvokedMethod().getTestMethod().getXmlTest().getParameter("browser");
-
-        // Override browser type
-        FirefoxOnly firefoxOnly = testInfo.getDeclaredMethod().getAnnotation(FirefoxOnly.class);
-        ChromeOnly chromeOnly = testInfo.getDeclaredMethod().getAnnotation(ChromeOnly.class);
-        if (!retryBrowserType.isEmpty()) {
-            browserType = retryBrowserType;
-        } else if (firefoxOnly != null) {
-            browserType = "firefox";
-        } else if (chromeOnly != null) {
-            browserType = "chrome";
-        } else if ("random".equalsIgnoreCase(browserType)) {
-            browserType = Math.round(Math.random()) == 1 ? "chrome" : "firefox";
-        }
-
-        // Update browser type to retry method
-        ((RetryAnalyzer) analyzer).getRetryMethod(testResult).setBrowserType(browserType);
-
-        // Reset report data
-        resetReporter(testInfo, testResult);
-
-        MutableCapabilities browserOptions;
-        switch (browserType) {
-            case "chrome": {
-                ChromeOptions options = new ChromeOptions();
-
-                // Get Chrome options/arguments
-                ChromeArguments chromeArguments = testInfo.getDeclaredMethod().getAnnotation(ChromeArguments.class);
-                if (chromeArguments != null && chromeArguments.options().length > 0) {
-                    options.addArguments(chromeArguments.options());
-                }
-
-                // private mode
-                IncognitoPrivateMode privateMode = testInfo.getDeclaredMethod().getAnnotation(IncognitoPrivateMode.class);
-                if (privateMode != null) {
-                    options.addArguments("--incognito");
-                }
-
-                // headless mode
-                HeadlessMode headlessMode = testInfo.getDeclaredMethod().getAnnotation(HeadlessMode.class);
-                options.setHeadless(headlessMode != null);
-
-                // Accept untrusted certificates
-                AcceptUntrustedCertificates acceptUntrustedCertificates = testInfo.getDeclaredMethod().getAnnotation(AcceptUntrustedCertificates.class);
-                options.setAcceptInsecureCerts(acceptUntrustedCertificates != null);
-
-                browserOptions = options;
-
-                break;
-            }
-            case "firefox": {
-                FirefoxOptions options = new FirefoxOptions();
-                // Get Firefox options/arguments
-                FirefoxArguments firefoxArguments = testInfo.getDeclaredMethod().getAnnotation(FirefoxArguments.class);
-                if (firefoxArguments != null && firefoxArguments.options().length > 0) {
-                    options.addArguments(firefoxArguments.options());
-                }
-
-                // private mode
-                IncognitoPrivateMode privateMode = testInfo.getDeclaredMethod().getAnnotation(IncognitoPrivateMode.class);
-                if (privateMode != null) {
-                    options.addArguments("-private");
-                }
-
-                // headless mode
-                HeadlessMode headlessMode = testInfo.getDeclaredMethod().getAnnotation(HeadlessMode.class);
-                options.setHeadless(headlessMode != null);
-
-                // Accept untrusted certificates
-                AcceptUntrustedCertificates acceptUntrustedCertificates = testInfo.getDeclaredMethod().getAnnotation(AcceptUntrustedCertificates.class);
-                options.setAcceptInsecureCerts(acceptUntrustedCertificates != null);
-
-                browserOptions = options;
-
-                break;
-            }
-            default:
-                throw new RuntimeException("Unsupported browser: " + browserType);
-        }
-
-        // Check the mobile screen size preference
-        Device deviceAnnotationData = testInfo.getDeclaredMethod().getAnnotation(Device.class);
-        Dimension deviceDimension;
-        if (deviceAnnotationData != null) {
-            int width = deviceAnnotationData.device() == DeviceName.OtherDevice ? deviceAnnotationData.width() : deviceAnnotationData.device().width;
-            int height = deviceAnnotationData.device() == DeviceName.OtherDevice ? deviceAnnotationData.height() : deviceAnnotationData.device().height;
-            deviceDimension = new Dimension(width, height);
-        } else {
-            // If device dimension is not specified, use desktop by default
-            deviceDimension = new Dimension(DeviceName.DeskTopHD.width, DeviceName.DeskTopHD.height);
-        }
+        MutableCapabilities browserOptions = testInfo.getBrowserOption();
+        Dimension deviceDimension = testInfo.getDeviceDimension();
 
         try {
             // Setup web driver
             driverManager.startDriverInstance(browserOptions, deviceDimension);
         } catch (Exception ex1) {
-            if(!RunTimeContext.getInstance().isDebugMode()) {
+            if (!RunTimeContext.getInstance().isDebugMode()) {
                 try {
                     driverManager.stopWebDriver();
                     // Wait 30 seconds and retry driver setup
@@ -184,8 +95,6 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
                 throw ex1;
             }
         }
-
-        return browserType;
     }
 
     /**

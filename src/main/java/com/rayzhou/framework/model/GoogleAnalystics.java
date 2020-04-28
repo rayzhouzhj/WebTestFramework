@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Refer to GA parameters: https://cheatography.com/dmpg-tom/cheat-sheets/google-universal-analytics-url-collect-parameters/
+ */
 public class GoogleAnalystics {
     private String original = "";
     private Map<String, String> variables = new HashMap<>();

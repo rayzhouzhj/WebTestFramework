@@ -1,4 +1,4 @@
-package com.rayzhou.framework.test.data;
+package com.rayzhou.framework.model;
 
 public enum Browser {
     RANDOM("RANDOM"),
@@ -10,7 +10,8 @@ public enum Browser {
         this.name = name;
     }
 
-    public String getName() {
+    @Override
+    public String toString() {
         return this.name;
     }
 }

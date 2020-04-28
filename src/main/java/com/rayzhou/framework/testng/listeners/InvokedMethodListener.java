@@ -34,35 +34,10 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 
             // Create test case in test report
             ReportManager.getInstance().setTestInfo(testInfo);
-            ReportManager.getInstance().addTag(testInfo.getBrowserType().getName());
+            ReportManager.getInstance().addTag(testInfo.getBrowserType().toString());
             ReportManager.getInstance().setSetupStatus(true);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    /**
-     * Before each method invocation
-     * Initialize Web Driver and Report Manager
-     */
-    @Override
-    public void beforeInvocation(IInvokedMethod method, ITestResult testResult) {
-
-        TestInfo testInfo = new TestInfo(method, testResult);
-
-        // Skip beforeInvocation if current method is not with Annotation Test
-        if (!testInfo.isTestMethod()) {
-            return;
-        }
-
-        System.out.println("[INFO] Start running test [" + testInfo.getMethodName() + "]");
-        try {
-            setupDriverForTest(testInfo);
-            setupReporterForTest(testInfo);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            ReportManager.getInstance().setSetupStatus(false);
-            Assert.fail("Fails to setup test driver.");
         }
     }
 
@@ -94,6 +69,31 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
             } else {
                 throw ex1;
             }
+        }
+    }
+
+    /**
+     * Before each method invocation
+     * Initialize Web Driver and Report Manager
+     */
+    @Override
+    public void beforeInvocation(IInvokedMethod method, ITestResult testResult) {
+
+        TestInfo testInfo = new TestInfo(method, testResult);
+
+        // Skip beforeInvocation if current method is not with Annotation Test
+        if (!testInfo.isTestMethod()) {
+            return;
+        }
+
+        System.out.println("[INFO] Start running test [" + testInfo.getMethodName() + "]");
+        try {
+            setupDriverForTest(testInfo);
+            setupReporterForTest(testInfo);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            ReportManager.getInstance().setSetupStatus(false);
+            Assert.fail("Fails to setup test driver.");
         }
     }
 

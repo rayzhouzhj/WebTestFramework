@@ -1,12 +1,9 @@
 package com.rayzhou.framework.testng.model;
 
-import java.lang.reflect.Method;
-import java.util.logging.Level;
-
 import com.rayzhou.framework.annotations.*;
 import com.rayzhou.framework.annotations.screens.Device;
 import com.rayzhou.framework.annotations.screens.DeviceName;
-import com.rayzhou.framework.test.data.Browser;
+import com.rayzhou.framework.model.Browser;
 import com.rayzhou.framework.testng.listeners.RetryAnalyzer;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
@@ -18,6 +15,9 @@ import org.testng.IInvokedMethod;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 import org.testng.annotations.Test;
+
+import java.lang.reflect.Method;
+import java.util.logging.Level;
 
 public class TestInfo {
     private IInvokedMethod invokedMethod;
@@ -109,7 +109,7 @@ public class TestInfo {
         String browserTypeParam = this.invokedMethod.getTestMethod().getXmlTest().getParameter("browser");
         Browser configBrowserType = null;
         try {
-            configBrowserType = Browser.valueOf(browserTypeParam);
+            configBrowserType = Browser.valueOf(browserTypeParam.toUpperCase());
         } catch (Exception e) {
             throw new RuntimeException("Unsupported browser: " + configBrowserType);
         }

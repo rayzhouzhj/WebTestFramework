@@ -1,6 +1,6 @@
 package com.rayzhou.framework.testng.model;
 
-import com.rayzhou.framework.test.data.Browser;
+import com.rayzhou.framework.model.Browser;
 
 public class RetryMethod {
     private int retryCount = 0;

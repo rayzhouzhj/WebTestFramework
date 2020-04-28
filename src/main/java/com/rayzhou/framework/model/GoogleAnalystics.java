@@ -11,12 +11,12 @@ import java.util.Map;
  * Refer to GA parameters: https://cheatography.com/dmpg-tom/cheat-sheets/google-universal-analytics-url-collect-parameters/
  */
 public class GoogleAnalystics {
-    private String original = "";
+    private String originalUrl = "";
     private Map<String, String> variables = new HashMap<>();
 
     public GoogleAnalystics(String original) {
-        this.original = original;
-        this.parse(this.original);
+        this.originalUrl = original;
+        this.parse(this.originalUrl);
     }
 
     public GoogleAnalystics parse(String url) {
@@ -27,6 +27,10 @@ public class GoogleAnalystics {
         }
 
         return this;
+    }
+
+    public String getOriginalURL() {
+        return this.originalUrl;
     }
 
     public boolean isEventType() {

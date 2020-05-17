@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class NetworkManager {
 
@@ -30,6 +32,9 @@ public class NetworkManager {
 
     public static List<GoogleAnalystics> getGoogleAnalyticsRequests() {
         List<GoogleAnalystics> gaData = Collections.synchronizedList(new ArrayList<>());
+        String pattern = "^https://www.google-analytics.com/([a-z]/)?collect\\?.+";
+        // Create a Pattern object
+        Pattern regex = Pattern.compile(pattern);
 
         LogEntries logs = WebDriverManager.getDriver().manage().logs().get("performance");
         logs.getAll()
@@ -43,8 +48,8 @@ public class NetworkManager {
                         JSONObject request = (JSONObject) params.get("request");
                         String url = (String) request.get("url");
 
-                        if (url.startsWith("https://www.google-analytics.com/collect?")
-                                || url.startsWith("https://www.google-analytics.com/r/collect?")) {
+                        Matcher matcher = regex.matcher(url);
+                        if (matcher.matches()) {
                             System.out.println(entry.getMessage());
                             gaData.add(new GoogleAnalystics(url));
                         }

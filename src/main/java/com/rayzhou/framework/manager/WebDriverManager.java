@@ -1,6 +1,5 @@
 package com.rayzhou.framework.manager;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -38,10 +37,6 @@ public class WebDriverManager {
     public void startDriverInstance(MutableCapabilities browser, Dimension screenDimension) throws Exception {
         RemoteWebDriver currentDriverSession;
 
-        LoggingPreferences logPrefs = new LoggingPreferences();
-        logPrefs.enable(LogType.BROWSER, Level.INFO);
-        browser.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-
         // For Execution Mode
         if (!RunTimeContext.getInstance().isDebugMode()) {
             currentDriverSession = new RemoteWebDriver(new URL(context.getProperty("HOST_URL")), browser);
@@ -69,9 +64,8 @@ public class WebDriverManager {
     }
 
     public void stopWebDriver() {
-        if(WebDriverManager.getDriver() != null) {
+        if (WebDriverManager.getDriver() != null) {
             WebDriverManager.getDriver().quit();
         }
     }
-
 }

@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.rayzhou.framework.annotations.RetryCount;
+import com.rayzhou.framework.testng.model.RetryMethod;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
@@ -27,14 +28,14 @@ public class RetryAnalyzer implements IRetryAnalyzer {
     public boolean retry(ITestResult iTestResult) {
         if (iTestResult.getStatus() == ITestResult.FAILURE) {
             RetryMethod method = getRetryMethod(iTestResult);
-            System.out.println("Test Failed - " + method.methodName);
+            System.out.println("Test Failed - " + method.getMethodName());
             if (method.needRetry()) {
                 method.increaseRetryCount();
-                System.out.println("Retrying Failed Test Cases " + method.retryCount + " out of " + method.maxRetryCount);
+                System.out.println("Retrying Failed Test Cases " + method.getRetryCount() + " out of " + method.getMaxRetryCount());
 
                 return true;
             } else {
-                System.out.println("Meet maximum retry count [ " + method.maxRetryCount + " ]");
+                System.out.println("Meet maximum retry count [ " + method.getMaxRetryCount() + " ]");
 
                 return false;
             }
@@ -72,49 +73,6 @@ public class RetryAnalyzer implements IRetryAnalyzer {
             this.retryMap.put(key, new RetryMethod(0, maxRetryCount, methodName));
 
             return this.retryMap.get(key);
-        }
-    }
-
-    class RetryMethod {
-        private int retryCount = 0;
-        private int maxRetryCount = 0;
-        private String methodName = "";
-        private String browserType = "";
-        private boolean isRetried = false;
-
-        public RetryMethod(int retryCount, int maxRetryCount, String methodName) {
-            this.retryCount = retryCount;
-            this.maxRetryCount = maxRetryCount;
-            this.methodName = methodName;
-        }
-
-        public boolean needRetry() {
-            return retryCount < maxRetryCount;
-        }
-
-        public void increaseRetryCount() {
-            isRetried = true;
-            retryCount++;
-        }
-
-        public void decreaseRetryCount() {
-            retryCount--;
-        }
-
-        public void setBrowserType(String browserType) {
-            this.browserType = browserType;
-        }
-
-        public String getBrowserType() {
-            return this.browserType;
-        }
-
-        public void setRetried(boolean status) {
-            this.isRetried = status;
-        }
-
-        public boolean isRetried() {
-            return this.isRetried;
         }
     }
 }

@@ -119,6 +119,7 @@ public class TestInfo {
         ChromeOnly chromeOnly = this.declaredMethod.getAnnotation(ChromeOnly.class);
         CaptureNetworkTraffic4Chrome captureNetworkTraffic4Chrome = this.declaredMethod.getAnnotation(CaptureNetworkTraffic4Chrome.class);
 
+        // Further update browser type base on annotation
         if (retryBrowserType != null) {
             browserType = retryBrowserType;
         } else if (firefoxOnly != null) {
@@ -128,8 +129,8 @@ public class TestInfo {
         } else if (configBrowserType == Browser.RANDOM) {
             browserType = Math.round(Math.random()) == 1 ? Browser.CHROME : Browser.FIREFOX;
         } else {
-            // If no browser type matched, use RANDOM by default
-            browserType = Browser.RANDOM;
+            // Default browser type value from config
+            browserType = configBrowserType;
         }
 
         return browserType;

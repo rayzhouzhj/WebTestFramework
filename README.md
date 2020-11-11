@@ -1,14 +1,10 @@
 # WebTestFramework
 
-[![](https://jitpack.io/v/rayzhouzhj/WebTestFramework.svg)](https://jitpack.io/#rayzhouzhj/WebTestFramework)
+[![](https://jitpack.io/v/scmp-contributor/WebTestFramework.svg)](https://jitpack.io/#scmp-contributor/WebTestFramework)
 
 ## Description:
 Test framework for Web testing integrated with TestNG and Extent Report.
 
-### Run Below command to create docker containers before test execution:
-```
-docker-compose up --scale selenium-chrome=5 --scale selenium-firefox=3
-```
 
 ### Config below properties to setup the test framework(config.properties):
 ```
@@ -46,17 +42,6 @@ DEBUG_MODE=OFF
 ```
 URL=<your testing url> mvn clean test -Dtest=WebRunner
 ```
-
-### Visual Testing
-#### Install [pixelmatch](https://github.com/mapbox/pixelmatch)
-```
-npm install pixelmatch
-```
-
-#### How to use it
-```java
-PixelMatch.PixelMatchResult matchResult = new PixelMatch()
-                                             .match(actualScreenPNG, expectedResultPNG, outputPNGFile);
 
 if (matchResult.IsMatched) {
     logger.logPassWithScreenshot("Passed");

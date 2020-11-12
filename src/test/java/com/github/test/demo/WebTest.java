@@ -1,17 +1,17 @@
 package com.github.test.demo;
 
-import com.rayzhou.framework.annotations.Authors;
-import com.rayzhou.framework.annotations.screens.Device;
-import com.rayzhou.framework.test.BaseTest;
-import com.rayzhou.framework.utils.PixelMatch;
+import com.scmp.framework.annotations.Authors;
+import com.scmp.framework.annotations.screens.Device;
+import com.scmp.framework.test.BaseTest;
+import com.scmp.framework.utils.PixelMatch;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 
-import com.rayzhou.framework.annotations.ChromeArguments;
-import com.rayzhou.framework.annotations.HeadlessMode;
-import com.rayzhou.framework.annotations.screens.DeviceName;
-import com.rayzhou.framework.manager.WebDriverManager;
+import com.scmp.framework.annotations.ChromeArguments;
+import com.scmp.framework.annotations.HeadlessMode;
+import com.scmp.framework.annotations.screens.DeviceName;
+import com.scmp.framework.manager.WebDriverManager;
 import com.github.test.demo.pom.Browser;
 
 public class WebTest extends BaseTest {

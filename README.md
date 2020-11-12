@@ -38,17 +38,3 @@ DRIVER_HOME=/Users/ray.zhou/Documents/WebDriver
 DEBUG_MODE=OFF
 ```
 
-### Run below command to start test execution:
-```
-URL=<your testing url> mvn clean test -Dtest=WebRunner
-```
-
-if (matchResult.IsMatched) {
-    logger.logPassWithScreenshot("Passed");
-} else {
-    logger.logFailWithImage("error in visual testing", output);
-}
-```
-#### Pixelmatch result in report
-<img src="https://github.com/rayzhouzhj/WebTestFramework/blob/master/for-readme/report.png" width="300" style="padding-left: 50px"><img src="https://github.com/rayzhouzhj/WebTestFramework/blob/master/for-readme/pixelmatchresult.png" width="300">
-

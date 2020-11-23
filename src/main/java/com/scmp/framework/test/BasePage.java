@@ -30,6 +30,10 @@ public abstract class BasePage extends BasePageElement {
         this.launch();
     }
 
+    public void launchWithoutWaiting() {
+        this.getDriver().get(this.getURL());
+    }
+
     public String getPath() {
         String path = this.PATH;
         path = path.replace("?action=preview", "");

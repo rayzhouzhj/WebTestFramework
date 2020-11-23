@@ -27,6 +27,14 @@ public abstract class BasePageElement {
         }
     }
 
+    public void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     public boolean waitForVisible(WebElement element) {
         return waitForVisible(element, 60);
     }

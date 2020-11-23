@@ -48,14 +48,6 @@ public abstract class BasePage extends BasePageElement {
         return url;
     }
 
-    public void sleep(long millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
     public RemoteWebDriver getDriver() {
         return this.driver;
     }

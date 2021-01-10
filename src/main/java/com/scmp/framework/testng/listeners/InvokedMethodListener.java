@@ -56,7 +56,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
             // Setup web driver
             driverManager.startDriverInstance(browserOptions, deviceDimension);
         } catch (Exception ex1) {
-            if (!RunTimeContext.getInstance().isDebugMode()) {
+            if (!RunTimeContext.getInstance().isLocalExecutionMode()) {
                 try {
                     driverManager.stopWebDriver();
                     // Wait 30 seconds and retry driver setup

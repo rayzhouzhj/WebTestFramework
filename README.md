@@ -35,6 +35,6 @@ INCLUDE_GROUPS=DEBUG
 # DRIVER_HOME ==> Path for webdriver, e.g. chromedriver and geckodriver
 DRIVER_HOME=/Users/ray.zhou/Documents/WebDriver
 # With debug mode ON, browser will be launched locally using driver in DRIVER_HOME
-DEBUG_MODE=OFF
+LOCAL_EXECUTION=OFF
 ```
 

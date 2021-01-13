@@ -5,8 +5,29 @@
 ## Description:
 Test framework for Web testing integrated with TestNG and Extent Report.
 
+### Test Entry Point [WebRunner.java](https://github.com/scmp-contributor/WebTestFramework/blob/master/src/test/java/com/github/test/demo/WebRunner.java)
+```java
+public class WebRunner 
+{
+    @Test
+    public static void testApp() throws Exception 
+    {
+        TestExecutor parallelThread = new TestExecutor();
+        boolean hasFailures = parallelThread.runner("com.github.test.demo");
+        
+        Assert.assertFalse(hasFailures, "Testcases execution failed.");
+    }
+}
+```
 
-### Config below properties to setup the test framework(config.properties):
+### How To Start The Test
+```bash
+URL=<your testing url> mvn clean test -Dtest=WebRunner
+# To override the configs from config.properties, e.g. overriding INCLUDE_GROUPS
+URL=<your testing url> INCLUDE_GROUPS=<your runtime include groups> mvn clean test -Dtest=WebRunner
+```
+
+#### Config below properties to setup the test framework([config.properties](https://github.com/scmp-contributor/WebTestFramework/blob/master/config.properties)):
 ```properties
 ############################## WEB ##########################################
 # If more than one browser is provided in BROWSER_TYPE
@@ -38,7 +59,7 @@ DRIVER_HOME=/Users/ray.zhou/Documents/WebDriver
 LOCAL_EXECUTION=OFF
 ```
 
-# Useful Annotations
+### Useful Annotations
 | Annotation Name | Description |
 |------|------|
 | `IncognitoPrivateMode` | Incognito for Chrome and private mode for Firefox |

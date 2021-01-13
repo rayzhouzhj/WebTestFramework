@@ -7,7 +7,7 @@ Test framework for Web testing integrated with TestNG and Extent Report.
 
 
 ### Config below properties to setup the test framework(config.properties):
-```
+```properties
 ############################## WEB ##########################################
 # If more than one browser is provided in BROWSER_TYPE
 # test will be run on different browsers in parallel thread
@@ -41,18 +41,17 @@ LOCAL_EXECUTION=OFF
 # Useful Annotations
 | Annotation Name | Description |
 |------|------|
-| IncognitoPrivateMode | Incognito for Chrome and private mode for Firefox |
-| AcceptUntrustedCertificates | Accept untrusted certificates |
-| CaptureNetworkTraffic4Chrome | Capture newwork log for GA testing |
-| ChromeArguments | Extra chrome arguments <br/> @ChromeArguments(options = {"--incognito"}) |
-| FirefoxArguments | Extra firefox arguments <br/> @FirefoxArguments(options = {"--private"}) |
-| HeadlessMode | Headless mode for both firefox and chrome |
-| RetryCount | Retry count of the test, it will override the config retry count |
-| Device | Custom the screen size <br/> @Device(device = DeviceName.iPhoneX) |
-| ChromeOnly | Override the browser config, run test on chrome only |
-| FirefoxOnly | Override the browser config, run test on firefox only |
-| Test | TestNG annotation, test case indication <br/> @Test(groups = {DESKTOP, LOGIN, GA, REGRESSION}) |
-| Author | Author of the test case, it will show up in report |
-| ClassGroup | Class level group |
-| ClassDescription | Override the config retry count |
-| | |
+| `IncognitoPrivateMode` | Incognito for Chrome and private mode for Firefox |
+| `AcceptUntrustedCertificates` | Accept untrusted certificates |
+| `CaptureNetworkTraffic4Chrome` | Capture newwork log for GA testing |
+| `ChromeArguments` | Extra chrome arguments <br/> @ChromeArguments(options = {"--incognito"}) |
+| `FirefoxArguments` | Extra firefox arguments <br/> @FirefoxArguments(options = {"--private"}) |
+| `HeadlessMode` | Headless mode for both firefox and chrome |
+| `RetryCount` | Retry count of the test, it will override the config retry count |
+| `Device` | Custom the screen size <br/> @Device(device = DeviceName.iPhoneX) |
+| `ChromeOnly` | Override the browser config, run test on chrome only |
+| `FirefoxOnly` | Override the browser config, run test on firefox only |
+| `Test` | TestNG annotation, test case indication <br/> @Test(groups = {DESKTOP, LOGIN, GA, REGRESSION}) |
+| `Author` | Author of the test case, it will show up in report |
+| `ClassGroup` | Class level group |
+| `ClassDescription` | Override the config retry count |

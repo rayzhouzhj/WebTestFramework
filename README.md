@@ -45,7 +45,7 @@ LOCAL_EXECUTION=OFF
 | AcceptUntrustedCertificates | Accept untrusted certificates |
 | CaptureNetworkTraffic4Chrome | Capture newwork log for GA testing |
 | ChromeArguments | Extra chrome arguments <br/> @ChromeArguments(options = {"--incognito"}) |
-| FirefoxArguments | Extra firefox arguments <br/> @ChromeArguments(options = {"--private"}) |
+| FirefoxArguments | Extra firefox arguments <br/> @FirefoxArguments(options = {"--private"}) |
 | HeadlessMode | Headless mode for both firefox and chrome |
 | RetryCount | Retry count of the test, it will override the config retry count |
 | Device | Custom the screen size <br/> @Device(device = DeviceName.iPhoneX) |

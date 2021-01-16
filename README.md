@@ -76,3 +76,18 @@ LOCAL_EXECUTION=OFF
 | `Author` | Author of the test case, it will show up in report |
 | `ClassGroup` | Class level group |
 | `ClassDescription` | Override the config retry count |
+
+### Use Logging Function
+```java
+// To initialize the test logger
+TestLogger logger = new TestLogger();
+```
+| Function Name | Description |
+|------|------|
+| `logInfo(message)` | Log info to report |
+| `logInfoWithScreenshot(message)` | Log info to report with screenshot of current page |
+| `logPass(message)` | Log a test pass for one step |
+| `logPassWithScreenshot(message)` | Log a test pass for one step with screenshot |
+| `logFail(message)` | With screenshot by default, will NOT stop current test |
+| `logFatalError(message)` | With screenshot by default, will STOP current test |
+| `String captureScreen()` | Returning the file path of the screenshot |

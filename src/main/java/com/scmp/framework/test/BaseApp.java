@@ -71,20 +71,25 @@ public abstract class BaseApp {
         driver.switchTo().window(tabs.get(tabSequence));
     }
 
-    public void setLocalStorage(Map<String, String> dataMap) {
+    public void setLocalStorageItems(Map<String, String> dataMap) {
         LocalStorage local = ((WebStorage) this.driver).getLocalStorage();
         for(String key : dataMap.keySet()) {
             local.setItem(key, dataMap.get(key));
         }
     }
 
-    public String getLocalStorage(String key) {
+    public String getLocalStorageItem(String key) {
         LocalStorage local = ((WebStorage) this.driver).getLocalStorage();
         return local.getItem(key);
     }
 
-    public void setLocalStorage(String key, String value) {
+    public void setLocalStorageItem(String key, String value) {
         LocalStorage local = ((WebStorage) this.driver).getLocalStorage();
         local.setItem(key, value);
+    }
+
+    public String removeLocalStorageItem(String key) {
+        LocalStorage local = ((WebStorage) this.driver).getLocalStorage();
+        return local.removeItem(key);
     }
 }

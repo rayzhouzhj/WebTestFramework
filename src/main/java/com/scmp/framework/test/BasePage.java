@@ -37,11 +37,16 @@ public abstract class BasePage extends BasePageElement {
         this.launch();
     }
 
+    public void launchWithSetups(String path) {
+        this.PATH = path;
+        this.launchWithSetups();
+    }
+
     public void launchWithoutWaiting() {
         this.getDriver().get(this.getURL());
     }
 
-    public void launchWithPostActions() {
+    public void launchWithSetups() {
         this.getDriver().get(this.getURL());
         this.postLaunchActions();
 

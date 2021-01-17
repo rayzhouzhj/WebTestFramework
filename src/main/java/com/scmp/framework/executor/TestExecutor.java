@@ -18,7 +18,6 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
 import com.scmp.framework.utils.ConfigFileKeys;
-import com.scmp.framework.utils.Constants;
 import com.scmp.framework.testng.listeners.InvokedMethodListener;
 import com.scmp.framework.testng.listeners.RetryListener;
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -33,7 +32,6 @@ import org.testng.xml.XmlTest;
 
 import com.scmp.framework.context.RunTimeContext;
 import com.scmp.framework.utils.Figlet;
-import com.scmp.framework.utils.PackageUtil;
 
 import static com.scmp.framework.utils.Constants.*;
 
@@ -52,15 +50,15 @@ public class TestExecutor {
   private void prepareWebDriver() {
     System.setProperty(WDM_CACHE_PATH, context.getProperty(ConfigFileKeys.DRIVER_HOME));
     WebDriverManager.chromedriver().setup();
-    context.setVariables(
+    context.setGlobalVariables(
             CHROME_DRIVER_PATH, WebDriverManager.chromedriver().getDownloadedDriverPath());
 
-    System.out.println("ChromeDriver Path => " + context.getVariables(CHROME_DRIVER_PATH));
+    System.out.println("ChromeDriver Path => " + context.getGlobalVariables(CHROME_DRIVER_PATH));
 
     WebDriverManager.firefoxdriver().setup();
-    context.setVariables(
+    context.setGlobalVariables(
             FIREFOX_DRIVER_PATH, WebDriverManager.firefoxdriver().getDownloadedDriverPath());
-    System.out.println("FirefoxDriver Path => " + context.getVariables(FIREFOX_DRIVER_PATH));
+    System.out.println("FirefoxDriver Path => " + context.getGlobalVariables(FIREFOX_DRIVER_PATH));
   }
 
   public boolean runner(String pack, List<String> tests) throws Exception {

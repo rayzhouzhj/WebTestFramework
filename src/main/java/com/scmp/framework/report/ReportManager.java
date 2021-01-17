@@ -75,7 +75,7 @@ public class ReportManager {
     }
 
     public boolean getSetupStatus() {
-        return this.SetupStatus.get();
+        return this.SetupStatus.get() == null? false : this.SetupStatus.get();
     }
 
     public synchronized ExtentTest setupReportForTestSet(TestInfo testInfo) {

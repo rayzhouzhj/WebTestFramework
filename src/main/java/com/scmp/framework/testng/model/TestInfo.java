@@ -3,8 +3,10 @@ package com.scmp.framework.testng.model;
 import com.scmp.framework.annotations.*;
 import com.scmp.framework.annotations.screens.Device;
 import com.scmp.framework.annotations.screens.DeviceName;
+import com.scmp.framework.context.RunTimeContext;
 import com.scmp.framework.model.Browser;
 import com.scmp.framework.testng.listeners.RetryAnalyzer;
+import com.scmp.framework.utils.ConfigFileReader;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -17,28 +19,33 @@ import org.testng.ITestResult;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
+import static com.scmp.framework.utils.ConfigFileKeys.LOCAL_STORAGE_DATA_PATH;
+import static com.scmp.framework.utils.ConfigFileKeys.PRELOAD_LOCAL_STORAGE_DATA;
+
 public class TestInfo {
-    private IInvokedMethod invokedMethod;
+    private IInvokedMethod testNGInvokedMethod;
     private ITestResult testResult;
     private Method declaredMethod;
 
     private Browser browserType = null;
 
     public TestInfo(IInvokedMethod methodName, ITestResult testResult) {
-        this.invokedMethod = methodName;
+        this.testNGInvokedMethod = methodName;
         this.testResult = testResult;
 
-        this.declaredMethod = this.invokedMethod.getTestMethod().getConstructorOrMethod().getMethod();
+        this.declaredMethod = this.testNGInvokedMethod.getTestMethod().getConstructorOrMethod().getMethod();
     }
 
     public ITestResult getTestResult() {
         return this.testResult;
     }
 
-    public IInvokedMethod getInvokedMethod() {
-        return this.invokedMethod;
+    public IInvokedMethod getTestNGInvokedMethod() {
+        return this.testNGInvokedMethod;
     }
 
     public Method getDeclaredMethod() {
@@ -73,7 +80,7 @@ public class TestInfo {
 
     public String getTestName() {
         String dataProvider = null;
-        Object dataParameter = this.invokedMethod.getTestResult().getParameters();
+        Object dataParameter = this.testNGInvokedMethod.getTestResult().getParameters();
         if (((Object[]) dataParameter).length > 0) {
             dataProvider = (String) ((Object[]) dataParameter)[0];
         }
@@ -86,7 +93,7 @@ public class TestInfo {
     }
 
     public String[] getTestGroups() {
-        return this.invokedMethod.getTestMethod().getGroups();
+        return this.testNGInvokedMethod.getTestMethod().getGroups();
     }
 
     /**
@@ -106,7 +113,7 @@ public class TestInfo {
             retryBrowserType = ((RetryAnalyzer) analyzer).getRetryMethod(testResult).getBrowserType();
         }
 
-        String browserTypeParam = this.invokedMethod.getTestMethod().getXmlTest().getParameter("browser");
+        String browserTypeParam = this.testNGInvokedMethod.getTestMethod().getXmlTest().getParameter("browser");
         Browser configBrowserType = null;
         try {
             configBrowserType = Browser.valueOf(browserTypeParam.toUpperCase());
@@ -233,5 +240,43 @@ public class TestInfo {
             default:
                 throw new RuntimeException("Unsupported browser: " + browserType);
         }
+    }
+
+    /**
+     * Get the local storage data from
+     * 1. config.properties: LOCAL_STORAGE_DATA_PATH
+     * 2. CustomLocalStorage: path
+     * 3. CustomLocalStorage: LocalStorageData
+     *
+     * @return
+     *
+     */
+    public Map<String, String> getCustomLocalStorage() {
+
+        Map<String, String> customData = new HashMap<>();
+        boolean loadDefaultData = "true".equalsIgnoreCase(RunTimeContext.getInstance().getProperty(PRELOAD_LOCAL_STORAGE_DATA, "false"));
+        CustomLocalStorage customLocalStorage = this.declaredMethod.getAnnotation(CustomLocalStorage.class);
+        loadDefaultData = customLocalStorage != null && customLocalStorage.loadDefault()? customLocalStorage.loadDefault() : loadDefaultData;
+
+        // Load default data
+        if (loadDefaultData) {
+            String filePath = RunTimeContext.getInstance().getProperty(LOCAL_STORAGE_DATA_PATH);
+            customData.putAll(new ConfigFileReader(filePath).getAllProperties());
+        }
+
+        // Load custom data file
+        if (customLocalStorage != null && !"".equalsIgnoreCase(customLocalStorage.path().trim())) {
+            String filePath = customLocalStorage.path().trim();
+            customData.putAll(new ConfigFileReader(filePath).getAllProperties());
+        }
+
+        // Load custom data
+        if (customLocalStorage != null && customLocalStorage.data().length > 0) {
+            for(LocalStorageData data : customLocalStorage.data()) {
+                customData.put(data.key(), data.value());
+            }
+        }
+
+        return customData;
     }
 }

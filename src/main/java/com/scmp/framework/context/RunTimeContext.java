@@ -1,6 +1,7 @@
 package com.scmp.framework.context;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.scmp.framework.utils.ConfigFileKeys;
@@ -8,9 +9,21 @@ import com.scmp.framework.utils.ConfigFileReader;
 
 public class RunTimeContext {
   private static RunTimeContext instance;
-  private ConcurrentHashMap<String, Object> concurrentHashMap = new ConcurrentHashMap<>();
+  private ThreadLocal<HashMap<String, Object>> testLevelVariables = new ThreadLocal<>();
+  private ConcurrentHashMap<String, Object> globalVariables = new ConcurrentHashMap<>();
+  private ConfigFileReader configFileReader;
 
-  private RunTimeContext() {}
+  private RunTimeContext() {
+
+    String configFile = "config.properties";
+    if (System.getenv().containsKey("CONFIG_FILE"))
+    {
+      configFile = System.getenv().get("CONFIG_FILE");
+      System.out.println("Using config file from " + configFile);
+    }
+
+    this.configFileReader = new ConfigFileReader(configFile);
+  }
 
   public static synchronized RunTimeContext getInstance() {
     if (instance == null) {
@@ -20,12 +33,34 @@ public class RunTimeContext {
     return instance;
   }
 
-  public Object getVariables(String name) {
-    return this.concurrentHashMap.getOrDefault(name, null);
+  public void setGlobalVariables(String name, Object data) {
+    this.globalVariables.put(name, data);
   }
 
-  public Object setVariables(String name, Object data) {
-    return this.concurrentHashMap.put(name, data);
+  public Object getGlobalVariables(String name) {
+    return this.globalVariables.get(name);
+  }
+
+  public Object getTestLevelVariables(String name) {
+    if(this.testLevelVariables.get() ==  null) {
+      return null;
+    } else {
+      return this.testLevelVariables.get().getOrDefault(name, null);
+    }
+  }
+
+  public void setTestLevelVariables(String name, Object data) {
+    if(this.testLevelVariables.get() ==  null) {
+      this.testLevelVariables.set(new HashMap<>());
+    }
+
+    this.testLevelVariables.get().put(name, data);
+  }
+
+  public void clearRunTimeVariables() {
+    if(this.testLevelVariables.get() !=  null) {
+      this.testLevelVariables.get().clear();
+    }
   }
 
   public String getProperty(String name) {
@@ -35,7 +70,7 @@ public class RunTimeContext {
   public String getProperty(String key, String defaultValue) {
     String value = System.getenv(key);
     if (value == null || value.isEmpty()) {
-      value = ConfigFileReader.getInstance().getProperty(key, defaultValue);
+      value = configFileReader.getProperty(key, defaultValue);
     }
 
     return value;

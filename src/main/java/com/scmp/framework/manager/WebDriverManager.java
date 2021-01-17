@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import com.scmp.framework.utils.ConfigFileKeys;
-import com.scmp.framework.utils.Constants;
 import com.scmp.framework.context.RunTimeContext;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
@@ -49,13 +48,13 @@ public class WebDriverManager {
         System.out.println("Launch local Chrome Browser");
         System.setProperty(
             CHROME_DRIVER_SYSTEM_PROPERTY_NAME,
-            RunTimeContext.getInstance().getVariables(CHROME_DRIVER_PATH).toString());
+            RunTimeContext.getInstance().getGlobalVariables(CHROME_DRIVER_PATH).toString());
         currentDriverSession = new ChromeDriver((ChromeOptions) browser);
       } else {
         System.out.println("Launch local Firefox Browser");
         System.setProperty(
             FIREFOX_DRIVER_SYSTEM_PROPERTY_NAME,
-            RunTimeContext.getInstance().getVariables(FIREFOX_DRIVER_PATH).toString());
+            RunTimeContext.getInstance().getGlobalVariables(FIREFOX_DRIVER_PATH).toString());
         currentDriverSession = new FirefoxDriver((FirefoxOptions) browser);
       }
     }

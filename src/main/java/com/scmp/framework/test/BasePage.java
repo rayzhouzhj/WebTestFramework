@@ -1,10 +1,17 @@
 package com.scmp.framework.test;
 
 import com.scmp.framework.context.RunTimeContext;
+import com.scmp.framework.testng.model.TestInfo;
 import com.scmp.framework.utils.HTMLTags;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.html5.LocalStorage;
+import org.openqa.selenium.html5.WebStorage;
 import org.openqa.selenium.remote.RemoteWebDriver;
+
+import java.util.Map;
+
+import static com.scmp.framework.utils.Constants.TEST_INFO_OBJECT;
 
 public abstract class BasePage extends BasePageElement {
 
@@ -32,6 +39,20 @@ public abstract class BasePage extends BasePageElement {
 
     public void launchWithoutWaiting() {
         this.getDriver().get(this.getURL());
+    }
+
+    public void launchWithPostActions() {
+        this.getDriver().get(this.getURL());
+        this.postLaunchActions();
+
+        // Reload the page
+        this.getDriver().get(this.getURL());
+        this.waitForPageLoad();
+    }
+
+    public void postLaunchActions() {
+        TestInfo testInfo = (TestInfo)RunTimeContext.getInstance().getTestLevelVariables(TEST_INFO_OBJECT);
+        this.setLocalStorage(testInfo.getCustomLocalStorage());
     }
 
     public String getPath() {
@@ -201,5 +222,17 @@ public abstract class BasePage extends BasePageElement {
         }
 
         return parent;
+    }
+
+    public void setLocalStorage(Object inputData) {
+        if(inputData instanceof Map) {
+            Map<String, String> dataMap = (Map<String, String>)inputData;
+            LocalStorage local = ((WebStorage) this.driver).getLocalStorage();
+            for(String key : dataMap.keySet()) {
+                local.setItem(key, dataMap.get(key));
+            }
+        } else {
+            throw new IllegalArgumentException("Invalid argument: inputData");
+        }
     }
 }

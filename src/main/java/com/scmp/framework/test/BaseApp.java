@@ -1,11 +1,14 @@
 package com.scmp.framework.test;
 
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.html5.LocalStorage;
+import org.openqa.selenium.html5.WebStorage;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Map;
 
 public abstract class BaseApp {
     private RemoteWebDriver driver;
@@ -66,5 +69,22 @@ public abstract class BaseApp {
     public void switchToTab(int tabSequence) {
         ArrayList<String> tabs = new ArrayList<> (driver.getWindowHandles());
         driver.switchTo().window(tabs.get(tabSequence));
+    }
+
+    public void setLocalStorage(Map<String, String> dataMap) {
+        LocalStorage local = ((WebStorage) this.driver).getLocalStorage();
+        for(String key : dataMap.keySet()) {
+            local.setItem(key, dataMap.get(key));
+        }
+    }
+
+    public String getLocalStorage(String key) {
+        LocalStorage local = ((WebStorage) this.driver).getLocalStorage();
+        return local.getItem(key);
+    }
+
+    public void setLocalStorage(String key, String value) {
+        LocalStorage local = ((WebStorage) this.driver).getLocalStorage();
+        local.setItem(key, value);
     }
 }

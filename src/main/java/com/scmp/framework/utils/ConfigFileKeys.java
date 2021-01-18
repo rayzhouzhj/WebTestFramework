@@ -11,6 +11,8 @@ public class ConfigFileKeys {
     public static String MONGODB_PORT = "MONGODB_PORT";
     public static String MAX_RETRY_COUNT = "MAX_RETRY_COUNT";
     public static String REMOVE_FAILED_TEST_B4_RETRY = "REMOVE_FAILED_TEST_B4_RETRY";
+    public static String PRELOAD_LOCAL_STORAGE_DATA = "PRELOAD_LOCAL_STORAGE_DATA";
+    public static String LOCAL_STORAGE_DATA_PATH = "LOCAL_STORAGE_DATA_PATH";
     public static String EXCLUDE_GROUPS = "EXCLUDE_GROUPS";
     public static String INCLUDE_GROUPS = "INCLUDE_GROUPS";
     public static String DEBUG_MODE = "DEBUG_MODE";

@@ -13,6 +13,8 @@ import org.testng.annotations.Test;
 import com.scmp.framework.report.ExtentManager;
 import com.scmp.framework.report.ReportManager;
 
+import static com.scmp.framework.utils.Constants.TEST_INFO_OBJECT;
+
 
 public final class InvokedMethodListener implements IInvokedMethodListener {
     private WebDriverManager driverManager;
@@ -61,6 +63,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
                     driverManager.stopWebDriver();
                     // Wait 30 seconds and retry driver setup
                     Thread.sleep(30000);
+
                     // Setup web driver
                     driverManager.startDriverInstance(browserOptions, deviceDimension);
                 } catch (Exception ex2) {
@@ -79,7 +82,11 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
     @Override
     public void beforeInvocation(IInvokedMethod method, ITestResult testResult) {
 
+        // Clear all runtime variables
+        RunTimeContext.getInstance().clearRunTimeVariables();
+
         TestInfo testInfo = new TestInfo(method, testResult);
+        RunTimeContext.getInstance().setTestLevelVariables(TEST_INFO_OBJECT, testInfo);
 
         // Skip beforeInvocation if current method is not with Annotation Test
         if (!testInfo.isTestMethod()) {
@@ -133,6 +140,10 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
                 ReportManager.getInstance().removeTest();
             }
 
+            // Clear all runtime variables
+            RunTimeContext.getInstance().clearRunTimeVariables();
+
+            // Stop driver
             driverManager.stopWebDriver();
         } catch (Exception e) {
             e.printStackTrace();

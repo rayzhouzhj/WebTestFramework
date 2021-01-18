@@ -8,4 +8,7 @@ public class Constants {
 
     public static String CHROME_DRIVER_PATH = "CHROME_DRIVER_PATH";
     public static String FIREFOX_DRIVER_PATH = "FIREFOX_DRIVER_PATH";
+
+    // Key for TestInfo
+    public static String TEST_INFO_OBJECT = "TEST_INFO_OBJECT";
 }

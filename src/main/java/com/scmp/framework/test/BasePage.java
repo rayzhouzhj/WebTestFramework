@@ -7,7 +7,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.html5.LocalStorage;
 import org.openqa.selenium.html5.WebStorage;
+import org.openqa.selenium.remote.RemoteExecuteMethod;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.html5.RemoteWebStorage;
 
 import java.util.Map;
 
@@ -231,10 +233,20 @@ public abstract class BasePage extends BasePageElement {
 
     public void setLocalStorage(Object inputData) {
         if(inputData instanceof Map) {
+
+            LocalStorage localStorage;
             Map<String, String> dataMap = (Map<String, String>)inputData;
-            LocalStorage local = ((WebStorage) this.driver).getLocalStorage();
+
+            if(RunTimeContext.getInstance().isLocalExecutionMode()){
+                localStorage = ((WebStorage) this.driver).getLocalStorage();
+            } else {
+                RemoteExecuteMethod executeMethod = new RemoteExecuteMethod(this.driver);
+                RemoteWebStorage webStorage = new RemoteWebStorage(executeMethod);
+                localStorage = webStorage.getLocalStorage();
+            }
+
             for(String key : dataMap.keySet()) {
-                local.setItem(key, dataMap.get(key));
+                localStorage.setItem(key, dataMap.get(key));
             }
         } else {
             throw new IllegalArgumentException("Invalid argument: inputData");

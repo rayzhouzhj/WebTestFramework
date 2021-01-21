@@ -58,8 +58,7 @@ public abstract class BasePage extends BasePageElement {
     }
 
     public void postLaunchActions() {
-        TestInfo testInfo = (TestInfo)RunTimeContext.getInstance().getTestLevelVariables(TEST_INFO_OBJECT);
-        this.setLocalStorage(testInfo.getCustomLocalStorage());
+        this.loadLocalStorageItems();
     }
 
     public String getPath() {
@@ -231,7 +230,12 @@ public abstract class BasePage extends BasePageElement {
         return parent;
     }
 
-    public void setLocalStorage(Object inputData) {
+    public void loadLocalStorageItems() {
+        TestInfo testInfo = (TestInfo)RunTimeContext.getInstance().getTestLevelVariables(TEST_INFO_OBJECT);
+        this.setLocalStorageItems(testInfo.getCustomLocalStorage());
+    }
+
+    public void setLocalStorageItems(Object inputData) {
         if(inputData instanceof Map) {
 
             LocalStorage localStorage;

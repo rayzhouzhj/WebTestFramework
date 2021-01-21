@@ -1,5 +1,7 @@
 package com.scmp.framework.test;
 
+import com.scmp.framework.context.RunTimeContext;
+import com.scmp.framework.testng.model.TestInfo;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.html5.LocalStorage;
 import org.openqa.selenium.html5.WebStorage;
@@ -9,6 +11,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Map;
+
+import static com.scmp.framework.utils.Constants.TEST_INFO_OBJECT;
 
 public abstract class BaseApp {
     private RemoteWebDriver driver;
@@ -69,6 +73,11 @@ public abstract class BaseApp {
     public void switchToTab(int tabSequence) {
         ArrayList<String> tabs = new ArrayList<> (driver.getWindowHandles());
         driver.switchTo().window(tabs.get(tabSequence));
+    }
+
+    public void loadLocalStorageItems() {
+        TestInfo testInfo = (TestInfo)RunTimeContext.getInstance().getTestLevelVariables(TEST_INFO_OBJECT);
+        this.setLocalStorageItems(testInfo.getCustomLocalStorage());
     }
 
     public void setLocalStorageItems(Map<String, String> dataMap) {

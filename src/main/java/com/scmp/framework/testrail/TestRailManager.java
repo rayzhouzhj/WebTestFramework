@@ -1,11 +1,14 @@
 package com.scmp.framework.testrail;
 
+import com.scmp.framework.testrail.models.TestCase;
 import com.scmp.framework.testrail.models.TestRun;
+import com.scmp.framework.testrail.models.requests.AddTestRunRequest;
 import okhttp3.*;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,17 +60,99 @@ public class TestRailManager {
     String CustomQuery = String.format(TestRailService.GET_TEST_RUNS_API, projectID);
 
     TestRailService service = retrofit.create(TestRailService.class);
-    List<TestRun> runs = null;
+    List<TestRun> testRunList = null;
     try {
       Map<String, String> data = new HashMap<>();
       data.put(CustomQuery, "");
-      runs = service.getRuns(data).execute().body();
+      testRunList = service.getTestRuns(data).execute().body();
     } catch (IOException e) {
       e.printStackTrace();
     }
-    System.out.println(runs.get(0));
 
-    return runs;
+    return testRunList;
+  }
+
+  public List<TestCase> getAutomatedTestCases(String projectId) {
+    String CustomQuery = String.format(TestRailService.GET_TEST_CASES_API, projectId);
+
+    TestRailService service = retrofit.create(TestRailService.class);
+    List<TestCase> testCaseList = null;
+    try {
+      Map<String, String> data = new HashMap<>();
+      data.put(CustomQuery, "");
+      data.put(TestCase.TYPE_ID, TestCase.TYPE_AUTOMATED);
+      testCaseList = service.getTestCases(data).execute().body();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return testCaseList;
+  }
+
+  public TestRun getTestRun(String testRunId) {
+    String CustomQuery = String.format(TestRailService.GET_TEST_RUN_API, testRunId);
+
+    TestRailService service = retrofit.create(TestRailService.class);
+    TestRun testRun = null;
+    try {
+      Map<String, String> data = new HashMap<>();
+      data.put(CustomQuery, "");
+      testRun = service.getTestRun(data).execute().body();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return testRun;
+  }
+
+  public TestRun addTestRun(String projectId, String testRunName, List<Integer> includeTestCaseIds) {
+    if(includeTestCaseIds == null) {
+      includeTestCaseIds = new ArrayList<>();
+    }
+
+    AddTestRunRequest request = new AddTestRunRequest(
+            testRunName,
+            includeTestCaseIds.size() == 0,
+            includeTestCaseIds);
+
+    String CustomQuery = String.format(TestRailService.ADD_TEST_RUN_API, projectId);
+
+    TestRailService service = retrofit.create(TestRailService.class);
+    TestRun testRun = null;
+    try {
+      Map<String, String> data = new HashMap<>();
+      data.put(CustomQuery, "");
+      testRun = service.addTestRun(data, request).execute().body();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    testRun.setTestCaseIds(includeTestCaseIds);
+
+    return testRun;
+  }
+
+  public TestRun updateTestRun(TestRun testRun) {
+
+    AddTestRunRequest request = new AddTestRunRequest(
+            testRun.getName(),
+            testRun.getIncludeAll(),
+            testRun.getTestCaseIds());
+
+    String CustomQuery = String.format(TestRailService.UPDATE_TEST_RUN_API, testRun.getId());
+
+    TestRailService service = retrofit.create(TestRailService.class);
+    TestRun updatedTestRun = null;
+    try {
+      Map<String, String> data = new HashMap<>();
+      data.put(CustomQuery, "");
+      updatedTestRun = service.updateTestRun(data, request).execute().body();
+      updatedTestRun.setTestCaseIds(testRun.getTestCaseIds());
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return updatedTestRun;
   }
 }
 

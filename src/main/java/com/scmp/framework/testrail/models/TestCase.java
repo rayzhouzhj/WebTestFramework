@@ -4,6 +4,9 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 
 public class TestCase {
+    public static String TYPE_ID = "type_id";
+    public static String TYPE_AUTOMATED = "3";
+
     @SerializedName("id")
     private @Getter Integer id;
 

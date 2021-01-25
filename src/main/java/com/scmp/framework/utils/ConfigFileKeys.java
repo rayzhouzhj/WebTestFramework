@@ -13,12 +13,16 @@ public class ConfigFileKeys {
     public static String REMOVE_FAILED_TEST_B4_RETRY = "REMOVE_FAILED_TEST_B4_RETRY";
     public static String PRELOAD_LOCAL_STORAGE_DATA = "PRELOAD_LOCAL_STORAGE_DATA";
     public static String LOCAL_STORAGE_DATA_PATH = "LOCAL_STORAGE_DATA_PATH";
-    public static String USER_NAME = "USER_NAME";
-    public static String API_KEY = "API_KEY";
-    public static String UPLOAD_TO_TESTRAIL = "UPLOAD_TO_TESTRAIL";
-    public static String TEST_RUN_NAME = "TEST_RUN_NAME";
+    public static String TESTRAIL_SERVER = "TESTRAIL_SERVER";
+    public static String TESTRAIL_USER_NAME = "TESTRAIL_USER_NAME";
+    public static String TESTRAIL_API_KEY = "TESTRAIL_API_KEY";
+    public static String TESTRAIL_UPLOAD_FLAG = "TESTRAIL_UPLOAD_FLAG";
+    public static String TESTRAIL_TEST_RUN_NAME = "TESTRAIL_TEST_RUN_NAME";
+    public static String TESTRAIL_ALWAYS_CREATE_NEW_TEST_RUN = "TESTRAIL_ALWAYS_CREATE_NEW_TEST_RUN";
     public static String EXCLUDE_GROUPS = "EXCLUDE_GROUPS";
     public static String INCLUDE_GROUPS = "INCLUDE_GROUPS";
+    public static String URL = "URL";
+    public static String FEATURE_DESCRIPTION = "FEATURE_DESCRIPTION";
     public static String DEBUG_MODE = "DEBUG_MODE";
     public static String LOCAL_EXECUTION = "LOCAL_EXECUTION";
 }

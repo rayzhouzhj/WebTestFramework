@@ -2,6 +2,7 @@ package com.scmp.framework.utils;
 
 public class Constants {
 
+    public static String USER_DIR = "user.dir";
     public static String WDM_CACHE_PATH = "wdm.cachePath";
     public static String CHROME_DRIVER_SYSTEM_PROPERTY_NAME = "webdriver.chrome.driver";
     public static String FIREFOX_DRIVER_SYSTEM_PROPERTY_NAME = "webdriver.gecko.driver";

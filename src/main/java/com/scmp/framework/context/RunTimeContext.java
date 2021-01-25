@@ -6,6 +6,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.scmp.framework.utils.ConfigFileKeys;
 import com.scmp.framework.utils.ConfigFileReader;
+import sun.security.krb5.Config;
+
+import static com.scmp.framework.utils.Constants.USER_DIR;
 
 public class RunTimeContext {
   private static RunTimeContext instance;
@@ -77,12 +80,12 @@ public class RunTimeContext {
   }
 
   public String getURL() {
-    return this.getProperty("URL", "");
+    return this.getProperty(ConfigFileKeys.URL, "");
   }
 
   public synchronized String getLogPath(String category, String className, String methodName) {
     String path =
-        System.getProperty("user.dir")
+        System.getProperty(USER_DIR)
             + File.separator
             + "target"
             + File.separator
@@ -115,4 +118,9 @@ public class RunTimeContext {
     return "true"
         .equalsIgnoreCase(this.getProperty(ConfigFileKeys.REMOVE_FAILED_TEST_B4_RETRY, "false"));
   }
+
+  public boolean isUploadToTestRail() {
+    return "true".equalsIgnoreCase(
+                    this.getProperty(ConfigFileKeys.TESTRAIL_UPLOAD_FLAG, "false"));
+    }
 }

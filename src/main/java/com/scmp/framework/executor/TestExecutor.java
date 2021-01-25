@@ -17,6 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
+import com.scmp.framework.testrail.TestRailManager;
 import com.scmp.framework.utils.ConfigFileKeys;
 import com.scmp.framework.testng.listeners.InvokedMethodListener;
 import com.scmp.framework.testng.listeners.RetryListener;
@@ -40,11 +41,26 @@ public class TestExecutor {
   private ArrayList<String> items = new ArrayList<>();
 
   public TestExecutor() {
+
     context = RunTimeContext.getInstance();
 
     if(RunTimeContext.getInstance().isLocalExecutionMode()) {
       prepareWebDriver();
     }
+
+    if(RunTimeContext.getInstance().isUploadToTestRail()) {
+      initTestRail();
+    }
+  }
+
+  private void initTestRail() {
+    String baseUrl = RunTimeContext.getInstance().getProperty(ConfigFileKeys.TESTRAIL_SERVER);
+    String userName = RunTimeContext.getInstance().getProperty(ConfigFileKeys.TESTRAIL_USER_NAME);
+    String password = RunTimeContext.getInstance().getProperty(ConfigFileKeys.TESTRAIL_API_KEY);
+
+    TestRailManager.init(baseUrl, userName, password);
+
+    TestRailManager.getInstance().getTestRuns("1");
   }
 
   private void prepareWebDriver() {

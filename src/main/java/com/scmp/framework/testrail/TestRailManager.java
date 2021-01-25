@@ -1,5 +1,6 @@
 package com.scmp.framework.testrail;
 
+import com.scmp.framework.testrail.models.Attachment;
 import com.scmp.framework.testrail.models.TestCase;
 import com.scmp.framework.testrail.models.TestRun;
 import com.scmp.framework.testrail.models.requests.AddTestResultRequest;
@@ -8,6 +9,7 @@ import okhttp3.*;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -106,15 +108,14 @@ public class TestRailManager {
     return testRun;
   }
 
-  public TestRun addTestRun(String projectId, String testRunName, List<Integer> includeTestCaseIds) {
-    if(includeTestCaseIds == null) {
+  public TestRun addTestRun(
+      String projectId, String testRunName, List<Integer> includeTestCaseIds) {
+    if (includeTestCaseIds == null) {
       includeTestCaseIds = new ArrayList<>();
     }
 
-    AddTestRunRequest request = new AddTestRunRequest(
-            testRunName,
-            includeTestCaseIds.size() == 0,
-            includeTestCaseIds);
+    AddTestRunRequest request =
+        new AddTestRunRequest(testRunName, includeTestCaseIds.size() == 0, includeTestCaseIds);
 
     String CustomQuery = String.format(TestRailService.ADD_TEST_RUN_API, projectId);
 
@@ -135,10 +136,8 @@ public class TestRailManager {
 
   public TestRun updateTestRun(TestRun testRun) {
 
-    AddTestRunRequest request = new AddTestRunRequest(
-            testRun.getName(),
-            testRun.getIncludeAll(),
-            testRun.getTestCaseIds());
+    AddTestRunRequest request =
+        new AddTestRunRequest(testRun.getName(), testRun.getIncludeAll(), testRun.getTestCaseIds());
 
     String CustomQuery = String.format(TestRailService.UPDATE_TEST_RUN_API, testRun.getId());
 
@@ -158,7 +157,8 @@ public class TestRailManager {
 
   public void addTestResult(Integer testRunId, Integer testCaseId, AddTestResultRequest request) {
 
-    String CustomQuery = String.format(TestRailService.ADD_RESULT_FOR_TEST_CASE_API, testRunId, testCaseId);
+    String CustomQuery =
+        String.format(TestRailService.ADD_RESULT_FOR_TEST_CASE_API, testRunId, testCaseId);
 
     TestRailService service = retrofit.create(TestRailService.class);
     try {
@@ -168,6 +168,31 @@ public class TestRailManager {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  public Attachment addAttachmentToTestRun(Integer testRunId, String imagePath) {
+
+    String CustomQuery = String.format(TestRailService.ADD_ATTACHMENT_FOR_TEST_RUN_API, testRunId);
+
+    TestRailService service = retrofit.create(TestRailService.class);
+    Attachment attachment = null;
+    try {
+      Map<String, String> data = new HashMap<>();
+      data.put(CustomQuery, "");
+
+      File file = new File(imagePath);
+      RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+
+      // MultipartBody.Part is used to send also the actual file name
+      MultipartBody.Part imageToUpload =
+          MultipartBody.Part.createFormData("attachment", file.getName(), requestFile);
+
+      attachment = service.addAttachmentToTestRun(data, imageToUpload).execute().body();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    return attachment;
   }
 }
 

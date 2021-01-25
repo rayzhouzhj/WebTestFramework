@@ -7,4 +7,5 @@ public class TestRailStatus {
     public static int Retest = 4;
     public static int Failed = 5;
     public static int NA = 6;
+    public static int Info = 7;
 }

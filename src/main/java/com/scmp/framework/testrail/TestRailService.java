@@ -1,7 +1,9 @@
 package com.scmp.framework.testrail;
 
 import com.scmp.framework.testrail.models.TestCase;
+import com.scmp.framework.testrail.models.TestResult;
 import com.scmp.framework.testrail.models.TestRun;
+import com.scmp.framework.testrail.models.requests.AddTestResultRequest;
 import com.scmp.framework.testrail.models.requests.AddTestRunRequest;
 import retrofit2.Call;
 import retrofit2.http.*;
@@ -18,7 +20,7 @@ public interface TestRailService {
     String ADD_TEST_RUN_API = "/api/v2/add_run/%s";
     String UPDATE_TEST_RUN_API = "/api/v2/update_run/%s";
 
-    String ADD_RESULT_FOR_TEST_CASES_API = "/api/v2/add_result_for_case/%s/%s";
+    String ADD_RESULT_FOR_TEST_CASE_API = "/api/v2/add_result_for_case/%s/%s";
 
     @GET("index.php")
     @Headers({"Content-Type: application/json"})
@@ -40,7 +42,7 @@ public interface TestRailService {
     @Headers({"Content-Type: application/json"})
     Call<TestRun> updateTestRun(@QueryMap(encoded = true) Map<String, String> options, @Body AddTestRunRequest request);
 
-//    @POST("index.php")
-//    @Headers({"Content-Type: application/json"})
-//    Call<List<TestCase>> AddResultForTestCase(@QueryMap(encoded = true) Map<String, String> options, @Body AddTestRunRequest);
+    @POST("index.php")
+    @Headers({"Content-Type: application/json"})
+    Call<TestResult> addResultForTestCase(@QueryMap(encoded = true) Map<String, String> options, @Body AddTestResultRequest request);
 }

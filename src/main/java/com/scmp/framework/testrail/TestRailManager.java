@@ -2,6 +2,7 @@ package com.scmp.framework.testrail;
 
 import com.scmp.framework.testrail.models.TestCase;
 import com.scmp.framework.testrail.models.TestRun;
+import com.scmp.framework.testrail.models.requests.AddTestResultRequest;
 import com.scmp.framework.testrail.models.requests.AddTestRunRequest;
 import okhttp3.*;
 import retrofit2.Retrofit;
@@ -153,6 +154,20 @@ public class TestRailManager {
     }
 
     return updatedTestRun;
+  }
+
+  public void addTestResult(Integer testRunId, Integer testCaseId, AddTestResultRequest request) {
+
+    String CustomQuery = String.format(TestRailService.ADD_RESULT_FOR_TEST_CASE_API, testRunId, testCaseId);
+
+    TestRailService service = retrofit.create(TestRailService.class);
+    try {
+      Map<String, String> data = new HashMap<>();
+      data.put(CustomQuery, "");
+      service.addResultForTestCase(data, request).execute().body();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 }
 

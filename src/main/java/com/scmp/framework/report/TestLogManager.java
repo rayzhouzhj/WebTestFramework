@@ -21,7 +21,7 @@ public class TestLogManager {
     }
 
 
-    public void endLog(ITestResult result, ThreadLocal<ExtentTest> test) throws IOException, InterruptedException {
+    public void endLog(ITestResult result, ThreadLocal<ExtentTest> test) {
         String className = result.getInstance().getClass().getSimpleName();
         if (result.isSuccess()) {
             test.get().log(Status.PASS, "Test Passed: " + result.getMethod().getMethodName());

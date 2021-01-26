@@ -12,4 +12,7 @@ public class Constants {
 
     // Key for TestInfo
     public static String TEST_INFO_OBJECT = "TEST_INFO_OBJECT";
+
+    // Key for TestRun
+    public static String TEST_RUN_OBJECT = "TEST_RUN_OBJECT";
 }

@@ -1,6 +1,7 @@
 package com.scmp.framework.context;
 
 import java.io.File;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -123,4 +124,13 @@ public class RunTimeContext {
     return "true".equalsIgnoreCase(
                     this.getProperty(ConfigFileKeys.TESTRAIL_UPLOAD_FLAG, "false"));
     }
+
+  public boolean isAlwaysCreateNewTestRunInTestRail() {
+    return "true".equalsIgnoreCase(
+            this.getProperty(ConfigFileKeys.TESTRAIL_ALWAYS_CREATE_NEW_TEST_RUN, "false"));
+  }
+
+  public ZoneId getZoneId() {
+    return ZoneId.of("Asia/Hong_Kong");
+  }
 }

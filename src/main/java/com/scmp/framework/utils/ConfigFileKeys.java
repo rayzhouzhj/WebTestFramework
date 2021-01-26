@@ -18,6 +18,7 @@ public class ConfigFileKeys {
     public static String TESTRAIL_API_KEY = "TESTRAIL_API_KEY";
     public static String TESTRAIL_UPLOAD_FLAG = "TESTRAIL_UPLOAD_FLAG";
     public static String TESTRAIL_TEST_RUN_NAME = "TESTRAIL_TEST_RUN_NAME";
+    public static String TESTRAIL_PROJECT_ID = "TESTRAIL_PROJECT_ID";
     public static String TESTRAIL_ALWAYS_CREATE_NEW_TEST_RUN = "TESTRAIL_ALWAYS_CREATE_NEW_TEST_RUN";
     public static String EXCLUDE_GROUPS = "EXCLUDE_GROUPS";
     public static String INCLUDE_GROUPS = "INCLUDE_GROUPS";

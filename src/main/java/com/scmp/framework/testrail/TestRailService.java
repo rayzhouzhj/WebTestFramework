@@ -7,7 +7,6 @@ import com.scmp.framework.testrail.models.TestRun;
 import com.scmp.framework.testrail.models.requests.AddTestResultRequest;
 import com.scmp.framework.testrail.models.requests.AddTestRunRequest;
 import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.*;
 

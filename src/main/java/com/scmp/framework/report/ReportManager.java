@@ -142,12 +142,8 @@ public class ReportManager {
     }
 
     public void logInfoWithScreenshot(String message) {
-        try {
-            this.CurrentTestMethod.get().log(Status.INFO, message);
-            this.logScreenshot();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.CurrentTestMethod.get().log(Status.INFO, message);
+        this.logScreenshot();
     }
 
     public void logPass(String message) {
@@ -160,19 +156,14 @@ public class ReportManager {
     }
 
     public void logFail(String message) {
-
         this.CurrentTestMethod.get().log(Status.FAIL, message);
         this.logScreenshot(Status.FAIL);
         this.TestResult.get().setStatus(ITestResult.FAILURE);
     }
 
     public void logFailWithoutScreenshot(String message) {
-        try {
-            this.CurrentTestMethod.get().log(Status.FAIL, message);
-            this.TestResult.get().setStatus(ITestResult.FAILURE);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.CurrentTestMethod.get().log(Status.FAIL, message);
+        this.TestResult.get().setStatus(ITestResult.FAILURE);
     }
 
     public void logFailWithImage(String message, String imagePath) {

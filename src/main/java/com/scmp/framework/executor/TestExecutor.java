@@ -17,7 +17,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.scmp.framework.testrail.TestRailManager;
+import com.scmp.framework.testrail.TestRailStatus;
+import com.scmp.framework.testrail.models.Attachment;
+import com.scmp.framework.testrail.models.TestRun;
+import com.scmp.framework.testrail.models.requests.AddTestResultRequest;
+import com.scmp.framework.testrail.models.CustomStepResult;
 import com.scmp.framework.utils.ConfigFileKeys;
 import com.scmp.framework.testng.listeners.InvokedMethodListener;
 import com.scmp.framework.testng.listeners.RetryListener;
@@ -60,7 +67,28 @@ public class TestExecutor {
 
     TestRailManager.init(baseUrl, userName, password);
 
-    TestRailManager.getInstance().getTestRuns("1");
+//    List<TestCase> testCaseList =TestRailManager.getInstance().getAutomatedTestCases("1");
+//    List<Integer> testCaseIdList = testCaseList.stream().map(testCase -> testCase.getId()).collect(Collectors.toList());
+//    TestRailManager.getInstance().addTestRun("1", "Automated Test", testCaseIdList);
+
+    Attachment attachment = TestRailManager.getInstance().addAttachmentToTestRun(22, "/Users/ray.zhou/Desktop/image.png");
+    List<CustomStepResult> list = new ArrayList<>();
+    list.add(new CustomStepResult("this is the content", TestRailStatus.Passed));
+    list.add(new CustomStepResult(String.format("![](index.php?/attachments/get/%d)", attachment.getAttachmentId()), TestRailStatus.Failed));
+    AddTestResultRequest request = new AddTestResultRequest(TestRailStatus.Failed, "This is a comment", "5s", list);
+
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    System.out.println(gson.toJson(request));
+
+    TestRailManager.getInstance().addTestResult(22, 344, request);
+
+    TestRun testRun = TestRailManager.getInstance().getTestRun("22");
+
+//    List<Integer> list = new ArrayList<>();
+//    list.add(66);
+//    list.addAll(testCaseIdList);
+//    testRun.setTestCaseIds(list);
+//    TestRailManager.getInstance().updateTestRun(testRun);
   }
 
   private void prepareWebDriver() {

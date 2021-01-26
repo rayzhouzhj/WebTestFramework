@@ -59,14 +59,15 @@ public class TestRailManager {
             .build();
   }
 
-  public List<TestRun> getTestRuns(String projectID) {
-    String CustomQuery = String.format(TestRailService.GET_TEST_RUNS_API, projectID);
+  public List<TestRun> getTestRuns(String projectId, String timestamp) {
+    String CustomQuery = String.format(TestRailService.GET_TEST_RUNS_API, projectId);
 
     TestRailService service = retrofit.create(TestRailService.class);
     List<TestRun> testRunList = null;
     try {
       Map<String, String> data = new HashMap<>();
       data.put(CustomQuery, "");
+      data.put("created_after", timestamp);
       testRunList = service.getTestRuns(data).execute().body();
     } catch (IOException e) {
       e.printStackTrace();

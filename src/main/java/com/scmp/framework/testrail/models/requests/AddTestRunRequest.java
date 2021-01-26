@@ -12,13 +12,11 @@ import java.util.List;
 public class AddTestRunRequest {
 
     @SerializedName("name")
-    @NonNull
     private String name;
 
     @SerializedName("include_all")
     private Boolean includeAll;
 
     @SerializedName("case_ids")
-    @NonNull
     private List<Integer> testCaseIds;
 }

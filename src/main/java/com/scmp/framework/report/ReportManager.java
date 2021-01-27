@@ -42,13 +42,20 @@ public class ReportManager {
         currentTestMethod.get().getModel().setStatus(Status.SKIP);
     }
 
-    private void handleTestFailure(ITestResult result, ThreadLocal<ExtentTest> test, TestInfo testInfo) {
+    /**
+     * Log details for failure case
+     * 1. Print stack trace
+     * 2. Capture screenshot
+     * @param result
+     * @param testInfo
+     */
+    private void handleTestFailure(ITestResult result, TestInfo testInfo) {
         if (result.getStatus() == ITestResult.FAILURE) {
             // Print exception stack trace if any
             Throwable throwable = result.getThrowable();
             if (throwable != null) {
                 throwable.printStackTrace();
-                test.get().log(Status.FAIL, "<pre>" + result.getThrowable().getMessage() + "</pre>");
+                currentTestMethod.get().log(Status.FAIL, "<pre>" + result.getThrowable().getMessage() + "</pre>");
             }
 
             try {
@@ -60,7 +67,7 @@ public class ReportManager {
 
                 String screenShotRelativePath = getRelativePathToReport(screenShotAbsolutePath);
 
-                test.get().addScreenCaptureFromPath(screenShotRelativePath);
+                currentTestMethod.get().addScreenCaptureFromPath(screenShotRelativePath);
 
                 testInfo
                         .getTestRailDataHandler()
@@ -73,13 +80,13 @@ public class ReportManager {
         }
     }
 
-    public void endLog(ITestResult result, ThreadLocal<ExtentTest> test) {
+    public void endLogTestResults(ITestResult result) {
         TestInfo testInfo =
                 (TestInfo) RunTimeContext.getInstance().getTestLevelVariables(TEST_INFO_OBJECT);
 
         if (result.isSuccess()) {
             String message = "Test Passed: " + result.getMethod().getMethodName();
-            test.get().log(Status.PASS, message);
+            currentTestMethod.get().log(Status.PASS, message);
             testInfo.getTestRailDataHandler().addStepResult(TestRailStatus.Passed, message, null);
 
         } else {
@@ -87,23 +94,18 @@ public class ReportManager {
                 /*
                  * Failure Block
                  */
-                handleTestFailure(result, test, testInfo);
+                handleTestFailure(result, testInfo);
             }
         }
 
-        /*
-         * Skip block
-         */
         if (result.getStatus() == ITestResult.SKIP) {
-            test.get().log(Status.SKIP, "Test skipped");
+            currentTestMethod.get().log(Status.SKIP, "Test skipped");
         }
 
         ExtentManager.getExtent().flush();
-    }
 
-    public void endLogTestResults(ITestResult result) {
-        this.endLog(result, currentTestMethod);
 
+        // Handling for Retry
         IRetryAnalyzer analyzer = result.getMethod().getRetryAnalyzer();
         if (analyzer instanceof RetryAnalyzer) {
             if (((RetryAnalyzer) analyzer).isRetriedMethod(result) ||

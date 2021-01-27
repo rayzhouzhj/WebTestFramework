@@ -36,7 +36,6 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 
             // Create test case in test report
             ReportManager.getInstance().setTestInfo(testInfo);
-            ReportManager.getInstance().addTag(testInfo.getBrowserType().toString());
             ReportManager.getInstance().setSetupStatus(true);
         } catch (Exception e) {
             e.printStackTrace();

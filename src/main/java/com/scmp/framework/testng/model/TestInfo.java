@@ -67,14 +67,14 @@ public class TestInfo {
         return this.declaredMethod.getDeclaringClass().getSimpleName();
     }
 
-    public String[] getClassGroups() {
-        ClassGroups groups = this.declaredMethod.getDeclaringClass().getAnnotation(ClassGroups.class);
-        return groups == null ? null : groups.groups();
+    public String[] getClassLevelGroups() {
+        Test testNgTest = this.declaredMethod.getDeclaringClass().getAnnotation(Test.class);
+        return testNgTest == null ? null : testNgTest.groups();
     }
 
     public String getClassDescription() {
-        ClassDescription description = this.declaredMethod.getDeclaringClass().getAnnotation(ClassDescription.class);
-        return description == null ? "" : description.value();
+        Test description = this.declaredMethod.getDeclaringClass().getAnnotation(Test.class);
+        return description == null ? "" : description.description();
     }
 
     public String getMethodName() {

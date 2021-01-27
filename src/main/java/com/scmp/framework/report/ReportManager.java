@@ -15,7 +15,6 @@ import com.aventstack.extentreports.Status;
 import com.scmp.framework.utils.ScreenShotManager;
 
 import static com.scmp.framework.utils.Constants.TARGET_PATH;
-import static com.scmp.framework.utils.Constants.TEST_INFO_OBJECT;
 
 /**
  * ReportManager - Handles all Reporting activities e.g communication with ExtentManager, etc
@@ -139,8 +138,8 @@ public class ReportManager {
 
     public synchronized ExtentTest setupReportForTestSet(TestInfo testInfo) {
         ExtentTest parent = ExtentTestManager.createTest(testInfo.getClassName(), testInfo.getClassDescription());
-        if(testInfo.getClassGroups() != null) {
-            parent.assignCategory(testInfo.getClassGroups());
+        if(testInfo.getClassLevelGroups() != null) {
+            parent.assignCategory(testInfo.getClassLevelGroups());
         }
 
         parentTestClass.set(parent);
@@ -162,6 +161,8 @@ public class ReportManager {
 
         // Update groups to category
         currentTestMethod.get().assignCategory(testInfo.getTestGroups());
+        // Added browser type tag to test
+        currentTestMethod.get().assignCategory(testInfo.getBrowserType().toString());
     }
 
     public void addTag(String tag){

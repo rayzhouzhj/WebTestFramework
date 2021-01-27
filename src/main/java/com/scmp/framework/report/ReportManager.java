@@ -22,6 +22,7 @@ import static com.scmp.framework.utils.Constants.TEST_INFO_OBJECT;
  */
 public class ReportManager {
     private static ReportManager manager = new ReportManager();
+    private ThreadLocal<TestInfo> testInfo = new ThreadLocal<>();
     private ThreadLocal<ExtentTest> parentTestClass = new ThreadLocal<>();
     private ThreadLocal<ExtentTest> currentTestMethod = new ThreadLocal<>();
     private ThreadLocal<ITestResult> testResult = new ThreadLocal<>();
@@ -47,9 +48,8 @@ public class ReportManager {
      * 1. Print stack trace
      * 2. Capture screenshot
      * @param result
-     * @param testInfo
      */
-    private void handleTestFailure(ITestResult result, TestInfo testInfo) {
+    private void handleTestFailure(ITestResult result) {
         if (result.getStatus() == ITestResult.FAILURE) {
             // Print exception stack trace if any
             Throwable throwable = result.getThrowable();
@@ -69,7 +69,7 @@ public class ReportManager {
 
                 currentTestMethod.get().addScreenCaptureFromPath(screenShotRelativePath);
 
-                testInfo
+                testInfo.get()
                         .getTestRailDataHandler()
                         .addStepResult(
                                 TestRailStatus.Failed, result.getThrowable().getMessage(), screenShotRelativePath);
@@ -81,20 +81,18 @@ public class ReportManager {
     }
 
     public void endLogTestResults(ITestResult result) {
-        TestInfo testInfo =
-                (TestInfo) RunTimeContext.getInstance().getTestLevelVariables(TEST_INFO_OBJECT);
 
         if (result.isSuccess()) {
             String message = "Test Passed: " + result.getMethod().getMethodName();
             currentTestMethod.get().log(Status.PASS, message);
-            testInfo.getTestRailDataHandler().addStepResult(TestRailStatus.Passed, message, null);
+            testInfo.get().getTestRailDataHandler().addStepResult(TestRailStatus.Passed, message, null);
 
         } else {
             if (result.getStatus() == ITestResult.FAILURE) {
                 /*
                  * Failure Block
                  */
-                handleTestFailure(result, testInfo);
+                handleTestFailure(result);
             }
         }
 
@@ -151,6 +149,8 @@ public class ReportManager {
     }
 
     public synchronized void setTestInfo(TestInfo testInfo) {
+
+        this.testInfo.set(testInfo);
 
         ExtentTest child = parentTestClass.get().createNode(testInfo.getTestName(), testInfo.getTestMethodDescription());
         currentTestMethod.set(child);

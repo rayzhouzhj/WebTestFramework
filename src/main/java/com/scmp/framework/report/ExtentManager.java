@@ -11,11 +11,14 @@ import com.aventstack.extentreports.reporter.configuration.ChartLocation;
 import com.aventstack.extentreports.reporter.configuration.Theme;
 import com.scmp.framework.context.RunTimeContext;
 
+import static com.scmp.framework.utils.Constants.TARGET_PATH;
+import static com.scmp.framework.utils.Constants.USER_DIR;
+
 public class ExtentManager 
 {
 	private static ExtentReports extent;
-	private static String filePath = System.getProperty("user.dir") + File.separator + "target" + File.separator + "WebTestReport.html";
-	private static String extentXML = System.getProperty("user.dir") + File.separator + "extent.xml";
+	private static String filePath = TARGET_PATH + File.separator + "WebTestReport.html";
+	private static String extentXML = System.getProperty(USER_DIR) + File.separator + "extent.xml";
 
 	public synchronized static ExtentReports getExtent() 
 	{

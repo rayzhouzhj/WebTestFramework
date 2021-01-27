@@ -31,7 +31,7 @@ public class TestRailDataHandler {
 
                     Attachment attachment = TestRailManager.getInstance().addAttachmentToTestRun(testRun.getId(), filePath);
                     String attachmentRef = String.format(Attachment.ATTACHMENT_REF_STRING, attachment.getAttachmentId());
-                    stepResult.setContent(stepResult.getContent() + "\n" + attachmentRef);
+                    stepResult.setContent(stepResult.getContent() + " \n " + attachmentRef);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {

@@ -14,6 +14,8 @@ import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.Status;
 import com.scmp.framework.utils.ScreenShotManager;
 
+import static com.scmp.framework.utils.Constants.TARGET_PATH;
+
 /**
  * ReportManager - Handles all Reporting activities e.g communication with ExtentManager, etc
  */
@@ -42,7 +44,7 @@ public class ReportManager {
         CurrentTestMethod.get().getModel().setStatus(Status.SKIP);
     }
 
-    public void endLogTestResults(ITestResult result) throws IOException, InterruptedException {
+    public void endLogTestResults(ITestResult result) {
         testLogger.endLog(result, CurrentTestMethod);
 
         IRetryAnalyzer analyzer = result.getMethod().getRetryAnalyzer();
@@ -199,7 +201,7 @@ public class ReportManager {
 
     public String getRelativePathToReport(String file) {
         Path path = new File(file).toPath();
-        Path targetPath = new File(System.getProperty("user.dir") + File.separator + "target").toPath();
+        Path targetPath = new File(TARGET_PATH).toPath();
         return targetPath.relativize(path).toString();
     }
 

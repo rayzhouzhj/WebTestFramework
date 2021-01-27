@@ -9,6 +9,7 @@ import com.scmp.framework.utils.ConfigFileKeys;
 import com.scmp.framework.utils.ConfigFileReader;
 import sun.security.krb5.Config;
 
+import static com.scmp.framework.utils.Constants.TARGET_PATH;
 import static com.scmp.framework.utils.Constants.USER_DIR;
 
 public class RunTimeContext {
@@ -86,9 +87,7 @@ public class RunTimeContext {
 
   public synchronized String getLogPath(String category, String className, String methodName) {
     String path =
-        System.getProperty(USER_DIR)
-            + File.separator
-            + "target"
+            TARGET_PATH
             + File.separator
             + category
             + File.separator

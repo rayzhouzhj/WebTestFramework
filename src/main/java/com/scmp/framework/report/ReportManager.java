@@ -1,12 +1,12 @@
 package com.scmp.framework.report;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 
 import com.scmp.framework.context.RunTimeContext;
 import com.scmp.framework.testng.listeners.RetryAnalyzer;
 import com.scmp.framework.testng.model.TestInfo;
+import com.scmp.framework.testrail.TestRailStatus;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
@@ -15,37 +15,94 @@ import com.aventstack.extentreports.Status;
 import com.scmp.framework.utils.ScreenShotManager;
 
 import static com.scmp.framework.utils.Constants.TARGET_PATH;
+import static com.scmp.framework.utils.Constants.TEST_INFO_OBJECT;
 
 /**
  * ReportManager - Handles all Reporting activities e.g communication with ExtentManager, etc
  */
 public class ReportManager {
-    private TestLogManager testLogger;
     private static ReportManager manager = new ReportManager();
-    private ThreadLocal<ExtentTest> ParentTestClass = new ThreadLocal<>();
-    private ThreadLocal<ExtentTest> CurrentTestMethod = new ThreadLocal<>();
-    private ThreadLocal<ITestResult> TestResult = new ThreadLocal<>();
-    private ThreadLocal<Boolean> SetupStatus = new ThreadLocal<>();
-    private ScreenShotManager ScreenshotManager = new ScreenShotManager();
+    private ThreadLocal<ExtentTest> parentTestClass = new ThreadLocal<>();
+    private ThreadLocal<ExtentTest> currentTestMethod = new ThreadLocal<>();
+    private ThreadLocal<ITestResult> testResult = new ThreadLocal<>();
+    private ThreadLocal<Boolean> setupStatus = new ThreadLocal<>();
+    private ScreenShotManager screenshotManager = new ScreenShotManager();
 
     public static ReportManager getInstance() {
         return manager;
     }
 
-    private ReportManager() {
-        testLogger = new TestLogManager();
-    }
+    private ReportManager() {}
 
     public void removeTest() {
-        ExtentTestManager.removeTest(CurrentTestMethod.get());
+        ExtentTestManager.removeTest(currentTestMethod.get());
     }
 
     public void skipTest() {
-        CurrentTestMethod.get().getModel().setStatus(Status.SKIP);
+        currentTestMethod.get().getModel().setStatus(Status.SKIP);
+    }
+
+    private void handleTestFailure(ITestResult result, ThreadLocal<ExtentTest> test, TestInfo testInfo) {
+        if (result.getStatus() == ITestResult.FAILURE) {
+            // Print exception stack trace if any
+            Throwable throwable = result.getThrowable();
+            if (throwable != null) {
+                throwable.printStackTrace();
+                test.get().log(Status.FAIL, "<pre>" + result.getThrowable().getMessage() + "</pre>");
+            }
+
+            try {
+                String screenShotAbsolutePath =
+                        screenshotManager.captureScreenShot(
+                                Status.FAIL,
+                                result.getInstance().getClass().getSimpleName(),
+                                result.getMethod().getMethodName());
+
+                String screenShotRelativePath = getRelativePathToReport(screenShotAbsolutePath);
+
+                test.get().addScreenCaptureFromPath(screenShotRelativePath);
+
+                testInfo
+                        .getTestRailDataHandler()
+                        .addStepResult(
+                                TestRailStatus.Failed, result.getThrowable().getMessage(), screenShotRelativePath);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void endLog(ITestResult result, ThreadLocal<ExtentTest> test) {
+        TestInfo testInfo =
+                (TestInfo) RunTimeContext.getInstance().getTestLevelVariables(TEST_INFO_OBJECT);
+
+        if (result.isSuccess()) {
+            String message = "Test Passed: " + result.getMethod().getMethodName();
+            test.get().log(Status.PASS, message);
+            testInfo.getTestRailDataHandler().addStepResult(TestRailStatus.Passed, message, null);
+
+        } else {
+            if (result.getStatus() == ITestResult.FAILURE) {
+                /*
+                 * Failure Block
+                 */
+                handleTestFailure(result, test, testInfo);
+            }
+        }
+
+        /*
+         * Skip block
+         */
+        if (result.getStatus() == ITestResult.SKIP) {
+            test.get().log(Status.SKIP, "Test skipped");
+        }
+
+        ExtentManager.getExtent().flush();
     }
 
     public void endLogTestResults(ITestResult result) {
-        testLogger.endLog(result, CurrentTestMethod);
+        this.endLog(result, currentTestMethod);
 
         IRetryAnalyzer analyzer = result.getMethod().getRetryAnalyzer();
         if (analyzer instanceof RetryAnalyzer) {
@@ -69,15 +126,15 @@ public class ReportManager {
     }
 
     public void setTestResult(ITestResult testResult) {
-        this.TestResult.set(testResult);
+        this.testResult.set(testResult);
     }
 
     public void setSetupStatus(boolean status) {
-        this.SetupStatus.set(status);
+        this.setupStatus.set(status);
     }
 
     public boolean getSetupStatus() {
-        return this.SetupStatus.get() == null? false : this.SetupStatus.get();
+        return this.setupStatus.get() == null? false : this.setupStatus.get();
     }
 
     public synchronized ExtentTest setupReportForTestSet(TestInfo testInfo) {
@@ -86,33 +143,33 @@ public class ReportManager {
             parent.assignCategory(testInfo.getClassGroups());
         }
 
-        ParentTestClass.set(parent);
+        parentTestClass.set(parent);
 
         return parent;
     }
 
     public synchronized void setTestInfo(TestInfo testInfo) {
 
-        ExtentTest child = ParentTestClass.get().createNode(testInfo.getTestName(), testInfo.getTestMethodDescription());
-        CurrentTestMethod.set(child);
+        ExtentTest child = parentTestClass.get().createNode(testInfo.getTestName(), testInfo.getTestMethodDescription());
+        currentTestMethod.set(child);
 
         // Update authors
         if (testInfo.getAuthorNames() != null) {
-            CurrentTestMethod.get().assignAuthor(testInfo.getAuthorNames());
+            currentTestMethod.get().assignAuthor(testInfo.getAuthorNames());
         }
 
         // Update groups to category
-        CurrentTestMethod.get().assignCategory(testInfo.getTestGroups());
+        currentTestMethod.get().assignCategory(testInfo.getTestGroups());
     }
 
     public void addTag(String tag){
-        this.CurrentTestMethod.get().assignCategory(tag);
+        this.currentTestMethod.get().assignCategory(tag);
     }
 
     public String getImagePath(String imageName) {
         String[] classAndMethod = getTestClassNameAndMethodName().split(",");
         try {
-            return ScreenshotManager.getScreenshotPath(classAndMethod[0], classAndMethod[1], imageName);
+            return screenshotManager.getScreenshotPath(classAndMethod[0], classAndMethod[1], imageName);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -120,7 +177,7 @@ public class ReportManager {
     }
 
     public void logInfo(String message) {
-        this.CurrentTestMethod.get().log(Status.INFO, message);
+        this.currentTestMethod.get().log(Status.INFO, message);
     }
 
     public String logScreenshot() {
@@ -130,9 +187,9 @@ public class ReportManager {
     public String logScreenshot(Status status) {
         try {
             String[] classAndMethod = getTestClassNameAndMethodName().split(",");
-            String screenShotAbsolutePath = ScreenshotManager.captureScreenShot(Status.INFO, classAndMethod[0], classAndMethod[1]);
+            String screenShotAbsolutePath = screenshotManager.captureScreenShot(Status.INFO, classAndMethod[0], classAndMethod[1]);
             String screenShotRelativePath = getRelativePathToReport(screenShotAbsolutePath);
-            this.CurrentTestMethod.get().log(status,
+            this.currentTestMethod.get().log(status,
                     "<img data-featherlight=" + screenShotRelativePath + " width=\"10%\" src=" + screenShotRelativePath + " data-src=" + screenShotRelativePath + ">");
 
             return screenShotAbsolutePath;
@@ -144,37 +201,37 @@ public class ReportManager {
     }
 
     public void logInfoWithScreenshot(String message) {
-        this.CurrentTestMethod.get().log(Status.INFO, message);
+        this.currentTestMethod.get().log(Status.INFO, message);
         this.logScreenshot();
     }
 
     public void logPass(String message) {
-        this.CurrentTestMethod.get().log(Status.PASS, message);
+        this.currentTestMethod.get().log(Status.PASS, message);
     }
 
     public void logPassWithScreenshot(String message) {
-        this.CurrentTestMethod.get().log(Status.PASS, message);
+        this.currentTestMethod.get().log(Status.PASS, message);
         this.logScreenshot(Status.PASS);
     }
 
     public void logFail(String message) {
-        this.CurrentTestMethod.get().log(Status.FAIL, message);
+        this.currentTestMethod.get().log(Status.FAIL, message);
         this.logScreenshot(Status.FAIL);
-        this.TestResult.get().setStatus(ITestResult.FAILURE);
+        this.testResult.get().setStatus(ITestResult.FAILURE);
     }
 
     public void logFailWithoutScreenshot(String message) {
-        this.CurrentTestMethod.get().log(Status.FAIL, message);
-        this.TestResult.get().setStatus(ITestResult.FAILURE);
+        this.currentTestMethod.get().log(Status.FAIL, message);
+        this.testResult.get().setStatus(ITestResult.FAILURE);
     }
 
     public void logFailWithImage(String message, String imagePath) {
         imagePath = getRelativePathToReport(imagePath);
         try {
-            this.CurrentTestMethod.get().log(Status.FAIL, message);
-            this.CurrentTestMethod.get().log(Status.FAIL,
+            this.currentTestMethod.get().log(Status.FAIL, message);
+            this.currentTestMethod.get().log(Status.FAIL,
                     "<img data-featherlight=" + imagePath + " width=\"10%\" src=" + imagePath + " data-src=" + imagePath + ">");
-            this.TestResult.get().setStatus(ITestResult.FAILURE);
+            this.testResult.get().setStatus(ITestResult.FAILURE);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -183,7 +240,7 @@ public class ReportManager {
     public String captureScreenShot() {
         try {
             String[] classAndMethod = getTestClassNameAndMethodName().split(",");
-            return ScreenshotManager.captureScreenShot(Status.INFO, classAndMethod[0], classAndMethod[1]);
+            return screenshotManager.captureScreenShot(Status.INFO, classAndMethod[0], classAndMethod[1]);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -193,7 +250,7 @@ public class ReportManager {
 
     public void attachImage(String image) {
         try {
-            this.CurrentTestMethod.get().addScreenCaptureFromPath(image);
+            this.currentTestMethod.get().addScreenCaptureFromPath(image);
         } catch (Exception e) {
             e.printStackTrace();
         }

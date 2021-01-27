@@ -59,58 +59,39 @@ public class TestRailManager {
             .build();
   }
 
-  public List<TestRun> getTestRuns(String projectId, String timestamp) {
+  public List<TestRun> getTestRuns(String projectId, String timestamp) throws IOException {
     String CustomQuery = String.format(TestRailService.GET_TEST_RUNS_API, projectId);
-
     TestRailService service = retrofit.create(TestRailService.class);
-    List<TestRun> testRunList = null;
-    try {
-      Map<String, String> data = new HashMap<>();
-      data.put(CustomQuery, "");
-      data.put("created_after", timestamp);
-      testRunList = service.getTestRuns(data).execute().body();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
 
-    return testRunList;
+    Map<String, String> data = new HashMap<>();
+    data.put(CustomQuery, "");
+    data.put("created_after", timestamp);
+
+    return service.getTestRuns(data).execute().body();
   }
 
-  public List<TestCase> getAutomatedTestCases(String projectId) {
+  public List<TestCase> getAutomatedTestCases(String projectId) throws IOException {
     String CustomQuery = String.format(TestRailService.GET_TEST_CASES_API, projectId);
-
     TestRailService service = retrofit.create(TestRailService.class);
-    List<TestCase> testCaseList = null;
-    try {
-      Map<String, String> data = new HashMap<>();
-      data.put(CustomQuery, "");
-      data.put(TestCase.TYPE_ID, TestCase.TYPE_AUTOMATED);
-      testCaseList = service.getTestCases(data).execute().body();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
 
-    return testCaseList;
+    Map<String, String> data = new HashMap<>();
+    data.put(CustomQuery, "");
+    data.put(TestCase.TYPE_ID, TestCase.TYPE_AUTOMATED);
+
+    return service.getTestCases(data).execute().body();
   }
 
-  public TestRun getTestRun(String testRunId) {
+  public TestRun getTestRun(String testRunId) throws IOException {
     String CustomQuery = String.format(TestRailService.GET_TEST_RUN_API, testRunId);
-
     TestRailService service = retrofit.create(TestRailService.class);
-    TestRun testRun = null;
-    try {
-      Map<String, String> data = new HashMap<>();
-      data.put(CustomQuery, "");
-      testRun = service.getTestRun(data).execute().body();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
 
-    return testRun;
+    Map<String, String> data = new HashMap<>();
+    data.put(CustomQuery, "");
+    return service.getTestRun(data).execute().body();
   }
 
   public TestRun addTestRun(
-      String projectId, String testRunName, List<Integer> includeTestCaseIds) {
+      String projectId, String testRunName, List<Integer> includeTestCaseIds) throws IOException {
     if (includeTestCaseIds == null) {
       includeTestCaseIds = new ArrayList<>();
     }
@@ -119,81 +100,59 @@ public class TestRailManager {
         new AddTestRunRequest(testRunName, includeTestCaseIds.size() == 0, includeTestCaseIds);
 
     String CustomQuery = String.format(TestRailService.ADD_TEST_RUN_API, projectId);
-
     TestRailService service = retrofit.create(TestRailService.class);
-    TestRun testRun = null;
-    try {
-      Map<String, String> data = new HashMap<>();
-      data.put(CustomQuery, "");
-      testRun = service.addTestRun(data, request).execute().body();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+
+    Map<String, String> data = new HashMap<>();
+    data.put(CustomQuery, "");
+    TestRun testRun = service.addTestRun(data, request).execute().body();
 
     testRun.setTestCaseIds(includeTestCaseIds);
 
     return testRun;
   }
 
-  public TestRun updateTestRun(TestRun testRun) {
+  public TestRun updateTestRun(TestRun testRun) throws IOException {
 
     AddTestRunRequest request =
         new AddTestRunRequest(testRun.getName(), testRun.getIncludeAll(), testRun.getTestCaseIds());
 
     String CustomQuery = String.format(TestRailService.UPDATE_TEST_RUN_API, testRun.getId());
-
     TestRailService service = retrofit.create(TestRailService.class);
-    TestRun updatedTestRun = null;
-    try {
-      Map<String, String> data = new HashMap<>();
-      data.put(CustomQuery, "");
-      updatedTestRun = service.updateTestRun(data, request).execute().body();
-      updatedTestRun.setTestCaseIds(testRun.getTestCaseIds());
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+
+    Map<String, String> data = new HashMap<>();
+    data.put(CustomQuery, "");
+    TestRun updatedTestRun = service.updateTestRun(data, request).execute().body();
+    updatedTestRun.setTestCaseIds(testRun.getTestCaseIds());
 
     return updatedTestRun;
   }
 
-  public void addTestResult(Integer testRunId, Integer testCaseId, AddTestResultRequest request) {
+  public void addTestResult(Integer testRunId, Integer testCaseId, AddTestResultRequest request)
+      throws IOException {
 
     String CustomQuery =
         String.format(TestRailService.ADD_RESULT_FOR_TEST_CASE_API, testRunId, testCaseId);
-
     TestRailService service = retrofit.create(TestRailService.class);
-    try {
-      Map<String, String> data = new HashMap<>();
-      data.put(CustomQuery, "");
-      service.addResultForTestCase(data, request).execute().body();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+
+    Map<String, String> data = new HashMap<>();
+    data.put(CustomQuery, "");
+    service.addResultForTestCase(data, request).execute().body();
   }
 
-  public Attachment addAttachmentToTestRun(Integer testRunId, String imagePath) {
+  public Attachment addAttachmentToTestRun(Integer testRunId, String imagePath) throws IOException {
 
     String CustomQuery = String.format(TestRailService.ADD_ATTACHMENT_FOR_TEST_RUN_API, testRunId);
-
     TestRailService service = retrofit.create(TestRailService.class);
-    Attachment attachment = null;
-    try {
-      Map<String, String> data = new HashMap<>();
-      data.put(CustomQuery, "");
 
-      File file = new File(imagePath);
-      RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+    Map<String, String> data = new HashMap<>();
+    data.put(CustomQuery, "");
 
-      // MultipartBody.Part is used to send also the actual file name
-      MultipartBody.Part imageToUpload =
-          MultipartBody.Part.createFormData("attachment", file.getName(), requestFile);
+    File file = new File(imagePath);
+    RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+    MultipartBody.Part imageToUpload =
+        MultipartBody.Part.createFormData("attachment", file.getName(), requestFile);
 
-      attachment = service.addAttachmentToTestRun(data, imageToUpload).execute().body();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    return attachment;
+    return service.addAttachmentToTestRun(data, imageToUpload).execute().body();
   }
 }
 

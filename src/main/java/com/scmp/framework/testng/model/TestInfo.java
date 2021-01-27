@@ -6,6 +6,8 @@ import com.scmp.framework.annotations.screens.DeviceName;
 import com.scmp.framework.context.RunTimeContext;
 import com.scmp.framework.model.Browser;
 import com.scmp.framework.testng.listeners.RetryAnalyzer;
+import com.scmp.framework.testrail.TestRailDataHandler;
+import com.scmp.framework.testrail.models.TestRun;
 import com.scmp.framework.utils.ConfigFileReader;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
@@ -32,12 +34,21 @@ public class TestInfo {
     private Method declaredMethod;
 
     private Browser browserType = null;
+    private TestRailDataHandler testRailDataHandler = null;
 
     public TestInfo(IInvokedMethod methodName, ITestResult testResult) {
         this.testNGInvokedMethod = methodName;
         this.testResult = testResult;
 
         this.declaredMethod = this.testNGInvokedMethod.getTestMethod().getConstructorOrMethod().getMethod();
+    }
+
+    public void setTestRailData(int testRailCaseId, TestRun testRun) {
+        this.testRailDataHandler = new TestRailDataHandler(testRailCaseId, testRun);
+    }
+
+    public TestRailDataHandler getTestRailDataHandler() {
+        return this.testRailDataHandler;
     }
 
     public ITestResult getTestResult() {

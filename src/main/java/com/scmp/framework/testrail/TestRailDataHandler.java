@@ -33,7 +33,7 @@ public class TestRailDataHandler {
     new Thread(
             () -> {
               // Create a new test result for adding attachment
-              String comment = "Mark In Progress Status and add test comment for attaching images";
+              String comment = "Mark In Progress Status";
               AddTestResultRequest request =
                   new AddTestResultRequest(TestRailStatus.IN_PROGRESS, comment, "", new ArrayList<>());
               try {

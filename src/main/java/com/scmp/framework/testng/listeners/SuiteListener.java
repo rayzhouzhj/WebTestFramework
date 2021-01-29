@@ -21,7 +21,7 @@ import static com.scmp.framework.utils.Constants.TEST_RUN_OBJECT;
 public class SuiteListener implements ISuiteListener {
   @Override
   public void onFinish(ISuite suite) {
-    System.out.println("onFinish function started of ISuiteListener ");
+    System.out.println("Test Suite execution completed.");
   }
 
   @Override

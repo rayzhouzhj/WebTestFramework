@@ -5,6 +5,7 @@ import com.scmp.framework.testrail.models.CustomStepResult;
 import com.scmp.framework.testrail.models.TestResult;
 import com.scmp.framework.testrail.models.TestRun;
 import com.scmp.framework.testrail.models.requests.AddTestResultRequest;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ public class TestRailDataHandler {
 
   private int testcaseId;
   private TestRun testRun;
+  private boolean isTestResultForUploadAttachmentsReady = false;
   private TestResult testResultForUploadAttachments;
   private List<CustomStepResult> testRailCustomStepResultList = new ArrayList<>();
   private ConcurrentLinkedQueue<CustomStepResult> pendingTaskQueue = new ConcurrentLinkedQueue<>();
@@ -28,32 +30,38 @@ public class TestRailDataHandler {
   }
 
   private void initTestResultForUploadAttachments() {
-    // Get the 1st test result for re-run test
-    try {
-      List<TestResult> testResultList =
-              TestRailManager.getInstance()
-                      .getTestResultsForTestCase(this.testRun.getId(), this.testcaseId);
+    new Thread(
+            () -> {
+              // Get the 1st test result for re-run test
+              try {
+                List<TestResult> testResultList =
+                    TestRailManager.getInstance()
+                        .getTestResultsForTestCase(this.testRun.getId(), this.testcaseId);
 
-      if(testResultList.size() > 0) {
-        testResultForUploadAttachments = testResultList.get(testResultList.size() - 1);
+                if (testResultList.size() > 0) {
+                  this.testResultForUploadAttachments = testResultList.get(testResultList.size() - 1);
+                  this.isTestResultForUploadAttachmentsReady = true;
+                  return;
+                }
+              } catch (IOException e) {
+                e.printStackTrace();
+              }
 
-        return;
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+              // Create a new test result for adding attachment
+              String comment = "Init test comment for attaching images";
+              AddTestResultRequest request =
+                  new AddTestResultRequest(TestRailStatus.Retest, comment, "", new ArrayList<>());
+              try {
+                this.testResultForUploadAttachments =
+                    TestRailManager.getInstance()
+                        .addTestResult(this.testRun.getId(), this.testcaseId, request);
 
-    // Create a new test result for adding attachment
-    String comment = "Init test comment for attaching images";
-    AddTestResultRequest request =
-        new AddTestResultRequest(TestRailStatus.Retest, comment, "", new ArrayList<>());
-    try {
-      testResultForUploadAttachments =
-          TestRailManager.getInstance()
-              .addTestResult(this.testRun.getId(), this.testcaseId, request);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+                this.isTestResultForUploadAttachmentsReady = true;
+              } catch (IOException e) {
+                e.printStackTrace();
+              }
+            })
+        .start();
   }
   /**
    * Add Test Step Result
@@ -67,18 +75,34 @@ public class TestRailDataHandler {
     testRailCustomStepResultList.add(stepResult);
 
     if (filePath != null) {
+      pendingTaskQueue.add(stepResult);
+
       Thread updateStepWithAttachment =
           new Thread(
               () -> {
                 try {
-                  pendingTaskQueue.add(stepResult);
 
+                  // Wait for test result for attachment ready
+                  int maxWaitSeconds = 20;
+                  int seconds = 0;
+                  while (!this.isTestResultForUploadAttachmentsReady && seconds < maxWaitSeconds) {
+                    try {
+                      seconds++;
+                      TimeUnit.SECONDS.sleep(1);
+                    } catch (InterruptedException e) {
+                      e.printStackTrace();
+                    }
+                  }
+
+                  System.out.println("Uploading attachment: " + filePath);
                   Attachment attachment =
                       TestRailManager.getInstance()
-                          .addAttachmentToTestResult(testResultForUploadAttachments.getId(), filePath);
+                          .addAttachmentToTestResult(
+                              testResultForUploadAttachments.getId(), filePath);
 
                   String attachmentRef =
                       String.format(Attachment.ATTACHMENT_REF_STRING, attachment.getAttachmentId());
+                  System.out.println("Attachment uploaded: " + attachmentRef);
                   stepResult.setContent(stepResult.getContent() + " \n " + attachmentRef);
                 } catch (Exception e) {
                   e.printStackTrace();
@@ -109,6 +133,10 @@ public class TestRailDataHandler {
         e.printStackTrace();
       }
     }
+
+    System.out.println("========RESULT CONTENT==========");
+    testRailCustomStepResultList.forEach(result -> {System.out.println(result.getContent());});
+    System.out.println("================================");
 
     AddTestResultRequest request =
         new AddTestResultRequest(

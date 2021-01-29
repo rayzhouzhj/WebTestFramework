@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.scmp.framework.testng.listeners.SuiteListener;
 import com.scmp.framework.testrail.TestRailManager;
 import com.scmp.framework.testrail.TestRailStatus;
 import com.scmp.framework.testrail.models.Attachment;
@@ -54,41 +55,6 @@ public class TestExecutor {
     if(RunTimeContext.getInstance().isLocalExecutionMode()) {
       prepareWebDriver();
     }
-
-    if(RunTimeContext.getInstance().isUploadToTestRail()) {
-      initTestRail();
-    }
-  }
-
-  private void initTestRail() {
-    String baseUrl = RunTimeContext.getInstance().getProperty(ConfigFileKeys.TESTRAIL_SERVER);
-    String userName = RunTimeContext.getInstance().getProperty(ConfigFileKeys.TESTRAIL_USER_NAME);
-    String password = RunTimeContext.getInstance().getProperty(ConfigFileKeys.TESTRAIL_API_KEY);
-
-    TestRailManager.init(baseUrl, userName, password);
-
-//    List<TestCase> testCaseList =TestRailManager.getInstance().getAutomatedTestCases("1");
-//    List<Integer> testCaseIdList = testCaseList.stream().map(testCase -> testCase.getId()).collect(Collectors.toList());
-//    TestRailManager.getInstance().addTestRun("1", "Automated Test", testCaseIdList);
-
-    Attachment attachment = TestRailManager.getInstance().addAttachmentToTestRun(22, "/Users/ray.zhou/Desktop/image.png");
-    List<CustomStepResult> list = new ArrayList<>();
-    list.add(new CustomStepResult("this is the content", TestRailStatus.Passed));
-    list.add(new CustomStepResult(String.format("![](index.php?/attachments/get/%d)", attachment.getAttachmentId()), TestRailStatus.Failed));
-    AddTestResultRequest request = new AddTestResultRequest(TestRailStatus.Failed, "This is a comment", "5s", list);
-
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    System.out.println(gson.toJson(request));
-
-    TestRailManager.getInstance().addTestResult(22, 344, request);
-
-    TestRun testRun = TestRailManager.getInstance().getTestRun("22");
-
-//    List<Integer> list = new ArrayList<>();
-//    list.add(66);
-//    list.addAll(testCaseIdList);
-//    testRun.setTestCaseIds(list);
-//    TestRailManager.getInstance().updateTestRun(testRun);
   }
 
   private void prepareWebDriver() {
@@ -135,9 +101,7 @@ public class TestExecutor {
     List<URL> testClassUrls = new ArrayList<>();
     String testClassPackagePath =
         "file:"
-            + System.getProperty("user.dir")
-            + File.separator
-            + "target"
+            + TARGET_PATH
             + File.separator
             + "test-classes"
             + File.separator;
@@ -233,6 +197,7 @@ public class TestExecutor {
     suite.setVerbose(2);
 
     // Add listeners
+    listeners.add(SuiteListener.class.getName());
     listeners.add(InvokedMethodListener.class.getName());
     listeners.add(RetryListener.class.getName());
     suite.setListeners(listeners);

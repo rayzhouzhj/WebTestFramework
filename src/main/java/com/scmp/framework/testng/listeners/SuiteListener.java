@@ -52,7 +52,7 @@ public class SuiteListener implements ISuiteListener {
     String projectId = instance.getProperty(ConfigFileKeys.TESTRAIL_PROJECT_ID);
 
     if (projectId == null || Pattern.compile("[0-9]+").matcher(projectId).matches()) {
-      throw new IllegalArgumentException(String.format("Config [%s] is invalid!", projectId));
+      throw new IllegalArgumentException(String.format("Config TESTRAIL_PROJECT_ID [%s] is invalid!", projectId));
     }
 
     LocalDate today = LocalDate.now(instance.getZoneId());
@@ -73,7 +73,7 @@ public class SuiteListener implements ISuiteListener {
     }
 
     final String finalTestRunName = testRunName;
-    if (!instance.isAlwaysCreateNewTestRunInTestRail()) {
+    if (!instance.isCreateNewTestRunInTestRail()) {
       List<TestRun> testRunList = TestRailManager.getInstance().getTestRuns(projectId, timestamp);
       TestRun existingTestRun =
           testRunList.stream()

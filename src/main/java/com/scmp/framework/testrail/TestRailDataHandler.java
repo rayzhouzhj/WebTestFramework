@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
 
 @Data
 @RequiredArgsConstructor
@@ -70,7 +71,7 @@ public class TestRailDataHandler {
     while (pendingTaskQueue.size() > 0 && seconds < maxWaitSeconds) {
       try {
         seconds++;
-        Thread.sleep(1000);
+        TimeUnit.SECONDS.sleep(1);
       } catch (InterruptedException e) {
         e.printStackTrace();
       }

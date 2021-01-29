@@ -116,7 +116,7 @@ public class RunTimeContext {
     return "true".equalsIgnoreCase(this.getProperty(ConfigFileKeys.TESTRAIL_UPLOAD_FLAG, "false"));
   }
 
-  public boolean isAlwaysCreateNewTestRunInTestRail() {
+  public boolean isCreateNewTestRunInTestRail() {
     return "true"
         .equalsIgnoreCase(
             this.getProperty(ConfigFileKeys.TESTRAIL_CREATE_NEW_TEST_RUN, "false"));

@@ -49,14 +49,19 @@ public class ReportManager {
      * @param result
      */
     private void handleTestFailure(ITestResult result) {
+
         if (result.getStatus() == ITestResult.FAILURE) {
             // Print exception stack trace if any
             Throwable throwable = result.getThrowable();
             if (throwable != null) {
                 throwable.printStackTrace();
                 currentTestMethod.get().log(Status.FAIL, "<pre>" + result.getThrowable().getMessage() + "</pre>");
+                testInfo.get()
+                        .addTestResultForTestRail(
+                                TestRailStatus.Failed, result.getThrowable().getMessage(), null);
             }
 
+            // Add screenshot
             try {
                 String screenShotAbsolutePath =
                         screenshotManager.captureScreenShot(
@@ -65,13 +70,8 @@ public class ReportManager {
                                 result.getMethod().getMethodName());
 
                 String screenShotRelativePath = getRelativePathToReport(screenShotAbsolutePath);
-
                 currentTestMethod.get().addScreenCaptureFromPath(screenShotRelativePath);
-
-                testInfo.get()
-                        .getTestRailDataHandler()
-                        .addStepResult(
-                                TestRailStatus.Failed, result.getThrowable().getMessage(), screenShotRelativePath);
+                testInfo.get().addTestResultForTestRail(TestRailStatus.Failed, "", screenShotRelativePath);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -81,16 +81,14 @@ public class ReportManager {
 
     public void endLogTestResults(ITestResult result) {
 
+        this.testInfo.get().setTestEndTime();
         if (result.isSuccess()) {
             String message = "Test Passed: " + result.getMethod().getMethodName();
             currentTestMethod.get().log(Status.PASS, message);
-            testInfo.get().getTestRailDataHandler().addStepResult(TestRailStatus.Passed, message, null);
+            this.addTestRailLog(TestRailStatus.Passed, message, null);
 
         } else {
             if (result.getStatus() == ITestResult.FAILURE) {
-                /*
-                 * Failure Block
-                 */
                 handleTestFailure(result);
             }
         }
@@ -122,6 +120,9 @@ public class ReportManager {
         }
 
         ExtentManager.flush();
+
+
+        this.testInfo.get().uploadTestResultsToTestRail();
     }
 
     public void setTestResult(ITestResult testResult) {
@@ -179,15 +180,23 @@ public class ReportManager {
         }
     }
 
+    private void addTestRailLog(int status, String message, String imagePath) {
+        this.testInfo.get().addTestResultForTestRail(status, message, imagePath);
+    }
+
     public void logInfo(String message) {
         this.currentTestMethod.get().log(Status.INFO, message);
+        this.addTestRailLog(TestRailStatus.Passed, message, null);
     }
 
     public String logScreenshot() {
-        return this.logScreenshot(Status.INFO);
+        String imagePath = this.logScreenshot(Status.INFO);
+        this.addTestRailLog(TestRailStatus.Passed, "", imagePath);
+
+        return imagePath;
     }
 
-    public String logScreenshot(Status status) {
+    private String logScreenshot(Status status) {
         try {
             String[] classAndMethod = getTestClassNameAndMethodName().split(",");
             String screenShotAbsolutePath = screenshotManager.captureScreenShot(Status.INFO, classAndMethod[0], classAndMethod[1]);
@@ -205,27 +214,36 @@ public class ReportManager {
 
     public void logInfoWithScreenshot(String message) {
         this.currentTestMethod.get().log(Status.INFO, message);
-        this.logScreenshot();
+        String imagePath = this.logScreenshot();
+
+        this.addTestRailLog(TestRailStatus.Passed, message, imagePath);
     }
 
     public void logPass(String message) {
         this.currentTestMethod.get().log(Status.PASS, message);
+        this.addTestRailLog(TestRailStatus.Passed, message, null);
     }
 
     public void logPassWithScreenshot(String message) {
         this.currentTestMethod.get().log(Status.PASS, message);
-        this.logScreenshot(Status.PASS);
+        String imagePath = this.logScreenshot(Status.PASS);
+
+        this.addTestRailLog(TestRailStatus.Passed, message, imagePath);
     }
 
     public void logFail(String message) {
-        this.currentTestMethod.get().log(Status.FAIL, message);
-        this.logScreenshot(Status.FAIL);
         this.testResult.get().setStatus(ITestResult.FAILURE);
+        this.currentTestMethod.get().log(Status.FAIL, message);
+        String imagePath = this.logScreenshot(Status.FAIL);
+
+        this.addTestRailLog(TestRailStatus.Failed, message, imagePath);
     }
 
     public void logFailWithoutScreenshot(String message) {
         this.currentTestMethod.get().log(Status.FAIL, message);
         this.testResult.get().setStatus(ITestResult.FAILURE);
+
+        this.addTestRailLog(TestRailStatus.Failed, message, null);
     }
 
     public void logFailWithImage(String message, String imagePath) {
@@ -235,6 +253,8 @@ public class ReportManager {
             this.currentTestMethod.get().log(Status.FAIL,
                     "<img data-featherlight=" + imagePath + " width=\"10%\" src=" + imagePath + " data-src=" + imagePath + ">");
             this.testResult.get().setStatus(ITestResult.FAILURE);
+
+            this.addTestRailLog(TestRailStatus.Failed, message, imagePath);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -251,9 +271,10 @@ public class ReportManager {
         return null;
     }
 
-    public void attachImage(String image) {
+    public void attachImage(String imagePath) {
         try {
-            this.currentTestMethod.get().addScreenCaptureFromPath(image);
+            this.currentTestMethod.get().addScreenCaptureFromPath(imagePath);
+            this.addTestRailLog(TestRailStatus.Passed, "", imagePath);
         } catch (Exception e) {
             e.printStackTrace();
         }

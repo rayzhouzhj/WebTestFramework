@@ -127,17 +127,8 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
         }
 
         try {
-            if (testResult.getStatus() == ITestResult.SUCCESS || testResult.getStatus() == ITestResult.FAILURE) {
-
-                ReportManager.getInstance().endLogTestResults(testResult);
-                ExtentManager.getExtent().flush();
-
-            } else if (testResult.getStatus() == ITestResult.SKIP) {
-                ExtentManager.getExtent().flush();
-
-                // Remove previous log data for retry test
-                ReportManager.getInstance().removeTest();
-            }
+            ReportManager.getInstance().endLogTestResults(testResult);
+            ExtentManager.getExtent().flush();
 
             // Clear all runtime variables
             RunTimeContext.getInstance().clearRunTimeVariables();

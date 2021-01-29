@@ -2,15 +2,14 @@ package com.scmp.framework.testng.listeners;
 
 import com.scmp.framework.context.RunTimeContext;
 import com.scmp.framework.testrail.TestRailManager;
-import com.scmp.framework.testrail.TestRailStatus;
 import com.scmp.framework.testrail.models.TestCase;
 import com.scmp.framework.testrail.models.TestRun;
 import com.scmp.framework.utils.ConfigFileKeys;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
 
+import java.io.IOException;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -28,8 +27,13 @@ public class SuiteListener implements ISuiteListener {
   public void onStart(ISuite suite) {
 
     if (RunTimeContext.getInstance().isUploadToTestRail()) {
-      initTestRail();
-      createTestRun();
+      try {
+        initTestRail();
+        createTestRun();
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new RuntimeException("Fail to init and create Test Run in TestRail.");
+      }
     }
   }
 
@@ -42,10 +46,10 @@ public class SuiteListener implements ISuiteListener {
     TestRailManager.init(baseUrl, userName, password);
   }
 
-  public void createTestRun() {
+  public void createTestRun() throws IOException {
 
     RunTimeContext instance = RunTimeContext.getInstance();
-    String projectId = instance.getProperty(ConfigFileKeys.FEATURE_DESCRIPTION);
+    String projectId = instance.getProperty(ConfigFileKeys.TESTRAIL_PROJECT_ID);
 
     if (projectId == null || Pattern.compile("[0-9]+").matcher(projectId).matches()) {
       throw new IllegalArgumentException(String.format("Config [%s] is invalid!", projectId));

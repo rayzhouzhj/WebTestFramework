@@ -20,6 +20,7 @@ public class ConfigFileKeys {
     public static String TESTRAIL_TEST_RUN_NAME = "TESTRAIL_TEST_RUN_NAME";
     public static String TESTRAIL_PROJECT_ID = "TESTRAIL_PROJECT_ID";
     public static String TESTRAIL_CREATE_NEW_TEST_RUN = "TESTRAIL_CREATE_NEW_TEST_RUN";
+    public static String TESTRAIL_STATUS_IN_PROGRESS_ID = "TESTRAIL_STATUS_IN_PROGRESS_ID";
     public static String EXCLUDE_GROUPS = "EXCLUDE_GROUPS";
     public static String INCLUDE_GROUPS = "INCLUDE_GROUPS";
     public static String URL = "URL";

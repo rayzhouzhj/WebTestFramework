@@ -32,25 +32,10 @@ public class TestRailDataHandler {
   private void initTestResultForUploadAttachments() {
     new Thread(
             () -> {
-              // Get the 1st test result for re-run test
-              try {
-                List<TestResult> testResultList =
-                    TestRailManager.getInstance()
-                        .getTestResultsForTestCase(this.testRun.getId(), this.testcaseId);
-
-                if (testResultList.size() > 0) {
-                  this.testResultForUploadAttachments = testResultList.get(testResultList.size() - 1);
-                  this.isTestResultForUploadAttachmentsReady = true;
-                  return;
-                }
-              } catch (IOException e) {
-                e.printStackTrace();
-              }
-
               // Create a new test result for adding attachment
-              String comment = "Init test comment for attaching images";
+              String comment = "Mark In Progress Status and add test comment for attaching images";
               AddTestResultRequest request =
-                  new AddTestResultRequest(TestRailStatus.Retest, comment, "", new ArrayList<>());
+                  new AddTestResultRequest(TestRailStatus.IN_PROGRESS, comment, "", new ArrayList<>());
               try {
                 this.testResultForUploadAttachments =
                     TestRailManager.getInstance()

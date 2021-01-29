@@ -2,6 +2,7 @@ package com.scmp.framework.testng.listeners;
 
 import com.scmp.framework.context.RunTimeContext;
 import com.scmp.framework.testrail.TestRailManager;
+import com.scmp.framework.testrail.TestRailStatus;
 import com.scmp.framework.testrail.models.TestCase;
 import com.scmp.framework.testrail.models.TestRun;
 import com.scmp.framework.utils.ConfigFileKeys;
@@ -47,6 +48,14 @@ public class SuiteListener implements ISuiteListener {
     String password = instance.getProperty(ConfigFileKeys.TESTRAIL_API_KEY);
 
     TestRailManager.init(baseUrl, userName, password);
+
+    String inProgressId = RunTimeContext.getInstance().getProperty(ConfigFileKeys.TESTRAIL_STATUS_IN_PROGRESS_ID);
+    if(inProgressId != null && Pattern.compile("[0-9]+").matcher(inProgressId).matches()) {
+      TestRailStatus.IN_PROGRESS = Integer.parseInt(inProgressId);
+    } else {
+      // Default use TestRailStatus.Retest for TestRailStatus.IN_PROGRESS
+      TestRailStatus.IN_PROGRESS = TestRailStatus.Retest;
+    }
 
     System.out.println("TestRailManager Initialized.");
   }

@@ -2,11 +2,9 @@ package com.scmp.framework.testrail;
 
 import com.scmp.framework.testrail.models.Attachment;
 import com.scmp.framework.testrail.models.CustomStepResult;
+import com.scmp.framework.testrail.models.TestResult;
 import com.scmp.framework.testrail.models.TestRun;
 import com.scmp.framework.testrail.models.requests.AddTestResultRequest;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,15 +12,49 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
-@Data
-@RequiredArgsConstructor
 public class TestRailDataHandler {
 
-  private @NonNull int testcaseId;
-  private @NonNull TestRun testRun;
+  private int testcaseId;
+  private TestRun testRun;
+  private TestResult testResultForUploadAttachments;
   private List<CustomStepResult> testRailCustomStepResultList = new ArrayList<>();
   private ConcurrentLinkedQueue<CustomStepResult> pendingTaskQueue = new ConcurrentLinkedQueue<>();
 
+  public TestRailDataHandler(int testcaseId, TestRun testRun) {
+    this.testcaseId = testcaseId;
+    this.testRun = testRun;
+
+    this.initTestResultForUploadAttachments();
+  }
+
+  private void initTestResultForUploadAttachments() {
+    // Get the 1st test result for re-run test
+    try {
+      List<TestResult> testResultList =
+              TestRailManager.getInstance()
+                      .getTestResultsForTestCase(this.testRun.getId(), this.testcaseId);
+
+      if(testResultList.size() > 0) {
+        testResultForUploadAttachments = testResultList.get(testResultList.size() - 1);
+
+        return;
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    // Create a new test result for adding attachment
+    String comment = "Init test comment for attaching images";
+    AddTestResultRequest request =
+        new AddTestResultRequest(TestRailStatus.Retest, comment, "", new ArrayList<>());
+    try {
+      testResultForUploadAttachments =
+          TestRailManager.getInstance()
+              .addTestResult(this.testRun.getId(), this.testcaseId, request);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
   /**
    * Add Test Step Result
    *
@@ -43,7 +75,8 @@ public class TestRailDataHandler {
 
                   Attachment attachment =
                       TestRailManager.getInstance()
-                          .addAttachmentToTestRun(testRun.getId(), filePath);
+                          .addAttachmentToTestResult(testResultForUploadAttachments.getId(), filePath);
+
                   String attachmentRef =
                       String.format(Attachment.ATTACHMENT_REF_STRING, attachment.getAttachmentId());
                   stepResult.setContent(stepResult.getContent() + " \n " + attachmentRef);

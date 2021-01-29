@@ -2,6 +2,7 @@ package com.scmp.framework.testrail;
 
 import com.scmp.framework.testrail.models.Attachment;
 import com.scmp.framework.testrail.models.TestCase;
+import com.scmp.framework.testrail.models.TestResult;
 import com.scmp.framework.testrail.models.TestRun;
 import com.scmp.framework.testrail.models.requests.AddTestResultRequest;
 import com.scmp.framework.testrail.models.requests.AddTestRunRequest;
@@ -21,6 +22,7 @@ public class TestRailManager {
   private Retrofit retrofit;
 
   public static synchronized void init(String baseUrl, String userName, String apiKey) {
+
     if (baseUrl == null
         || baseUrl.isEmpty()
         || userName == null
@@ -81,6 +83,16 @@ public class TestRailManager {
     return service.getTestCases(data).execute().body();
   }
 
+  public List<TestResult> getTestResultsForTestCase(int runId, int testcaseId) throws IOException {
+    String CustomQuery = String.format(TestRailService.GET_TEST_RESULTS_FOR_TEST_CASE_API, runId, testcaseId);
+    TestRailService service = retrofit.create(TestRailService.class);
+
+    Map<String, String> data = new HashMap<>();
+    data.put(CustomQuery, "");
+
+    return service.getTestResultsForTestCase(data).execute().body();
+  }
+
   public TestRun getTestRun(String testRunId) throws IOException {
     String CustomQuery = String.format(TestRailService.GET_TEST_RUN_API, testRunId);
     TestRailService service = retrofit.create(TestRailService.class);
@@ -127,7 +139,7 @@ public class TestRailManager {
     return updatedTestRun;
   }
 
-  public void addTestResult(Integer testRunId, Integer testCaseId, AddTestResultRequest request)
+  public TestResult addTestResult(Integer testRunId, Integer testCaseId, AddTestResultRequest request)
       throws IOException {
 
     String CustomQuery =
@@ -136,7 +148,8 @@ public class TestRailManager {
 
     Map<String, String> data = new HashMap<>();
     data.put(CustomQuery, "");
-    service.addResultForTestCase(data, request).execute().body();
+
+    return service.addResultForTestCase(data, request).execute().body();
   }
 
   public Attachment addAttachmentToTestRun(Integer testRunId, String imagePath) throws IOException {
@@ -151,6 +164,22 @@ public class TestRailManager {
     RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
     MultipartBody.Part imageToUpload =
         MultipartBody.Part.createFormData("attachment", file.getName(), requestFile);
+
+    return service.addAttachmentToTestRun(data, imageToUpload).execute().body();
+  }
+
+  public Attachment addAttachmentToTestResult(Integer testResultId, String imagePath) throws IOException {
+
+    String CustomQuery = String.format(TestRailService.ADD_ATTACHMENT_FOR_TEST_RESULT_API, testResultId);
+    TestRailService service = retrofit.create(TestRailService.class);
+
+    Map<String, String> data = new HashMap<>();
+    data.put(CustomQuery, "");
+
+    File file = new File(imagePath);
+    RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+    MultipartBody.Part imageToUpload =
+            MultipartBody.Part.createFormData("attachment", file.getName(), requestFile);
 
     return service.addAttachmentToTestRun(data, imageToUpload).execute().body();
   }

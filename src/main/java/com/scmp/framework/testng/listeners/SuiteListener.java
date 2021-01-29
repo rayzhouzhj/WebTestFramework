@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -38,20 +39,25 @@ public class SuiteListener implements ISuiteListener {
   }
 
   public void initTestRail() {
+    System.out.println("Initializing TestRailManager...");
+
     RunTimeContext instance = RunTimeContext.getInstance();
     String baseUrl = instance.getProperty(ConfigFileKeys.TESTRAIL_SERVER);
     String userName = instance.getProperty(ConfigFileKeys.TESTRAIL_USER_NAME);
     String password = instance.getProperty(ConfigFileKeys.TESTRAIL_API_KEY);
 
     TestRailManager.init(baseUrl, userName, password);
+
+    System.out.println("TestRailManager Initialized.");
   }
 
   public void createTestRun() throws IOException {
+    System.out.println("Creating Test Run in TestRail...");
 
     RunTimeContext instance = RunTimeContext.getInstance();
     String projectId = instance.getProperty(ConfigFileKeys.TESTRAIL_PROJECT_ID);
 
-    if (projectId == null || Pattern.compile("[0-9]+").matcher(projectId).matches()) {
+    if (projectId == null || !Pattern.compile("[0-9]+").matcher(projectId).matches()) {
       throw new IllegalArgumentException(String.format("Config TESTRAIL_PROJECT_ID [%s] is invalid!", projectId));
     }
 
@@ -75,15 +81,14 @@ public class SuiteListener implements ISuiteListener {
     final String finalTestRunName = testRunName;
     if (!instance.isCreateNewTestRunInTestRail()) {
       List<TestRun> testRunList = TestRailManager.getInstance().getTestRuns(projectId, timestamp);
-      TestRun existingTestRun =
+      Optional<TestRun> existingTestRun =
           testRunList.stream()
               .filter(testRun -> testRun.getName().equalsIgnoreCase(finalTestRunName))
-              .findFirst()
-              .get();
+              .findFirst();
 
-      if (existingTestRun != null) {
+      if (existingTestRun.isPresent()) {
         // Use the existing TestRun for testing
-        instance.setGlobalVariables(TEST_RUN_OBJECT, existingTestRun);
+        instance.setGlobalVariables(TEST_RUN_OBJECT, existingTestRun.get());
         return;
       }
     }
@@ -97,5 +102,7 @@ public class SuiteListener implements ISuiteListener {
 
     // Save new created test run
     instance.setGlobalVariables(TEST_RUN_OBJECT, testRun);
+
+    System.out.println("Test Run created in TestRail.");
   }
 }

@@ -56,9 +56,7 @@ public class ReportManager {
             if (throwable != null) {
                 throwable.printStackTrace();
                 currentTestMethod.get().log(Status.FAIL, "<pre>" + result.getThrowable().getMessage() + "</pre>");
-                testInfo.get()
-                        .addTestResultForTestRail(
-                                TestRailStatus.Failed, result.getThrowable().getMessage(), null);
+                this.addTestRailLog(TestRailStatus.Failed, result.getThrowable().getMessage(), null);
             }
 
             // Add screenshot
@@ -71,7 +69,7 @@ public class ReportManager {
 
                 String screenShotRelativePath = getRelativePathToReport(screenShotAbsolutePath);
                 currentTestMethod.get().addScreenCaptureFromPath(screenShotRelativePath);
-                testInfo.get().addTestResultForTestRail(TestRailStatus.Failed, "", screenShotRelativePath);
+                this.addTestRailLog(TestRailStatus.Failed, "", screenShotAbsolutePath);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -246,15 +244,15 @@ public class ReportManager {
         this.addTestRailLog(TestRailStatus.Failed, message, null);
     }
 
-    public void logFailWithImage(String message, String imagePath) {
-        imagePath = getRelativePathToReport(imagePath);
+    public void logFailWithImage(String message, String originalImagePath) {
+        String imageRelativePath = getRelativePathToReport(originalImagePath);
         try {
             this.currentTestMethod.get().log(Status.FAIL, message);
             this.currentTestMethod.get().log(Status.FAIL,
-                    "<img data-featherlight=" + imagePath + " width=\"10%\" src=" + imagePath + " data-src=" + imagePath + ">");
+                    "<img data-featherlight=" + imageRelativePath + " width=\"10%\" src=" + imageRelativePath + " data-src=" + imageRelativePath + ">");
             this.testResult.get().setStatus(ITestResult.FAILURE);
 
-            this.addTestRailLog(TestRailStatus.Failed, message, imagePath);
+            this.addTestRailLog(TestRailStatus.Failed, message, originalImagePath);
         } catch (Exception e) {
             e.printStackTrace();
         }

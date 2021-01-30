@@ -102,7 +102,7 @@ public class SuiteListener implements ISuiteListener {
     }
 
     LocalDate today = LocalDate.now(instance.getZoneId());
-    String timestamp = "" + today.minusDays(1).atStartOfDay(instance.getZoneId()).toEpochSecond();
+    String timestamp = "" + today.minusDays(7).atStartOfDay(instance.getZoneId()).toEpochSecond();
     String todayDateString =
         LocalDate.now(instance.getZoneId()).format(DateTimeFormatter.ofPattern("dd/MM/yyy"));
     String testRunName = instance.getProperty(ConfigFileKeys.TESTRAIL_TEST_RUN_NAME, "");

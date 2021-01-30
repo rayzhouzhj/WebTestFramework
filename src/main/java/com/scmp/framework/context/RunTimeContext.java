@@ -122,6 +122,12 @@ public class RunTimeContext {
             this.getProperty(ConfigFileKeys.TESTRAIL_CREATE_NEW_TEST_RUN, "false"));
   }
 
+  public boolean isIncludeAllAutomatedTestCaseToTestRail() {
+    return "true"
+            .equalsIgnoreCase(
+                    this.getProperty(ConfigFileKeys.TESTRAIL_INCLUDE_ALL_AUTOMATED_TEST_CASES, "false"));
+  }
+
   public ZoneId getZoneId() {
     return ZoneId.of("Asia/Hong_Kong");
   }

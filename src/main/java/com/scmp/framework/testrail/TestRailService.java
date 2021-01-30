@@ -57,9 +57,5 @@ public interface TestRailService {
 
     @POST("index.php")
     @Multipart
-    Call<Attachment> addAttachmentToTestRun(@QueryMap(encoded = true) Map<String, String> options, @Part MultipartBody.Part image);
-
-    @POST("index.php")
-    @Multipart
-    Call<Attachment> addAttachmentToTestResult(@QueryMap(encoded = true) Map<String, String> options, @Part MultipartBody.Part image);
+    Call<Attachment> addAttachment(@QueryMap(encoded = true) Map<String, String> options, @Part MultipartBody.Part image);
 }

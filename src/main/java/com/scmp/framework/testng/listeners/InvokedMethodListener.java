@@ -7,6 +7,8 @@ import com.scmp.framework.testng.model.TestInfo;
 import com.scmp.framework.manager.WebDriverManager;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.*;
 import org.testng.annotations.Test;
 
@@ -17,6 +19,7 @@ import static com.scmp.framework.utils.Constants.TEST_INFO_OBJECT;
 
 
 public final class InvokedMethodListener implements IInvokedMethodListener {
+    private static final Logger frameworkLogger = LoggerFactory.getLogger(InvokedMethodListener.class);
     private WebDriverManager driverManager;
 
     public InvokedMethodListener() {
@@ -38,7 +41,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
             ReportManager.getInstance().setTestInfo(testInfo);
             ReportManager.getInstance().setSetupStatus(true);
         } catch (Exception e) {
-            e.printStackTrace();
+            frameworkLogger.error("Ops!", e);
         }
     }
 
@@ -92,7 +95,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
             return;
         }
 
-        System.out.println("[INFO] Start running test [" + testInfo.getMethodName() + "]");
+        frameworkLogger.info("Start running test [" + testInfo.getMethodName() + "]");
         try {
             setupDriverForTest(testInfo);
             setupReporterForTest(testInfo);
@@ -112,7 +115,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
         Method refMethod = method.getTestMethod().getConstructorOrMethod().getMethod();
         String methodName = refMethod.getName();
 
-        System.out.println("[INFO] Completed running test [" + methodName + "]");
+        frameworkLogger.info("Completed running test [" + methodName + "]");
 
         // Skip afterInvocation if current method is not with Annotation Test
         if (refMethod.getAnnotation(Test.class) == null) {
@@ -136,7 +139,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
             // Stop driver
             driverManager.stopWebDriver();
         } catch (Exception e) {
-            e.printStackTrace();
+            frameworkLogger.error("Ops!", e);
         }
     }
 }

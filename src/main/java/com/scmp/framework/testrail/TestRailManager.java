@@ -7,6 +7,8 @@ import com.scmp.framework.testrail.models.TestRun;
 import com.scmp.framework.testrail.models.requests.AddTestResultRequest;
 import com.scmp.framework.testrail.models.requests.AddTestRunRequest;
 import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -19,6 +21,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class TestRailManager {
+  private static final Logger frameworkLogger = LoggerFactory.getLogger(TestRailManager.class);
   private static TestRailManager instance;
   private Retrofit retrofit;
 
@@ -71,7 +74,16 @@ public class TestRailManager {
     data.put(CustomQuery, "");
     data.put("created_after", timestamp);
 
-    return service.getTestRuns(data).execute().body();
+    retrofit2.Response<List<TestRun>> response = service.getTestRuns(data).execute();
+    if (!response.isSuccessful()) {
+      frameworkLogger.error(
+          "Request getTestRuns Failed with Error Code: {}, Error Body: {}",
+          response.code(),
+          response.errorBody().string());
+      frameworkLogger.error("ProjectId: {}, Timestamp: {}", projectId, timestamp);
+    }
+
+    return response.body();
   }
 
   public List<TestCase> getAutomatedTestCases(String projectId) throws IOException {
@@ -82,7 +94,16 @@ public class TestRailManager {
     data.put(CustomQuery, "");
     data.put(TestCase.TYPE_ID, TestCase.TYPE_AUTOMATED);
 
-    return service.getTestCases(data).execute().body();
+    retrofit2.Response<List<TestCase>> response = service.getTestCases(data).execute();
+    if (!response.isSuccessful()) {
+      frameworkLogger.error(
+          "Request getTestCases Failed with Error Code: {}, Error Body: {}",
+          response.code(),
+          response.errorBody().string());
+      frameworkLogger.error("ProjectId: {}", projectId);
+    }
+
+    return response.body();
   }
 
   public List<TestResult> getTestResultsForTestCase(int runId, int testcaseId) throws IOException {
@@ -93,7 +114,17 @@ public class TestRailManager {
     Map<String, String> data = new HashMap<>();
     data.put(CustomQuery, "");
 
-    return service.getTestResultsForTestCase(data).execute().body();
+    retrofit2.Response<List<TestResult>> response =
+        service.getTestResultsForTestCase(data).execute();
+    if (!response.isSuccessful()) {
+      frameworkLogger.error(
+          "Request getTestCases Failed with Error Code: {}, Error Body: {}",
+          response.code(),
+          response.errorBody().string());
+      frameworkLogger.error("RunId: {}, TestCaseId: {}", runId, testcaseId);
+    }
+
+    return response.body();
   }
 
   public TestRun getTestRun(String testRunId) throws IOException {
@@ -102,7 +133,17 @@ public class TestRailManager {
 
     Map<String, String> data = new HashMap<>();
     data.put(CustomQuery, "");
-    return service.getTestRun(data).execute().body();
+
+    retrofit2.Response<TestRun> response = service.getTestRun(data).execute();
+    if (!response.isSuccessful()) {
+      frameworkLogger.error(
+          "Request getTestRun Failed with Error Code: {}, Error Body: {}",
+          response.code(),
+          response.errorBody().string());
+      frameworkLogger.error("RunId: {}", testRunId);
+    }
+
+    return response.body();
   }
 
   public TestRun addTestRun(String projectId, String testRunName, List<Integer> includeTestCaseIds)
@@ -121,6 +162,19 @@ public class TestRailManager {
     data.put(CustomQuery, "");
     TestRun testRun = service.addTestRun(data, request).execute().body();
 
+    retrofit2.Response<TestRun> response = service.addTestRun(data, request).execute();
+    if (!response.isSuccessful()) {
+      frameworkLogger.error(
+          "Request addTestRun Failed with Error Code: {}, Error Body: {}",
+          response.code(),
+          response.errorBody().string());
+      frameworkLogger.error(
+          "ProjectId: {}, TestRunName: {}, includeTestCaseIds: {}",
+          projectId,
+          testRunName,
+          includeTestCaseIds);
+    }
+
     testRun.setTestCaseIds(includeTestCaseIds);
 
     return testRun;
@@ -136,7 +190,17 @@ public class TestRailManager {
 
     Map<String, String> data = new HashMap<>();
     data.put(CustomQuery, "");
-    TestRun updatedTestRun = service.updateTestRun(data, request).execute().body();
+
+    retrofit2.Response<TestRun> response = service.updateTestRun(data, request).execute();
+    if (!response.isSuccessful()) {
+      frameworkLogger.error(
+          "Request updateTestRun Failed with Error Code: {}, Error Body: {}",
+          response.code(),
+          response.errorBody().string());
+      frameworkLogger.error("RunName: {}", request.getName());
+    }
+
+    TestRun updatedTestRun = response.body();
     updatedTestRun.setTestCaseIds(testRun.getTestCaseIds());
 
     return updatedTestRun;
@@ -152,7 +216,16 @@ public class TestRailManager {
     Map<String, String> data = new HashMap<>();
     data.put(CustomQuery, "");
 
-    return service.addResultForTestCase(data, request).execute().body();
+    retrofit2.Response<TestResult> response = service.addResultForTestCase(data, request).execute();
+    if (!response.isSuccessful()) {
+      frameworkLogger.error(
+          "Request addResultForTestCase Failed with Error Code: {}, Error Body: {}",
+          response.code(),
+          response.errorBody().string());
+      frameworkLogger.error("RunId: {}, TestCaseId: {}", testRunId, testCaseId);
+    }
+
+    return response.body();
   }
 
   public Attachment addAttachmentToTestRun(Integer testRunId, String imagePath) throws IOException {
@@ -168,7 +241,16 @@ public class TestRailManager {
     MultipartBody.Part imageToUpload =
         MultipartBody.Part.createFormData("attachment", file.getName(), requestFile);
 
-    return service.addAttachmentToTestRun(data, imageToUpload).execute().body();
+    retrofit2.Response<Attachment> response = service.addAttachment(data, imageToUpload).execute();
+    if (!response.isSuccessful()) {
+      frameworkLogger.error(
+          "Request addAttachment Failed with Error Code: {}, Error Body: {}",
+          response.code(),
+          response.errorBody().string());
+      frameworkLogger.error("RunId: {}", testRunId);
+    }
+
+    return response.body();
   }
 
   public Attachment addAttachmentToTestResult(Integer testResultId, String imagePath)
@@ -186,7 +268,16 @@ public class TestRailManager {
     MultipartBody.Part imageToUpload =
         MultipartBody.Part.createFormData("attachment", file.getName(), requestFile);
 
-    return service.addAttachmentToTestRun(data, imageToUpload).execute().body();
+    retrofit2.Response<Attachment> response = service.addAttachment(data, imageToUpload).execute();
+    if (!response.isSuccessful()) {
+      frameworkLogger.error(
+          "Request addAttachment Failed with Error Code: {}, Error Body: {}",
+          response.code(),
+          response.errorBody().string());
+      frameworkLogger.error("TestResultId: {}, Image: {}", testResultId, imagePath);
+    }
+
+    return response.body();
   }
 }
 

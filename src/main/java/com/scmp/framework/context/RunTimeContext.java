@@ -7,6 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.scmp.framework.utils.ConfigFileKeys;
 import com.scmp.framework.utils.ConfigFileReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.scmp.framework.utils.Constants.TARGET_PATH;
 
@@ -16,12 +18,14 @@ public class RunTimeContext {
   private ConcurrentHashMap<String, Object> globalVariables = new ConcurrentHashMap<>();
   private ConfigFileReader configFileReader;
 
+  private static final Logger frameworkLogger = LoggerFactory.getLogger(RunTimeContext.class);
+
   private RunTimeContext() {
 
     String configFile = "config.properties";
     if (System.getenv().containsKey("CONFIG_FILE")) {
       configFile = System.getenv().get("CONFIG_FILE");
-      System.out.println("Using config file from " + configFile);
+      frameworkLogger.info("Using config file from " + configFile);
     }
 
     this.configFileReader = new ConfigFileReader(configFile);
@@ -91,9 +95,9 @@ public class RunTimeContext {
     File file = new File(path);
     if (!file.exists()) {
       if (file.mkdirs()) {
-        System.out.println("Directory [" + path + "] is created!");
+        frameworkLogger.info("Directory [" + path + "] is created!");
       } else {
-        System.out.println("Failed to create directory!");
+        frameworkLogger.error("Failed to create directory!");
       }
     }
 

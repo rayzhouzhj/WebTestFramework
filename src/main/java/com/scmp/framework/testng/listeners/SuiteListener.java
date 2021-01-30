@@ -7,6 +7,8 @@ import com.scmp.framework.testrail.TestRailStatus;
 import com.scmp.framework.testrail.models.TestCase;
 import com.scmp.framework.testrail.models.TestRun;
 import com.scmp.framework.utils.ConfigFileKeys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
 import org.testng.ITestNGMethod;
@@ -22,9 +24,12 @@ import java.util.stream.Collectors;
 import static com.scmp.framework.utils.Constants.TEST_RUN_OBJECT;
 
 public class SuiteListener implements ISuiteListener {
+
+  private static final Logger frameworkLogger = LoggerFactory.getLogger(SuiteListener.class);
+
   @Override
   public void onFinish(ISuite suite) {
-    System.out.println("Test Suite execution completed.");
+    frameworkLogger.info("Test Suite execution completed.");
   }
 
   @Override
@@ -35,8 +40,9 @@ public class SuiteListener implements ISuiteListener {
         initTestRail();
         createTestRun(suite);
       } catch (Exception e) {
-        e.printStackTrace();
-        throw new RuntimeException("Fail to init and create Test Run in TestRail.");
+        String errorMessage = "Fail to init and create Test Run in TestRail.";
+        frameworkLogger.error(errorMessage, e);
+        throw new RuntimeException(errorMessage);
       }
     }
   }
@@ -44,25 +50,26 @@ public class SuiteListener implements ISuiteListener {
   private List<Integer> getAllTestRailTestCases(ISuite suite) {
     List<ITestNGMethod> testNGMethods = suite.getAllMethods();
     return testNGMethods.stream()
-            .map(
-                    iTestNGMethod -> {
-                      TestRailTestCase testRailTestCase =
-                              iTestNGMethod
-                                      .getConstructorOrMethod()
-                                      .getMethod()
-                                      .getAnnotation(TestRailTestCase.class);
-                      if (testRailTestCase != null) {
-                        return testRailTestCase.id();
-                      } else {
-                        return null;
-                      }
-                    })
-            .filter(out -> out != null)
-            .collect(Collectors.toList());
+        .map(
+            iTestNGMethod -> {
+              TestRailTestCase testRailTestCase =
+                  iTestNGMethod
+                      .getConstructorOrMethod()
+                      .getMethod()
+                      .getAnnotation(TestRailTestCase.class);
+              if (testRailTestCase != null) {
+                return testRailTestCase.id();
+              } else {
+                return null;
+              }
+            })
+        .filter(out -> out != null)
+        .sorted()
+        .collect(Collectors.toList());
   }
 
   private void initTestRail() {
-    System.out.println("Initializing TestRailManager...");
+    frameworkLogger.info("Initializing TestRailManager...");
 
     RunTimeContext instance = RunTimeContext.getInstance();
     String baseUrl = instance.getProperty(ConfigFileKeys.TESTRAIL_SERVER);
@@ -80,11 +87,11 @@ public class SuiteListener implements ISuiteListener {
       TestRailStatus.IN_PROGRESS = TestRailStatus.Retest;
     }
 
-    System.out.println("TestRailManager Initialized.");
+    frameworkLogger.info("TestRailManager Initialized.");
   }
 
   private void createTestRun(ISuite suite) throws IOException {
-    System.out.println("Creating Test Run in TestRail...");
+    frameworkLogger.info("Creating Test Run in TestRail...");
 
     RunTimeContext instance = RunTimeContext.getInstance();
     String projectId = instance.getProperty(ConfigFileKeys.TESTRAIL_PROJECT_ID);
@@ -122,7 +129,12 @@ public class SuiteListener implements ISuiteListener {
 
       if (existingTestRun.isPresent()) {
         // Use the existing TestRun for testing
-        instance.setGlobalVariables(TEST_RUN_OBJECT, existingTestRun.get());
+        TestRun existingTestRunData = existingTestRun.get();
+        frameworkLogger.info(
+            "Used existing TestRun, Id: {}, Name: {}",
+                existingTestRunData.getId(),
+                existingTestRunData.getName());
+        instance.setGlobalVariables(TEST_RUN_OBJECT, existingTestRunData);
         return;
       }
     }
@@ -130,14 +142,14 @@ public class SuiteListener implements ISuiteListener {
     // Create a new test run
     // Look up test case ids
     List<Integer> testCaseIdList;
-    if(RunTimeContext.getInstance().isIncludeAllAutomatedTestCaseToTestRail()) {
+    if (RunTimeContext.getInstance().isIncludeAllAutomatedTestCaseToTestRail()) {
       List<TestCase> testCaseList = TestRailManager.getInstance().getAutomatedTestCases(projectId);
       testCaseIdList =
-              testCaseList.stream().map(testCase -> testCase.getId()).collect(Collectors.toList());
+          testCaseList.stream().map(testCase -> testCase.getId()).collect(Collectors.toList());
     } else {
       testCaseIdList = this.getAllTestRailTestCases(suite);
     }
-    
+
     // Create test run
     TestRun testRun =
         TestRailManager.getInstance().addTestRun(projectId, finalTestRunName, testCaseIdList);
@@ -145,6 +157,6 @@ public class SuiteListener implements ISuiteListener {
     // Save new created test run
     instance.setGlobalVariables(TEST_RUN_OBJECT, testRun);
 
-    System.out.println("Test Run created in TestRail.");
+    frameworkLogger.info("Test Run created in TestRail.");
   }
 }

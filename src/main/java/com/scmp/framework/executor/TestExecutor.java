@@ -17,15 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.scmp.framework.testng.listeners.SuiteListener;
-import com.scmp.framework.testrail.TestRailManager;
-import com.scmp.framework.testrail.TestRailStatus;
-import com.scmp.framework.testrail.models.Attachment;
-import com.scmp.framework.testrail.models.TestRun;
-import com.scmp.framework.testrail.models.requests.AddTestResultRequest;
-import com.scmp.framework.testrail.models.CustomStepResult;
 import com.scmp.framework.utils.ConfigFileKeys;
 import com.scmp.framework.testng.listeners.InvokedMethodListener;
 import com.scmp.framework.testng.listeners.RetryListener;
@@ -33,6 +25,8 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.TestNG;
 import org.testng.xml.XmlClass;
 import org.testng.xml.XmlSuite;
@@ -47,6 +41,8 @@ import static com.scmp.framework.utils.Constants.*;
 public class TestExecutor {
   private final RunTimeContext context;
   private ArrayList<String> items = new ArrayList<>();
+
+  private static final Logger frameworkLogger = LoggerFactory.getLogger(TestExecutor.class);
 
   public TestExecutor() {
 
@@ -63,12 +59,12 @@ public class TestExecutor {
     context.setGlobalVariables(
             CHROME_DRIVER_PATH, WebDriverManager.chromedriver().getDownloadedDriverPath());
 
-    System.out.println("ChromeDriver Path => " + context.getGlobalVariables(CHROME_DRIVER_PATH));
+    frameworkLogger.info("ChromeDriver Path => {}", context.getGlobalVariables(CHROME_DRIVER_PATH));
 
     WebDriverManager.firefoxdriver().setup();
     context.setGlobalVariables(
             FIREFOX_DRIVER_PATH, WebDriverManager.firefoxdriver().getDownloadedDriverPath());
-    System.out.println("FirefoxDriver Path => " + context.getGlobalVariables(FIREFOX_DRIVER_PATH));
+    frameworkLogger.info("FirefoxDriver Path => {}", context.getGlobalVariables(FIREFOX_DRIVER_PATH));
   }
 
   public boolean runner(String pack, List<String> tests) throws Exception {
@@ -248,7 +244,7 @@ public class TestExecutor {
       writer.flush();
       writer.close();
     } catch (IOException e) {
-      e.printStackTrace();
+      frameworkLogger.error("Ops!", e);
     }
 
     return suiteXML;

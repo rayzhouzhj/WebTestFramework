@@ -7,6 +7,8 @@ import com.scmp.framework.context.RunTimeContext;
 import com.scmp.framework.testng.listeners.RetryAnalyzer;
 import com.scmp.framework.testng.model.TestInfo;
 import com.scmp.framework.testrail.TestRailStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
@@ -20,6 +22,7 @@ import static com.scmp.framework.utils.Constants.TARGET_PATH;
  * ReportManager - Handles all Reporting activities e.g communication with ExtentManager, etc
  */
 public class ReportManager {
+    private static final Logger frameworkLogger = LoggerFactory.getLogger(ReportManager.class);
     private static ReportManager manager = new ReportManager();
     private ThreadLocal<TestInfo> testInfo = new ThreadLocal<>();
     private ThreadLocal<ExtentTest> parentTestClass = new ThreadLocal<>();
@@ -54,7 +57,7 @@ public class ReportManager {
             // Print exception stack trace if any
             Throwable throwable = result.getThrowable();
             if (throwable != null) {
-                throwable.printStackTrace();
+                frameworkLogger.error("Ops!", throwable);
                 currentTestMethod.get().log(Status.FAIL, "<pre>" + result.getThrowable().getMessage() + "</pre>");
                 this.addTestRailLog(TestRailStatus.Failed, result.getThrowable().getMessage(), null);
             }
@@ -72,7 +75,7 @@ public class ReportManager {
                 this.addTestRailLog(TestRailStatus.Failed, "", screenShotAbsolutePath);
 
             } catch (Exception e) {
-                e.printStackTrace();
+                frameworkLogger.error("Ops!", e);
             }
         }
     }
@@ -173,7 +176,7 @@ public class ReportManager {
         try {
             return screenshotManager.getScreenshotPath(classAndMethod[0], classAndMethod[1], imageName);
         } catch (Exception e) {
-            e.printStackTrace();
+            frameworkLogger.error("Ops!", e);
             return null;
         }
     }
@@ -204,7 +207,7 @@ public class ReportManager {
 
             return screenShotAbsolutePath;
         } catch (Exception e) {
-            e.printStackTrace();
+            frameworkLogger.error("Ops!", e);
         }
 
         return "";
@@ -254,7 +257,7 @@ public class ReportManager {
 
             this.addTestRailLog(TestRailStatus.Failed, message, originalImagePath);
         } catch (Exception e) {
-            e.printStackTrace();
+            frameworkLogger.error("Ops!", e);
         }
     }
 
@@ -263,7 +266,7 @@ public class ReportManager {
             String[] classAndMethod = getTestClassNameAndMethodName().split(",");
             return screenshotManager.captureScreenShot(Status.INFO, classAndMethod[0], classAndMethod[1]);
         } catch (Exception e) {
-            e.printStackTrace();
+            frameworkLogger.error("Ops!", e);
         }
 
         return null;
@@ -274,7 +277,7 @@ public class ReportManager {
             this.currentTestMethod.get().addScreenCaptureFromPath(imagePath);
             this.addTestRailLog(TestRailStatus.Passed, "", imagePath);
         } catch (Exception e) {
-            e.printStackTrace();
+            frameworkLogger.error("Ops!", e);
         }
     }
 

@@ -5,7 +5,8 @@ import com.scmp.framework.testrail.models.CustomStepResult;
 import com.scmp.framework.testrail.models.TestResult;
 import com.scmp.framework.testrail.models.TestRun;
 import com.scmp.framework.testrail.models.requests.AddTestResultRequest;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 public class TestRailDataHandler {
+  private static final Logger frameworkLogger = LoggerFactory.getLogger(TestRailDataHandler.class);
 
   private int testcaseId;
   private TestRun testRun;
@@ -43,7 +45,7 @@ public class TestRailDataHandler {
 
                 this.isTestResultForUploadAttachmentsReady = true;
               } catch (IOException e) {
-                e.printStackTrace();
+                frameworkLogger.error("Failed to create test result.", e);
               }
             })
         .start();
@@ -66,7 +68,6 @@ public class TestRailDataHandler {
           new Thread(
               () -> {
                 try {
-
                   // Wait for test result for attachment ready
                   int maxWaitSeconds = 20;
                   int seconds = 0;
@@ -75,11 +76,11 @@ public class TestRailDataHandler {
                       seconds++;
                       TimeUnit.SECONDS.sleep(1);
                     } catch (InterruptedException e) {
-                      e.printStackTrace();
+                      frameworkLogger.error("Ops!", e);
                     }
                   }
 
-                  System.out.println("Uploading attachment: " + filePath);
+                  frameworkLogger.info("Uploading attachment: " + filePath);
                   Attachment attachment =
                       TestRailManager.getInstance()
                           .addAttachmentToTestResult(
@@ -87,10 +88,10 @@ public class TestRailDataHandler {
 
                   String attachmentRef =
                       String.format(Attachment.ATTACHMENT_REF_STRING, attachment.getAttachmentId());
-                  System.out.println("Attachment uploaded: " + attachmentRef);
+                  frameworkLogger.info("Attachment uploaded: " + attachmentRef);
                   stepResult.setContent(stepResult.getContent() + " \n " + attachmentRef);
                 } catch (Exception e) {
-                  e.printStackTrace();
+                  frameworkLogger.error("Failed to upload attachment.", e);
                 } finally {
                   pendingTaskQueue.remove(stepResult);
                 }
@@ -115,13 +116,13 @@ public class TestRailDataHandler {
         seconds++;
         TimeUnit.SECONDS.sleep(1);
       } catch (InterruptedException e) {
-        e.printStackTrace();
+        frameworkLogger.error("Ops!", e);
       }
     }
 
-    System.out.println("========RESULT CONTENT==========");
-    testRailCustomStepResultList.forEach(result -> {System.out.println(result.getContent());});
-    System.out.println("================================");
+//    frameworkLogger.info("========RESULT CONTENT==========");
+//    testRailCustomStepResultList.forEach(result -> {frameworkLogger.info(result.getContent());});
+//    frameworkLogger.info("================================");
 
     AddTestResultRequest request =
         new AddTestResultRequest(
@@ -129,7 +130,7 @@ public class TestRailDataHandler {
     try {
       TestRailManager.getInstance().addTestResult(this.testRun.getId(), this.testcaseId, request);
     } catch (IOException e) {
-      e.printStackTrace();
+      frameworkLogger.error("Failed to create test result.", e);
     }
   }
 }

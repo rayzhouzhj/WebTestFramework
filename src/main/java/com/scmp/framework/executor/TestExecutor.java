@@ -59,12 +59,9 @@ public class TestExecutor {
     context.setGlobalVariables(
             CHROME_DRIVER_PATH, WebDriverManager.chromedriver().getDownloadedDriverPath());
 
-    frameworkLogger.info("ChromeDriver Path => {}", context.getGlobalVariables(CHROME_DRIVER_PATH));
-
     WebDriverManager.firefoxdriver().setup();
     context.setGlobalVariables(
             FIREFOX_DRIVER_PATH, WebDriverManager.firefoxdriver().getDownloadedDriverPath());
-    frameworkLogger.info("FirefoxDriver Path => {}", context.getGlobalVariables(FIREFOX_DRIVER_PATH));
   }
 
   public boolean runner(String pack, List<String> tests) throws Exception {

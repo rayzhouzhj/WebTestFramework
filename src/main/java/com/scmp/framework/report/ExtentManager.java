@@ -31,8 +31,6 @@ public class ExtentManager {
 
       String browserType = RunTimeContext.getInstance().getProperty(ConfigFileKeys.BROWSER_TYPE);
       String threadCount = RunTimeContext.getInstance().getProperty(ConfigFileKeys.THREAD_COUNT);
-      String uploadToTestRail =
-          RunTimeContext.getInstance().getProperty(ConfigFileKeys.TESTRAIL_UPLOAD_FLAG);
       String excludeGroups =
           RunTimeContext.getInstance().getProperty(ConfigFileKeys.EXCLUDE_GROUPS);
       String includeGroups =
@@ -40,13 +38,13 @@ public class ExtentManager {
       String url = RunTimeContext.getInstance().getProperty(ConfigFileKeys.URL);
       String featureDesc =
           RunTimeContext.getInstance().getProperty(ConfigFileKeys.FEATURE_DESCRIPTION);
+
       extent.setSystemInfo("URL", url);
       extent.setSystemInfo("Include Groups", includeGroups);
       extent.setSystemInfo("Exclude Groups", excludeGroups);
       extent.setSystemInfo("Browser Type", browserType);
       extent.setSystemInfo("Tread Count", threadCount);
       extent.setSystemInfo("Feature", featureDesc);
-      extent.setSystemInfo("Upload To TestRail", uploadToTestRail);
 
       List<Status> statusHierarchy =
           Arrays.asList(

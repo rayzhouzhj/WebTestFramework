@@ -7,8 +7,9 @@ public class ConfigFileKeys {
     public static String FRAMEWORK = "FRAMEWORK";
     public static String THREAD_COUNT = "THREAD_COUNT";
     public static String DATAPROVIDER_THREAD_COUNT = "DATAPROVIDER_THREAD_COUNT";
-    public static String MONGODB_SERVER = "MONGODB_SERVER";
-    public static String MONGODB_PORT = "MONGODB_PORT";
+    public static String EXTENT_MONGODB_SERVER = "EXTENT_MONGODB_SERVER";
+    public static String EXTENT_MONGODB_PORT = "EXTENT_MONGODB_PORT";
+    public static String EXTENT_XML_PATH = "EXTENT_XML_PATH";
     public static String MAX_RETRY_COUNT = "MAX_RETRY_COUNT";
     public static String REMOVE_FAILED_TEST_B4_RETRY = "REMOVE_FAILED_TEST_B4_RETRY";
     public static String PRELOAD_LOCAL_STORAGE_DATA = "PRELOAD_LOCAL_STORAGE_DATA";

@@ -65,23 +65,31 @@ public class ExtentManager {
 
   private static ExtentHtmlReporter getHtmlReporter() {
     ExtentHtmlReporter htmlReporter = new ExtentHtmlReporter(filePath);
-    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-    URL resource = classLoader.getResource(extentXML);
-    if (resource != null) {
-      frameworkLogger.info("Loading extent.xml from {}", resource.getPath());
-      htmlReporter.loadXMLConfig(resource.getPath());
-    } else {
-      frameworkLogger.warn("Cannot load extent.xml, using default value");
+    String extentXML = RunTimeContext.getInstance().getProperty(ConfigFileKeys.EXTENT_XML_PATH);
+
+    boolean loadDefaultConfig = true;
+    if (extentXML != null && !extentXML.isEmpty()) {
+      frameworkLogger.info("Loading extent.xml from {}", extentXML);
+      try {
+        htmlReporter.loadXMLConfig(extentXML);
+        loadDefaultConfig = false;
+      } catch (Exception e) {
+        frameworkLogger.error("Failed to load extent.xml from " + extentXML, e);
+      }
+    }
+
+    if(loadDefaultConfig) {
+      frameworkLogger.info("Using default extent configs.");
+
+      // report title
+      htmlReporter.config().setDocumentTitle("WEB Test Report");
+      htmlReporter.config().setReportName("WEB Test Report");
+      htmlReporter.config().setTestViewChartLocation(ChartLocation.TOP);
+      htmlReporter.config().setTheme(Theme.STANDARD);
     }
 
     // make the charts visible on report open
     htmlReporter.config().setChartVisibilityOnOpen(true);
-
-    // report title
-    htmlReporter.config().setDocumentTitle("WEB Test Report");
-    htmlReporter.config().setReportName("WEB Test Report");
-    htmlReporter.config().setTestViewChartLocation(ChartLocation.TOP);
-    htmlReporter.config().setTheme(Theme.STANDARD);
 
     return htmlReporter;
   }

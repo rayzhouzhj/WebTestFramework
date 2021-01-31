@@ -1,6 +1,7 @@
 package com.scmp.framework.report;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,67 +11,84 @@ import com.aventstack.extentreports.reporter.ExtentHtmlReporter;
 import com.aventstack.extentreports.reporter.configuration.ChartLocation;
 import com.aventstack.extentreports.reporter.configuration.Theme;
 import com.scmp.framework.context.RunTimeContext;
+import com.scmp.framework.utils.ConfigFileKeys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.scmp.framework.utils.Constants.TARGET_PATH;
-import static com.scmp.framework.utils.Constants.USER_DIR;
 
-public class ExtentManager 
-{
-	private static ExtentReports extent;
-	private static String filePath = TARGET_PATH + File.separator + "WebTestReport.html";
-	private static String extentXML = System.getProperty(USER_DIR) + File.separator + "extent.xml";
+public class ExtentManager {
+  private static final Logger frameworkLogger = LoggerFactory.getLogger(ExtentManager.class);
 
-	public synchronized static ExtentReports getExtent() 
-	{
-		if (extent == null)
-		{
-			extent = new ExtentReports();
-			extent.attachReporter(getHtmlReporter());
+  private static ExtentReports extent;
+  private static final String filePath = TARGET_PATH + File.separator + "WebTestReport.html";
+  private static final String extentXML = "extent.xml";
 
-			String executionMode = RunTimeContext.getInstance().getProperty("RUNNER");
-			String platform = RunTimeContext.getInstance().getProperty("Platform");
-			String build = RunTimeContext.getInstance().getProperty("BuildNumber");
-			if(build == null) build = "";
-			
-			extent.setSystemInfo("Runner", executionMode);
-			extent.setSystemInfo("Platform", platform);
-			extent.setSystemInfo("Build", build);
+  public static synchronized ExtentReports getExtent() {
+    if (extent == null) {
+      extent = new ExtentReports();
+      extent.attachReporter(getHtmlReporter());
 
-			List<Status> statusHierarchy = Arrays.asList(
-					Status.FATAL,
-					Status.FAIL,
-					Status.ERROR,
-					Status.WARNING,
-					Status.PASS,
-					Status.SKIP,
-					Status.DEBUG,
-					Status.INFO
-					);
+      String browserType = RunTimeContext.getInstance().getProperty(ConfigFileKeys.BROWSER_TYPE);
+      String threadCount = RunTimeContext.getInstance().getProperty(ConfigFileKeys.THREAD_COUNT);
+      String uploadToTestRail =
+          RunTimeContext.getInstance().getProperty(ConfigFileKeys.TESTRAIL_UPLOAD_FLAG);
+      String excludeGroups =
+          RunTimeContext.getInstance().getProperty(ConfigFileKeys.EXCLUDE_GROUPS);
+      String includeGroups =
+          RunTimeContext.getInstance().getProperty(ConfigFileKeys.INCLUDE_GROUPS);
+      String url = RunTimeContext.getInstance().getProperty(ConfigFileKeys.URL);
+      String featureDesc =
+          RunTimeContext.getInstance().getProperty(ConfigFileKeys.FEATURE_DESCRIPTION);
+      extent.setSystemInfo("URL", url);
+      extent.setSystemInfo("Include Groups", includeGroups);
+      extent.setSystemInfo("Exclude Groups", excludeGroups);
+      extent.setSystemInfo("Browser Type", browserType);
+      extent.setSystemInfo("Tread Count", threadCount);
+      extent.setSystemInfo("Feature", featureDesc);
+      extent.setSystemInfo("Upload To TestRail", uploadToTestRail);
 
-			extent.config().statusConfigurator().setStatusHierarchy(statusHierarchy);
-		}
+      List<Status> statusHierarchy =
+          Arrays.asList(
+              Status.FATAL,
+              Status.FAIL,
+              Status.ERROR,
+              Status.WARNING,
+              Status.PASS,
+              Status.SKIP,
+              Status.DEBUG,
+              Status.INFO);
 
-		return extent;
-	}
+      extent.config().statusConfigurator().setStatusHierarchy(statusHierarchy);
+    }
 
-	private static ExtentHtmlReporter getHtmlReporter()
-	{
-		ExtentHtmlReporter htmlReporter = new ExtentHtmlReporter(filePath);
-		htmlReporter.loadXMLConfig(extentXML);
-		// make the charts visible on report open
-		htmlReporter.config().setChartVisibilityOnOpen(true);
+    return extent;
+  }
 
-		// report title
-		htmlReporter.config().setDocumentTitle("WEB Test Report");
-		htmlReporter.config().setReportName("WEB Test Report");
-		htmlReporter.config().setTestViewChartLocation(ChartLocation.TOP);
-		htmlReporter.config().setTheme(Theme.STANDARD);
+  private static ExtentHtmlReporter getHtmlReporter() {
+    ExtentHtmlReporter htmlReporter = new ExtentHtmlReporter(filePath);
+    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+    URL resource = classLoader.getResource(extentXML);
+    if (resource != null) {
+      frameworkLogger.info("Loading extent.xml from {}", resource.getPath());
+      htmlReporter.loadXMLConfig(resource.getPath());
+    } else {
+      frameworkLogger.warn("Cannot load extent.xml, using default value");
+    }
 
-		return htmlReporter;
-	}
+    // make the charts visible on report open
+    htmlReporter.config().setChartVisibilityOnOpen(true);
 
-	public static void flush()
-	{
-		extent.flush();
-	}
+    // report title
+    htmlReporter.config().setDocumentTitle("WEB Test Report");
+    htmlReporter.config().setReportName("WEB Test Report");
+    htmlReporter.config().setTestViewChartLocation(ChartLocation.TOP);
+    htmlReporter.config().setTheme(Theme.STANDARD);
+
+    return htmlReporter;
+  }
+
+  public static void flush() {
+    extent.flush();
+  }
 }

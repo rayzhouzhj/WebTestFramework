@@ -160,7 +160,7 @@ public class TestRailManager {
 
     Map<String, String> data = new HashMap<>();
     data.put(CustomQuery, "");
-    TestRun testRun = service.addTestRun(data, request).execute().body();
+    TestRun testRun = null;
 
     retrofit2.Response<TestRun> response = service.addTestRun(data, request).execute();
     if (!response.isSuccessful()) {
@@ -173,9 +173,10 @@ public class TestRailManager {
           projectId,
           testRunName,
           includeTestCaseIds);
+    } else {
+      testRun = response.body();
+      testRun.setTestCaseIds(includeTestCaseIds);
     }
-
-    testRun.setTestCaseIds(includeTestCaseIds);
 
     return testRun;
   }
@@ -191,6 +192,7 @@ public class TestRailManager {
     Map<String, String> data = new HashMap<>();
     data.put(CustomQuery, "");
 
+    TestRun updatedTestRun = null;
     retrofit2.Response<TestRun> response = service.updateTestRun(data, request).execute();
     if (!response.isSuccessful()) {
       frameworkLogger.error(
@@ -198,10 +200,10 @@ public class TestRailManager {
           response.code(),
           response.errorBody().string());
       frameworkLogger.error("RunName: {}", request.getName());
+    } else {
+      updatedTestRun = response.body();
+      updatedTestRun.setTestCaseIds(testRun.getTestCaseIds());
     }
-
-    TestRun updatedTestRun = response.body();
-    updatedTestRun.setTestCaseIds(testRun.getTestCaseIds());
 
     return updatedTestRun;
   }

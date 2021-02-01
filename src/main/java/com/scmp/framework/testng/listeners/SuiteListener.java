@@ -132,8 +132,8 @@ public class SuiteListener implements ISuiteListener {
         TestRun existingTestRunData = existingTestRun.get();
         frameworkLogger.info(
             "Used existing TestRun, Id: {}, Name: {}",
-                existingTestRunData.getId(),
-                existingTestRunData.getName());
+            existingTestRunData.getId(),
+            existingTestRunData.getName());
         instance.setGlobalVariables(TEST_RUN_OBJECT, existingTestRunData);
         return;
       }
@@ -150,13 +150,20 @@ public class SuiteListener implements ISuiteListener {
       testCaseIdList = this.getAllTestRailTestCases(suite);
     }
 
-    // Create test run
-    TestRun testRun =
-        TestRailManager.getInstance().addTestRun(projectId, finalTestRunName, testCaseIdList);
-
-    // Save new created test run
-    instance.setGlobalVariables(TEST_RUN_OBJECT, testRun);
-
-    frameworkLogger.info("Test Run created in TestRail.");
+    if (testCaseIdList.size() > 0) {
+      // Create test run
+      TestRun testRun =
+          TestRailManager.getInstance().addTestRun(projectId, finalTestRunName, testCaseIdList);
+      // Save new created test run
+      instance.setGlobalVariables(TEST_RUN_OBJECT, testRun);
+      if (testRun != null && testRun.getId() > 0) {
+        frameworkLogger.info("Test Run created in TestRail.");
+      } else {
+        frameworkLogger.error("Failed to create Test Run in TestRail.");
+        throw new RuntimeException("Failed to create Test Run in TestRail.");
+      }
+    } else {
+      frameworkLogger.warn("Test Run is NOT created in TestRail, empty Test Case List is detected.");
+    }
   }
 }

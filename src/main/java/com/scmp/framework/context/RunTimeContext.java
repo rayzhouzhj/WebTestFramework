@@ -1,11 +1,16 @@
 package com.scmp.framework.context;
 
 import java.io.File;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.scmp.framework.utils.ConfigFileKeys;
 import com.scmp.framework.utils.ConfigFileReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.scmp.framework.utils.Constants.TARGET_PATH;
 
 public class RunTimeContext {
   private static RunTimeContext instance;
@@ -13,13 +18,14 @@ public class RunTimeContext {
   private ConcurrentHashMap<String, Object> globalVariables = new ConcurrentHashMap<>();
   private ConfigFileReader configFileReader;
 
+  private static final Logger frameworkLogger = LoggerFactory.getLogger(RunTimeContext.class);
+
   private RunTimeContext() {
 
     String configFile = "config.properties";
-    if (System.getenv().containsKey("CONFIG_FILE"))
-    {
+    if (System.getenv().containsKey("CONFIG_FILE")) {
       configFile = System.getenv().get("CONFIG_FILE");
-      System.out.println("Using config file from " + configFile);
+      frameworkLogger.info("Using config file from " + configFile);
     }
 
     this.configFileReader = new ConfigFileReader(configFile);
@@ -42,15 +48,11 @@ public class RunTimeContext {
   }
 
   public Object getTestLevelVariables(String name) {
-    if(this.testLevelVariables.get() ==  null) {
-      return null;
-    } else {
-      return this.testLevelVariables.get().getOrDefault(name, null);
-    }
+    return this.testLevelVariables.get().getOrDefault(name, null);
   }
 
   public void setTestLevelVariables(String name, Object data) {
-    if(this.testLevelVariables.get() ==  null) {
+    if (this.testLevelVariables.get() == null) {
       this.testLevelVariables.set(new HashMap<>());
     }
 
@@ -58,7 +60,7 @@ public class RunTimeContext {
   }
 
   public void clearRunTimeVariables() {
-    if(this.testLevelVariables.get() !=  null) {
+    if (this.testLevelVariables.get() != null) {
       this.testLevelVariables.get().clear();
     }
   }
@@ -77,14 +79,12 @@ public class RunTimeContext {
   }
 
   public String getURL() {
-    return this.getProperty("URL", "");
+    return this.getProperty(ConfigFileKeys.URL, "");
   }
 
   public synchronized String getLogPath(String category, String className, String methodName) {
     String path =
-        System.getProperty("user.dir")
-            + File.separator
-            + "target"
+        TARGET_PATH
             + File.separator
             + category
             + File.separator
@@ -95,9 +95,9 @@ public class RunTimeContext {
     File file = new File(path);
     if (!file.exists()) {
       if (file.mkdirs()) {
-        System.out.println("Directory [" + path + "] is created!");
+        frameworkLogger.info("Directory [" + path + "] is created!");
       } else {
-        System.out.println("Failed to create directory!");
+        frameworkLogger.error("Failed to create directory!");
       }
     }
 
@@ -114,5 +114,25 @@ public class RunTimeContext {
   public boolean removeFailedTestB4Retry() {
     return "true"
         .equalsIgnoreCase(this.getProperty(ConfigFileKeys.REMOVE_FAILED_TEST_B4_RETRY, "false"));
+  }
+
+  public boolean isUploadToTestRail() {
+    return "true".equalsIgnoreCase(this.getProperty(ConfigFileKeys.TESTRAIL_UPLOAD_FLAG, "false"));
+  }
+
+  public boolean isCreateNewTestRunInTestRail() {
+    return "true"
+        .equalsIgnoreCase(
+            this.getProperty(ConfigFileKeys.TESTRAIL_CREATE_NEW_TEST_RUN, "false"));
+  }
+
+  public boolean isIncludeAllAutomatedTestCaseToTestRail() {
+    return "true"
+            .equalsIgnoreCase(
+                    this.getProperty(ConfigFileKeys.TESTRAIL_INCLUDE_ALL_AUTOMATED_TEST_CASES, "false"));
+  }
+
+  public ZoneId getZoneId() {
+    return ZoneId.of("Asia/Hong_Kong");
   }
 }

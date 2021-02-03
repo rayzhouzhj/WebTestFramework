@@ -7,6 +7,8 @@ import org.openqa.selenium.html5.LocalStorage;
 import org.openqa.selenium.html5.WebStorage;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ import java.util.Map;
 import static com.scmp.framework.utils.Constants.TEST_INFO_OBJECT;
 
 public abstract class BaseApp {
+    private static final Logger frameworkLogger = LoggerFactory.getLogger(BaseApp.class);
     private RemoteWebDriver driver;
 
     public BaseApp(RemoteWebDriver driver) {
@@ -32,7 +35,7 @@ public abstract class BaseApp {
                 try {
                     field.set(this, field.getType().getConstructors()[0].newInstance(driver));
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    frameworkLogger.error("Ops!", e);
                 }
             }
         }

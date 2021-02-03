@@ -1,63 +1,67 @@
 package com.scmp.framework.test;
 
 import com.scmp.framework.report.ReportManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 public class TestLogger {
 
-    public String captureScreen() {
-        return ReportManager.getInstance().captureScreenShot();
-    }
+  private static final Logger frameworkLogger = LoggerFactory.getLogger(TestLogger.class);
 
-    public String getImagePath(String imageName) {
-        return ReportManager.getInstance().getImagePath(imageName);
-    }
+  public String captureScreen() {
+    return ReportManager.getInstance().captureScreenShot();
+  }
 
-    public void attachImage(String image) {
-        ReportManager.getInstance().attachImage(image);
-    }
+  public String getImagePath(String imageName) {
+    return ReportManager.getInstance().getImagePath(imageName);
+  }
 
-    public String logScreenshot() {
-        return ReportManager.getInstance().logScreenshot();
-    }
+  public void attachImage(String image) {
+    ReportManager.getInstance().attachImage(image);
+  }
 
-    public void logInfo(String message) {
-        System.out.println("[INFO] " + message);
-        ReportManager.getInstance().logInfo(message);
-    }
+  public String logScreenshot() {
+    return ReportManager.getInstance().logScreenshot();
+  }
 
-    public void logInfoWithScreenshot(String message) {
-        System.out.println("[INFO] " + message);
-        ReportManager.getInstance().logInfoWithScreenshot(message);
-    }
+  public void logInfo(String message) {
+    frameworkLogger.info(message);
+    ReportManager.getInstance().logInfo(message);
+  }
 
-    public void logPass(String message) {
-        System.out.println("[PASSED] " + message);
-        ReportManager.getInstance().logPass(message);
-    }
+  public void logInfoWithScreenshot(String message) {
+    frameworkLogger.info(message);
+    ReportManager.getInstance().logInfoWithScreenshot(message);
+  }
 
-    public void logPassWithScreenshot(String message) {
-        System.out.println("[PASSED] " + message);
-        ReportManager.getInstance().logPassWithScreenshot(message);
-    }
+  public void logPass(String message) {
+    frameworkLogger.info("[PASSED] " + message);
+    ReportManager.getInstance().logPass(message);
+  }
 
-    public void logFail(String message) {
-        System.err.println("[FAILED] " + message);
-        ReportManager.getInstance().logFail(message);
-    }
+  public void logPassWithScreenshot(String message) {
+    frameworkLogger.info("[PASSED] " + message);
+    ReportManager.getInstance().logPassWithScreenshot(message);
+  }
 
-    public void logFailWithoutScreenshot(String message) {
-        System.err.println("[FAILED] " + message);
-        ReportManager.getInstance().logFailWithoutScreenshot(message);
-    }
+  public void logFail(String message) {
+    frameworkLogger.error("[FAILED] " + message);
+    ReportManager.getInstance().logFail(message);
+  }
 
-    public void logFailWithImage(String message, String imagePath) {
-        System.err.println("[FAILED] " + message);
-        ReportManager.getInstance().logFailWithImage(message, imagePath);
-    }
+  public void logFailWithoutScreenshot(String message) {
+    frameworkLogger.error("[FAILED] " + message);
+    ReportManager.getInstance().logFailWithoutScreenshot(message);
+  }
 
-    public void logFatalError(String message) {
-        System.err.println("[ERROR] " + message);
-        Assert.fail(message);
-    }
+  public void logFailWithImage(String message, String imagePath) {
+    frameworkLogger.error("[FAILED] " + message);
+    ReportManager.getInstance().logFailWithImage(message, imagePath);
+  }
+
+  public void logFatalError(String message) {
+    frameworkLogger.error("[ERROR] " + message);
+    Assert.fail(message);
+  }
 }

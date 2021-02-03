@@ -3,9 +3,13 @@ package com.scmp.framework.testng.model;
 import com.scmp.framework.annotations.*;
 import com.scmp.framework.annotations.screens.Device;
 import com.scmp.framework.annotations.screens.DeviceName;
+import com.scmp.framework.annotations.testrail.TestRailTestCase;
 import com.scmp.framework.context.RunTimeContext;
 import com.scmp.framework.model.Browser;
 import com.scmp.framework.testng.listeners.RetryAnalyzer;
+import com.scmp.framework.testrail.TestRailDataHandler;
+import com.scmp.framework.testrail.TestRailStatus;
+import com.scmp.framework.testrail.models.TestRun;
 import com.scmp.framework.utils.ConfigFileReader;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
@@ -19,12 +23,15 @@ import org.testng.ITestResult;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
 import static com.scmp.framework.utils.ConfigFileKeys.LOCAL_STORAGE_DATA_PATH;
 import static com.scmp.framework.utils.ConfigFileKeys.PRELOAD_LOCAL_STORAGE_DATA;
+import static com.scmp.framework.utils.Constants.TEST_RUN_OBJECT;
 
 public class TestInfo {
     private IInvokedMethod testNGInvokedMethod;
@@ -32,12 +39,58 @@ public class TestInfo {
     private Method declaredMethod;
 
     private Browser browserType = null;
+    private TestRailDataHandler testRailDataHandler = null;
+    private LocalDateTime testStartTime = null;
+    private LocalDateTime testEndTime = null;
 
     public TestInfo(IInvokedMethod methodName, ITestResult testResult) {
         this.testNGInvokedMethod = methodName;
         this.testResult = testResult;
-
         this.declaredMethod = this.testNGInvokedMethod.getTestMethod().getConstructorOrMethod().getMethod();
+        this.testStartTime = LocalDateTime.now(RunTimeContext.getInstance().getZoneId());
+
+        // Init TestRail handler
+        if(this.isTestMethod() && RunTimeContext.getInstance().isUploadToTestRail()) {
+            TestRailTestCase testRailCase = this.declaredMethod.getAnnotation(TestRailTestCase.class);
+            TestRun testRun = (TestRun) RunTimeContext.getInstance().getGlobalVariables(TEST_RUN_OBJECT);
+            if(testRailCase != null && testRun != null) {
+                this.testRailDataHandler = new TestRailDataHandler(testRailCase.id(), testRun);
+            }
+        }
+    }
+
+    public void addTestResultForTestRail(int status, String content, String filePath) {
+        if(this.testRailDataHandler != null) {
+            this.testRailDataHandler.addStepResult(status, content, filePath);
+        }
+    }
+
+    public void setTestEndTime() {
+        this.testEndTime = LocalDateTime.now(RunTimeContext.getInstance().getZoneId());
+    }
+
+    public void uploadTestResultsToTestRail() {
+        if(this.testRailDataHandler != null) {
+            int finalTestResult = TestRailStatus.Untested;
+            switch (this.testResult.getStatus()) {
+                case ITestResult.SUCCESS:
+                    finalTestResult = TestRailStatus.Passed;
+                    break;
+                case ITestResult.FAILURE:
+                    finalTestResult = TestRailStatus.Failed;
+                    break;
+                default:
+                    finalTestResult = TestRailStatus.Untested;
+
+            }
+
+            if(this.testEndTime == null) {
+                this.setTestEndTime();
+            }
+
+            long elapsed = Duration.between(this.testStartTime, this.testEndTime).getSeconds();
+            this.testRailDataHandler.uploadDataToTestRail(finalTestResult, elapsed);
+        }
     }
 
     public ITestResult getTestResult() {
@@ -56,14 +109,14 @@ public class TestInfo {
         return this.declaredMethod.getDeclaringClass().getSimpleName();
     }
 
-    public String[] getClassGroups() {
-        ClassGroups groups = this.declaredMethod.getDeclaringClass().getAnnotation(ClassGroups.class);
-        return groups == null ? null : groups.groups();
+    public String[] getClassLevelGroups() {
+        Test testNgTest = this.declaredMethod.getDeclaringClass().getAnnotation(Test.class);
+        return testNgTest == null ? null : testNgTest.groups();
     }
 
     public String getClassDescription() {
-        ClassDescription description = this.declaredMethod.getDeclaringClass().getAnnotation(ClassDescription.class);
-        return description == null ? "" : description.value();
+        Test description = this.declaredMethod.getDeclaringClass().getAnnotation(Test.class);
+        return description == null ? "" : description.description();
     }
 
     public String getMethodName() {

@@ -31,7 +31,7 @@ URL=<your testing url> INCLUDE_GROUPS=<your runtime include groups> mvn clean te
 ```properties
 ############################## WEB ##########################################
 # If more than one browser is provided in BROWSER_TYPE
-# test will be run on different browsers in parallel thread
+# test will be run on different browsers on parallel thread
 # if `random` is set, chrome and firefox will be random assigned unless
 # the test is annotated by FirefoxOnly or ChromeOnly
 # Available options: chrome,firefox,random
@@ -43,20 +43,42 @@ HOST_URL=http://localhost:4444/wd/hub
 FRAMEWORK=testng
 THREAD_COUNT=3
 DATAPROVIDER_THREAD_COUNT=3
-MONGODB_SERVER=localhost
-MONGODB_PORT=27017
-MAX_RETRY_COUNT=0
+MAX_RETRY_COUNT=1
 REMOVE_FAILED_TEST_B4_RETRY=true
+PRELOAD_LOCAL_STORAGE_DATA=true
+LOCAL_STORAGE_DATA_PATH=data/configs/localstorage.properties
+
+######################## TESTRAIL #########################################
+TESTRAIL_SERVER=http://<server>/testrail/
+TESTRAIL_USER_NAME=XXXXXX
+TESTRAIL_API_KEY=XXXXXX
+# ${date} would be replaced with current date in format 1/20/2021
+# ${FEATURE_DESCRIPTION} will read data from environment variable
+TESTRAIL_TEST_RUN_NAME=Automated Test Run ${date} ${FEATURE_DESCRIPTION}
+TESTRAIL_PROJECT_ID=1
+# TESTRAIL_CREATE_NEW_TEST_RUN:
+# false: the framework will lookup existing TestRun from TestRail base on the
+# TESTRAIL_TEST_RUN_NAME if fails to find on TestRail, a new one will be created
+# true: always create a new test run
+TESTRAIL_CREATE_NEW_TEST_RUN=false
+# TESTRAIL_INCLUDE_ALL_AUTOMATED_TEST_CASES:
+# this field will be used when creating a new test run.
+# true: all automated test cases will be included
+# false: only the selected test from TestNG will be included
+TESTRAIL_INCLUDE_ALL_AUTOMATED_TEST_CASES=false
+TESTRAIL_UPLOAD_FLAG=false
 
 ######################## TEST ###############################################
-#EXCLUDE_GROUPS=Installation
-INCLUDE_GROUPS=DEBUG
+EXCLUDE_GROUPS=INVALID
+INCLUDE_GROUPS=RETRY
+URL=https://www.example.com
+FEATURE_DESCRIPTION=
 
-######################## DEBUG ###############################################
-# DRIVER_HOME ==> Path for webdriver, e.g. chromedriver and geckodriver
-DRIVER_HOME=/Users/ray.zhou/Documents/WebDriver
-# With debug mode ON, browser will be launched locally using driver in DRIVER_HOME
-LOCAL_EXECUTION=OFF
+######################## DEBUG ##############################################
+# DRIVER_HOME ==> Path to store webdriver, drivers will be downloaded base on your platform and browser version
+DRIVER_HOME=drivers
+# With local execution mode(debug mode) ON, browser will be launched locally using driver in DRIVER_HOME
+LOCAL_EXECUTION=ON
 ```
 
 ### Useful Annotations
@@ -74,8 +96,9 @@ LOCAL_EXECUTION=OFF
 | `FirefoxOnly` | Override the browser config, run test on firefox only |
 | `Test` | TestNG annotation, test case indication <br/> @Test(groups = {DESKTOP, LOGIN, GA, REGRESSION}) |
 | `Author` | Author of the test case, it will show up in report |
-| `ClassGroup` | Class level group |
-| `ClassDescription` | Override the config retry count |
+| `LocalStorageData` | LocalStorage data to be specified on CustomLocalStorage <br/> @LocalStorageData(key = "key", value = "value") |
+| `CustomLocalStorage` | LocalStorage data to load on testing page <br/> @CustomLocalStorage(path = "path/to/config.properties", data = {@LocalStorageData()}, loadDefault=true) |
+| `TestRailTestCase` | To indicate the test case on TestRail <br/> @TestRailTestCase(id = id, testRailUrl="url for the case") |
 
 ### Use Logging Function
 ```java
@@ -91,3 +114,17 @@ TestLogger logger = new TestLogger();
 | `logFail(message)` | With screenshot by default, will NOT stop current test |
 | `logFatalError(message)` | With screenshot by default, will STOP current test |
 | `String captureScreen()` | Returning the file path of the screenshot |
+
+## Changelog
+*4.1.0*
+- **[ENHANCEMENTS]**
+    - Integrated with TestRail
+    - Implemented logback for logging
+    - Cleanup unused codes
+- **[DEPENDENCY UPDATES]**
+    - added `retrofit`2.9.0.
+    - added `converter-gson` 2.9.0
+    - added `lombok` 1.18.16
+    - added `slf4j-api` 1.7.30
+    - added `logback-classic` 1.2.3  
+    - upgraded `gson` to 2.8.6

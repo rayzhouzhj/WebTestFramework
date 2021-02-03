@@ -1,5 +1,8 @@
 package com.scmp.framework.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,7 +11,7 @@ import java.util.Arrays;
 
 public class CommandPrompt {
     Process process;
-    ProcessBuilder builder;
+    private static final Logger frameworkLogger = LoggerFactory.getLogger(CommandPrompt.class);
 
     private static final String[] WIN_RUNTIME = {"cmd.exe", "/C"};
     private static final String[] OS_LINUX_RUNTIME = {"/bin/bash", "-l", "-c"};
@@ -27,7 +30,7 @@ public class CommandPrompt {
         ProcessBuilder tempBuilder;
 
         String os = System.getProperty("os.name");
-        System.out.println("INFO: Run Command on [" + os + "]: " + command);
+        frameworkLogger.info("Running Command on [" + os + "]: " + command);
 
         String[] allCommand;
         // build cmd proccess according to os
@@ -90,7 +93,7 @@ public class CommandPrompt {
                 }
 
             } catch (IOException e) {
-                e.printStackTrace();
+                frameworkLogger.error("Ops!", e);
             }
         }
     }

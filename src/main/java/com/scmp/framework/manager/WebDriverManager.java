@@ -13,10 +13,13 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.scmp.framework.utils.Constants.*;
 
 public class WebDriverManager {
+  private static final Logger frameworkLogger = LoggerFactory.getLogger(WebDriverManager.class);
   private static ThreadLocal<RemoteWebDriver> remoteWebDriver = new ThreadLocal<>();
   private RunTimeContext context;
 
@@ -45,13 +48,13 @@ public class WebDriverManager {
     else {
 
       if (browser.getBrowserName().equals(BrowserType.CHROME)) {
-        System.out.println("Launch local Chrome Browser");
+        frameworkLogger.info("Launch local Chrome Browser");
         System.setProperty(
             CHROME_DRIVER_SYSTEM_PROPERTY_NAME,
             RunTimeContext.getInstance().getGlobalVariables(CHROME_DRIVER_PATH).toString());
         currentDriverSession = new ChromeDriver((ChromeOptions) browser);
       } else {
-        System.out.println("Launch local Firefox Browser");
+        frameworkLogger.info("Launch local Firefox Browser");
         System.setProperty(
             FIREFOX_DRIVER_SYSTEM_PROPERTY_NAME,
             RunTimeContext.getInstance().getGlobalVariables(FIREFOX_DRIVER_PATH).toString());

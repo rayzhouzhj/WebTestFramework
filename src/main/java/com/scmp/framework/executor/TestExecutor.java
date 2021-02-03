@@ -17,6 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
+import com.scmp.framework.testng.listeners.SuiteListener;
 import com.scmp.framework.utils.ConfigFileKeys;
 import com.scmp.framework.testng.listeners.InvokedMethodListener;
 import com.scmp.framework.testng.listeners.RetryListener;
@@ -24,6 +25,8 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.TestNG;
 import org.testng.xml.XmlClass;
 import org.testng.xml.XmlSuite;
@@ -39,7 +42,10 @@ public class TestExecutor {
   private final RunTimeContext context;
   private ArrayList<String> items = new ArrayList<>();
 
+  private static final Logger frameworkLogger = LoggerFactory.getLogger(TestExecutor.class);
+
   public TestExecutor() {
+
     context = RunTimeContext.getInstance();
 
     if(RunTimeContext.getInstance().isLocalExecutionMode()) {
@@ -53,12 +59,9 @@ public class TestExecutor {
     context.setGlobalVariables(
             CHROME_DRIVER_PATH, WebDriverManager.chromedriver().getDownloadedDriverPath());
 
-    System.out.println("ChromeDriver Path => " + context.getGlobalVariables(CHROME_DRIVER_PATH));
-
     WebDriverManager.firefoxdriver().setup();
     context.setGlobalVariables(
             FIREFOX_DRIVER_PATH, WebDriverManager.firefoxdriver().getDownloadedDriverPath());
-    System.out.println("FirefoxDriver Path => " + context.getGlobalVariables(FIREFOX_DRIVER_PATH));
   }
 
   public boolean runner(String pack, List<String> tests) throws Exception {
@@ -91,9 +94,7 @@ public class TestExecutor {
     List<URL> testClassUrls = new ArrayList<>();
     String testClassPackagePath =
         "file:"
-            + System.getProperty("user.dir")
-            + File.separator
-            + "target"
+            + TARGET_PATH
             + File.separator
             + "test-classes"
             + File.separator;
@@ -189,6 +190,7 @@ public class TestExecutor {
     suite.setVerbose(2);
 
     // Add listeners
+    listeners.add(SuiteListener.class.getName());
     listeners.add(InvokedMethodListener.class.getName());
     listeners.add(RetryListener.class.getName());
     suite.setListeners(listeners);
@@ -239,7 +241,7 @@ public class TestExecutor {
       writer.flush();
       writer.close();
     } catch (IOException e) {
-      e.printStackTrace();
+      frameworkLogger.error("Ops!", e);
     }
 
     return suiteXML;

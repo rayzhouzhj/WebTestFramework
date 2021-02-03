@@ -114,3 +114,17 @@ TestLogger logger = new TestLogger();
 | `logFail(message)` | With screenshot by default, will NOT stop current test |
 | `logFatalError(message)` | With screenshot by default, will STOP current test |
 | `String captureScreen()` | Returning the file path of the screenshot |
+
+## Changelog
+*4.1.0*
+- **[ENHANCEMENTS]**
+    - Integrated with TestRail
+    - Implemented logback for logging
+    - Cleanup unused codes
+- **[DEPENDENCY UPDATES]**
+    - added `retrofit`2.9.0.
+    - added `converter-gson` 2.9.0
+    - added `lombok` 1.18.16
+    - added `slf4j-api` 1.7.30
+    - added `logback-classic` 1.2.3  
+    - upgraded `gson` to 2.8.6

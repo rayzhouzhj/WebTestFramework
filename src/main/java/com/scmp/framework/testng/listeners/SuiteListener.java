@@ -6,6 +6,7 @@ import com.scmp.framework.testrail.TestRailManager;
 import com.scmp.framework.testrail.TestRailStatus;
 import com.scmp.framework.testrail.models.TestCase;
 import com.scmp.framework.testrail.models.TestRun;
+import com.scmp.framework.testrail.models.TestRunTest;
 import com.scmp.framework.utils.ConfigFileKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.scmp.framework.utils.Constants.FILTERED_TEST_OBJECT;
 import static com.scmp.framework.utils.Constants.TEST_RUN_OBJECT;
 
 public class SuiteListener implements ISuiteListener {
@@ -103,8 +105,7 @@ public class SuiteListener implements ISuiteListener {
 
     LocalDate today = LocalDate.now(instance.getZoneId());
     String timestamp = "" + today.minusDays(7).atStartOfDay(instance.getZoneId()).toEpochSecond();
-    String todayDateString =
-        LocalDate.now(instance.getZoneId()).format(DateTimeFormatter.ofPattern("dd/MM/yyy"));
+    String todayDateString = today.format(DateTimeFormatter.ofPattern("M/dd/yyy"));
     String testRunName = instance.getProperty(ConfigFileKeys.TESTRAIL_TEST_RUN_NAME, "");
 
     if (testRunName.isEmpty()) {
@@ -119,22 +120,34 @@ public class SuiteListener implements ISuiteListener {
                   instance.getProperty(ConfigFileKeys.FEATURE_DESCRIPTION, ""));
     }
 
-    final String finalTestRunName = testRunName;
+    final String finalTestRunName = testRunName.trim();
+
     if (!instance.isCreateNewTestRunInTestRail()) {
       List<TestRun> testRunList = TestRailManager.getInstance().getTestRuns(projectId, timestamp);
       Optional<TestRun> existingTestRun =
           testRunList.stream()
-              .filter(testRun -> testRun.getName().equalsIgnoreCase(finalTestRunName))
+              .filter(testRun -> testRun.getName().trim().equalsIgnoreCase(finalTestRunName))
               .findFirst();
 
       if (existingTestRun.isPresent()) {
         // Use the existing TestRun for testing
         TestRun existingTestRunData = existingTestRun.get();
         frameworkLogger.info(
-            "Used existing TestRun, Id: {}, Name: {}",
+            "Use existing TestRun, Id: {}, Name: {}",
             existingTestRunData.getId(),
             existingTestRunData.getName());
         instance.setGlobalVariables(TEST_RUN_OBJECT, existingTestRunData);
+
+        String statusFilter =
+            RunTimeContext.getInstance()
+                .getProperty(ConfigFileKeys.TESTRAIL_TEST_STATUS_FILTER, "")
+                .replace(" ", "");
+
+        List<TestRunTest> matchedTests =
+            TestRailManager.getInstance()
+                .getTestRunTests(existingTestRunData.getId(), statusFilter);
+        instance.setGlobalVariables(FILTERED_TEST_OBJECT, matchedTests);
+
         return;
       }
     }
@@ -157,13 +170,15 @@ public class SuiteListener implements ISuiteListener {
       // Save new created test run
       instance.setGlobalVariables(TEST_RUN_OBJECT, testRun);
       if (testRun != null && testRun.getId() > 0) {
-        frameworkLogger.info("Test Run created in TestRail.");
+        frameworkLogger.info(
+            "Test Run created in TestRail - Id: {}, Name: {}", testRun.getId(), testRun.getName());
       } else {
         frameworkLogger.error("Failed to create Test Run in TestRail.");
         throw new RuntimeException("Failed to create Test Run in TestRail.");
       }
     } else {
-      frameworkLogger.warn("Test Run is NOT created in TestRail, empty Test Case List is detected.");
+      frameworkLogger.warn(
+          "Test Run is NOT created in TestRail, empty Test Case List is detected.");
     }
   }
 }

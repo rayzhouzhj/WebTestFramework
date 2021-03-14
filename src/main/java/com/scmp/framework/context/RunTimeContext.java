@@ -79,7 +79,12 @@ public class RunTimeContext {
   }
 
   public String getURL() {
-    return this.getProperty(ConfigFileKeys.URL, "");
+    String url = this.getProperty(ConfigFileKeys.URL, "");
+    if (url.endsWith("/")) {
+      url = url.substring(0, url.length() - 1);
+    }
+
+    return url;
   }
 
   public synchronized String getLogPath(String category, String className, String methodName) {

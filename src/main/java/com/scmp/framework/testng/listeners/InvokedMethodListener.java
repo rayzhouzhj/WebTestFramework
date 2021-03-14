@@ -88,11 +88,13 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
         RunTimeContext.getInstance().clearRunTimeVariables();
 
         TestInfo testInfo = new TestInfo(method, testResult);
+        // Save TestInfo to runtime memory
         RunTimeContext.getInstance().setTestLevelVariables(TEST_INFO_OBJECT, testInfo);
 
-        // Skip beforeInvocation if current method is not with Annotation Test
-        if (!testInfo.isTestMethod()) {
-            return;
+        // Skip beforeInvocation if current method is not with Annotation Test, or
+        // Current Test need to be skipped
+        if (!testInfo.isTestMethod() || testInfo.isSkippedTest()) {
+            throw new SkipException("Skipped Test - " + testInfo.getTestName());
         }
 
         frameworkLogger.info("Start running test [" + testInfo.getMethodName() + "]");
@@ -112,15 +114,18 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
      */
     @Override
     public void afterInvocation(IInvokedMethod method, ITestResult testResult) {
+
+        TestInfo testInfo = (TestInfo) RunTimeContext.getInstance().getTestLevelVariables(TEST_INFO_OBJECT);
+        // Skip beforeInvocation if current method is not with Annotation Test, or
+        // Current Test need to be skipped
+        if (!testInfo.isTestMethod() || testInfo.isSkippedTest()) {
+            return;
+        }
+
         Method refMethod = method.getTestMethod().getConstructorOrMethod().getMethod();
         String methodName = refMethod.getName();
 
         frameworkLogger.info("Completed running test [" + methodName + "]");
-
-        // Skip afterInvocation if current method is not with Annotation Test
-        if (refMethod.getAnnotation(Test.class) == null) {
-            return;
-        }
 
         // If fails to setup test
         if (!ReportManager.getInstance().getSetupStatus()) {

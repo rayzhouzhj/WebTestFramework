@@ -19,4 +19,7 @@ public class Constants {
 
     // Key for TestRun
     public static String TEST_RUN_OBJECT = "TEST_RUN_OBJECT";
+
+    // Key for Filtered Tests
+    public static String FILTERED_TEST_OBJECT = "FILTERED_TEST_OBJECT";
 }

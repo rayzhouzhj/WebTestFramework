@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 import com.scmp.framework.testng.listeners.SuiteListener;
 import com.scmp.framework.utils.ConfigFileKeys;
 import com.scmp.framework.testng.listeners.InvokedMethodListener;
-import com.scmp.framework.testng.listeners.RetryListener;
+import com.scmp.framework.testng.listeners.AnnotationTransformerListener;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -192,7 +192,7 @@ public class TestExecutor {
     // Add listeners
     listeners.add(SuiteListener.class.getName());
     listeners.add(InvokedMethodListener.class.getName());
-    listeners.add(RetryListener.class.getName());
+    listeners.add(AnnotationTransformerListener.class.getName());
     suite.setListeners(listeners);
 
     // Initialize the XML Test Suite

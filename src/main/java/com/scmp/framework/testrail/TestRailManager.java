@@ -1,9 +1,6 @@
 package com.scmp.framework.testrail;
 
-import com.scmp.framework.testrail.models.Attachment;
-import com.scmp.framework.testrail.models.TestCase;
-import com.scmp.framework.testrail.models.TestResult;
-import com.scmp.framework.testrail.models.TestRun;
+import com.scmp.framework.testrail.models.*;
 import com.scmp.framework.testrail.models.requests.AddTestResultRequest;
 import com.scmp.framework.testrail.models.requests.AddTestRunRequest;
 import okhttp3.*;
@@ -14,10 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class TestRailManager {
@@ -70,7 +64,7 @@ public class TestRailManager {
     String CustomQuery = String.format(TestRailService.GET_TEST_RUNS_API, projectId);
     TestRailService service = retrofit.create(TestRailService.class);
 
-    Map<String, String> data = new HashMap<>();
+    Map<String, String> data = new LinkedHashMap<>();
     data.put(CustomQuery, "");
     data.put("created_after", timestamp);
 
@@ -90,7 +84,7 @@ public class TestRailManager {
     String CustomQuery = String.format(TestRailService.GET_TEST_CASES_API, projectId);
     TestRailService service = retrofit.create(TestRailService.class);
 
-    Map<String, String> data = new HashMap<>();
+    Map<String, String> data = new LinkedHashMap<>();
     data.put(CustomQuery, "");
     data.put(TestCase.TYPE_ID, TestCase.TYPE_AUTOMATED);
 
@@ -111,7 +105,7 @@ public class TestRailManager {
         String.format(TestRailService.GET_TEST_RESULTS_FOR_TEST_CASE_API, runId, testcaseId);
     TestRailService service = retrofit.create(TestRailService.class);
 
-    Map<String, String> data = new HashMap<>();
+    Map<String, String> data = new LinkedHashMap<>();
     data.put(CustomQuery, "");
 
     retrofit2.Response<List<TestResult>> response =
@@ -131,7 +125,7 @@ public class TestRailManager {
     String CustomQuery = String.format(TestRailService.GET_TEST_RUN_API, testRunId);
     TestRailService service = retrofit.create(TestRailService.class);
 
-    Map<String, String> data = new HashMap<>();
+    Map<String, String> data = new LinkedHashMap<>();
     data.put(CustomQuery, "");
 
     retrofit2.Response<TestRun> response = service.getTestRun(data).execute();
@@ -141,6 +135,26 @@ public class TestRailManager {
           response.code(),
           response.errorBody().string());
       frameworkLogger.error("RunId: {}", testRunId);
+    }
+
+    return response.body();
+  }
+
+  public List<TestRunTest> getTestRunTests(int testRunId, String statusFilterString) throws IOException {
+    String CustomQuery = String.format(TestRailService.GET_TESTS_API, testRunId);
+    TestRailService service = retrofit.create(TestRailService.class);
+
+    Map<String, String> data = new LinkedHashMap<>();
+    data.put(CustomQuery, "");
+    data.put("status_id", statusFilterString);
+
+    retrofit2.Response<List<TestRunTest>> response = service.getTestRunTests(data).execute();
+    if (!response.isSuccessful()) {
+      frameworkLogger.error(
+              "Request getTestRunTests Failed with Error Code: {}, Error Body: {}",
+              response.code(),
+              response.errorBody().string());
+      frameworkLogger.error("RunId: {}, Status: {}", testRunId, statusFilterString);
     }
 
     return response.body();
@@ -158,7 +172,7 @@ public class TestRailManager {
     String CustomQuery = String.format(TestRailService.ADD_TEST_RUN_API, projectId);
     TestRailService service = retrofit.create(TestRailService.class);
 
-    Map<String, String> data = new HashMap<>();
+    Map<String, String> data = new LinkedHashMap<>();
     data.put(CustomQuery, "");
     TestRun testRun = null;
 
@@ -189,7 +203,7 @@ public class TestRailManager {
     String CustomQuery = String.format(TestRailService.UPDATE_TEST_RUN_API, testRun.getId());
     TestRailService service = retrofit.create(TestRailService.class);
 
-    Map<String, String> data = new HashMap<>();
+    Map<String, String> data = new LinkedHashMap<>();
     data.put(CustomQuery, "");
 
     TestRun updatedTestRun = null;
@@ -215,7 +229,7 @@ public class TestRailManager {
         String.format(TestRailService.ADD_RESULT_FOR_TEST_CASE_API, testRunId, testCaseId);
     TestRailService service = retrofit.create(TestRailService.class);
 
-    Map<String, String> data = new HashMap<>();
+    Map<String, String> data = new LinkedHashMap<>();
     data.put(CustomQuery, "");
 
     retrofit2.Response<TestResult> response = service.addResultForTestCase(data, request).execute();
@@ -235,7 +249,7 @@ public class TestRailManager {
     String CustomQuery = String.format(TestRailService.ADD_ATTACHMENT_FOR_TEST_RUN_API, testRunId);
     TestRailService service = retrofit.create(TestRailService.class);
 
-    Map<String, String> data = new HashMap<>();
+    Map<String, String> data = new LinkedHashMap<>();
     data.put(CustomQuery, "");
 
     File file = new File(imagePath);
@@ -262,7 +276,7 @@ public class TestRailManager {
         String.format(TestRailService.ADD_ATTACHMENT_FOR_TEST_RESULT_API, testResultId);
     TestRailService service = retrofit.create(TestRailService.class);
 
-    Map<String, String> data = new HashMap<>();
+    Map<String, String> data = new LinkedHashMap<>();
     data.put(CustomQuery, "");
 
     File file = new File(imagePath);

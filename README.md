@@ -116,6 +116,14 @@ TestLogger logger = new TestLogger();
 | `String captureScreen()` | Returning the file path of the screenshot |
 
 ## Changelog
+*4.1.2*
+- **[ENHANCEMENTS]**
+  - Support TestRail rerun test cases on specific status
+  
+*4.1.1*
+- **[DEPENDENCY UPDATES]**
+    - Fixed `testNG` version 6.14.3
+  
 *4.1.0*
 - **[ENHANCEMENTS]**
     - Integrated with TestRail

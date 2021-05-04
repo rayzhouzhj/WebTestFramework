@@ -8,8 +8,8 @@ import java.util.List;
 @Data
 public class Attachment {
 
-    public static transient String ATTACHMENT_REF_STRING = "![](index.php?/attachments/get/%d)";
+    public static transient String ATTACHMENT_REF_STRING = "![](index.php?/attachments/get/%s)";
 
     @SerializedName("attachment_id")
-    private int attachmentId;
+    private String attachmentId;
 }

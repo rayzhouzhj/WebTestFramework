@@ -116,6 +116,11 @@ TestLogger logger = new TestLogger();
 | `String captureScreen()` | Returning the file path of the screenshot |
 
 ## Changelog
+*4.1.3*
+- **[Bug Fix]**
+  - TestRail Attachment Id changed from Int to String
+
+
 *4.1.2*
 - **[ENHANCEMENTS]**
   - Support TestRail rerun test cases on specific status

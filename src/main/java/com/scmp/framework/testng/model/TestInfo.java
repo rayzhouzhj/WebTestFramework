@@ -393,4 +393,13 @@ public class TestInfo {
 
     return this.isSkippedTest;
   }
+
+  public boolean needLaunchBrowser() {
+    LaunchBrowser launchBrowser = this.declaredMethod.getAnnotation(LaunchBrowser.class);
+    if (launchBrowser != null && !launchBrowser.launchBrowser()) {
+      return false;
+    } else {
+      return true;
+    }
+  }
 }

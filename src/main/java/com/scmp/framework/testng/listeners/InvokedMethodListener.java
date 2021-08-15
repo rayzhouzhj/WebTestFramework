@@ -99,7 +99,9 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 
         frameworkLogger.info("Start running test [" + testInfo.getMethodName() + "]");
         try {
-            setupDriverForTest(testInfo);
+            if(testInfo.needLaunchBrowser()) {
+                setupDriverForTest(testInfo);
+            }
             setupReporterForTest(testInfo);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -129,7 +131,9 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 
         // If fails to setup test
         if (!ReportManager.getInstance().getSetupStatus()) {
-            driverManager.stopWebDriver();
+            if(testInfo.needLaunchBrowser()) {
+                driverManager.stopWebDriver();
+            }
 
             return;
         }
@@ -142,7 +146,9 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
             RunTimeContext.getInstance().clearRunTimeVariables();
 
             // Stop driver
-            driverManager.stopWebDriver();
+            if(testInfo.needLaunchBrowser()) {
+                driverManager.stopWebDriver();
+            }
         } catch (Exception e) {
             frameworkLogger.error("Ops!", e);
         }

@@ -8,7 +8,7 @@ import org.testng.annotations.Test;
 
 import com.scmp.framework.executor.TestExecutor;
 
-public class WebRunner 
+public class TestRunner
 {
     @Test
     public static void testApp() throws Exception 

@@ -71,30 +71,7 @@ public class TestLogger {
 	}
 
 	public void logJson(String json, String fileName) {
-		StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
-		int classIndex = 0;
-		for (int i = 0; i < stElements.length; i++) {
-			if (stElements[i].getClassName().equals("sun.reflect.NativeMethodAccessorImpl")) {
-				classIndex = i - 1;
-				break;
-			}
-		}
-		String filePath = RunTimeContext.getInstance().getLogPath("json", stElements[classIndex].getClassName(), stElements[classIndex].getMethodName());
-		if (fileName==null) {
-			filePath = filePath + File.separator + RunTimeContext.currentDateAndTime() + ".json";
-		} else {
-			filePath = filePath + File.separator + fileName + ".json";
-		}
-
-		FileWriter fw;
-		try {
-			fw = new FileWriter(filePath);
-			fw.write(json);
-			fw.flush();
-
-			ReportManager.getInstance().logInfo("<a target='_blank' href='" + filePath + "'> " + fileName + " </a>");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		frameworkLogger.info(json);
+		ReportManager.getInstance().logJson(json, fileName);
 	}
 }

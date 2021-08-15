@@ -396,7 +396,7 @@ public class TestInfo {
 
   public boolean needLaunchBrowser() {
     LaunchBrowser launchBrowser = this.declaredMethod.getAnnotation(LaunchBrowser.class);
-    if (launchBrowser != null && !launchBrowser.launchBrowser()) {
+    if (launchBrowser != null && !launchBrowser.status()) {
       return false;
     } else {
       return true;

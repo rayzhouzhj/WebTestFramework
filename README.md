@@ -7,7 +7,7 @@ Test framework for Web testing integrated with TestNG and Extent Report.
 
 ### Test Entry Point [WebRunner.java](https://github.com/scmp-contributor/WebTestFramework/blob/master/src/test/java/com/github/test/demo/WebRunner.java)
 ```java
-public class WebRunner 
+public class TestRunner 
 {
     @Test
     public static void testApp() throws Exception 
@@ -22,7 +22,7 @@ public class WebRunner
 
 ### How To Start The Test
 ```bash
-URL=<your testing url> mvn clean test -Dtest=WebRunner
+URL=<your testing url> mvn clean test -Dtest=TestRunner
 # To override the configs from config.properties, e.g. overriding INCLUDE_GROUPS
 URL=<your testing url> INCLUDE_GROUPS=<your runtime include groups> mvn clean test -Dtest=WebRunner
 ```

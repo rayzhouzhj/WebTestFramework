@@ -7,7 +7,7 @@ Test framework for Web testing integrated with TestNG and Extent Report.
 
 ### Test Entry Point [WebRunner.java](https://github.com/scmp-contributor/WebTestFramework/blob/master/src/test/java/com/github/test/demo/WebRunner.java)
 ```java
-public class WebRunner 
+public class TestRunner 
 {
     @Test
     public static void testApp() throws Exception 
@@ -22,7 +22,7 @@ public class WebRunner
 
 ### How To Start The Test
 ```bash
-URL=<your testing url> mvn clean test -Dtest=WebRunner
+URL=<your testing url> mvn clean test -Dtest=TestRunner
 # To override the configs from config.properties, e.g. overriding INCLUDE_GROUPS
 URL=<your testing url> INCLUDE_GROUPS=<your runtime include groups> mvn clean test -Dtest=WebRunner
 ```
@@ -99,6 +99,7 @@ LOCAL_EXECUTION=ON
 | `LocalStorageData` | LocalStorage data to be specified on CustomLocalStorage <br/> @LocalStorageData(key = "key", value = "value") |
 | `CustomLocalStorage` | LocalStorage data to load on testing page <br/> @CustomLocalStorage(path = "path/to/config.properties", data = {@LocalStorageData()}, loadDefault=true) |
 | `TestRailTestCase` | To indicate the test case on TestRail <br/> @TestRailTestCase(id = id, testRailUrl="url for the case") |
+| `LaunchBrowser` | Whether to launch browser, set false for API only test case <br/> @LaunchBrowser(status = true) |
 
 ### Use Logging Function
 ```java
@@ -116,10 +117,15 @@ TestLogger logger = new TestLogger();
 | `String captureScreen()` | Returning the file path of the screenshot |
 
 ## Changelog
+*4.2.0*
+- **[ENHANCEMENTS]**
+  - Support RestAssured API test
+  - Support logging for Json data  
+  - Added annotation @LaunchBrowser to control whether to launch browser
+  
 *4.1.3*
 - **[Bug Fix]**
   - TestRail Attachment Id changed from Int to String
-
 
 *4.1.2*
 - **[ENHANCEMENTS]**

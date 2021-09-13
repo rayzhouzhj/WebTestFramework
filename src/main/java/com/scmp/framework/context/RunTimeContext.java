@@ -1,7 +1,10 @@
 package com.scmp.framework.context;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -37,6 +40,12 @@ public class RunTimeContext {
     }
 
     return instance;
+  }
+
+  public static String currentDateAndTime() {
+    LocalDateTime now = LocalDateTime.now();
+    DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE_TIME;
+    return now.truncatedTo(ChronoUnit.SECONDS).format(dtf).replace(":", "-");
   }
 
   public void setGlobalVariables(String name, Object data) {

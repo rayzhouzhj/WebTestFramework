@@ -60,7 +60,7 @@ public class TestRailManager {
             .build();
   }
 
-  public List<TestRun> getTestRuns(String projectId, String timestamp) throws IOException {
+  public TestRunResult getTestRuns(String projectId, String timestamp) throws IOException {
     String CustomQuery = String.format(TestRailService.GET_TEST_RUNS_API, projectId);
     TestRailService service = retrofit.create(TestRailService.class);
 
@@ -68,7 +68,7 @@ public class TestRailManager {
     data.put(CustomQuery, "");
     data.put("created_after", timestamp);
 
-    retrofit2.Response<List<TestRun>> response = service.getTestRuns(data).execute();
+    retrofit2.Response<TestRunResult> response = service.getTestRuns(data).execute();
     if (!response.isSuccessful()) {
       frameworkLogger.error(
           "Request getTestRuns Failed with Error Code: {}, Error Body: {}",

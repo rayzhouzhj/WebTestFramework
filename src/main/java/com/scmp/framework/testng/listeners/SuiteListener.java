@@ -6,6 +6,7 @@ import com.scmp.framework.testrail.TestRailManager;
 import com.scmp.framework.testrail.TestRailStatus;
 import com.scmp.framework.testrail.models.TestCase;
 import com.scmp.framework.testrail.models.TestRun;
+import com.scmp.framework.testrail.models.TestRunResult;
 import com.scmp.framework.testrail.models.TestRunTest;
 import com.scmp.framework.utils.ConfigFileKeys;
 import org.slf4j.Logger;
@@ -123,9 +124,9 @@ public class SuiteListener implements ISuiteListener {
     final String finalTestRunName = testRunName.trim();
 
     if (!instance.isCreateNewTestRunInTestRail()) {
-      List<TestRun> testRunList = TestRailManager.getInstance().getTestRuns(projectId, timestamp);
+      TestRunResult testRunResult = TestRailManager.getInstance().getTestRuns(projectId, timestamp);
       Optional<TestRun> existingTestRun =
-          testRunList.stream()
+              testRunResult.getTestRunList().stream()
               .filter(testRun -> testRun.getName().trim().equalsIgnoreCase(finalTestRunName))
               .findFirst();
 

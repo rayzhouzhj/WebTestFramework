@@ -117,6 +117,9 @@ TestLogger logger = new TestLogger();
 | `String captureScreen()` | Returning the file path of the screenshot |
 
 ## Changelog
+*4.2.2*
+- **[Bug Fix]**
+  - Bug fix for TestRail upgrade v7.2.1.3027(fixed on getTestCases and getTestRunTests)
 *4.2.1*
 - **[Bug Fix]**
   - Bug fix for TestRail upgrade v7.2.1.3027(json response updated for test runs)

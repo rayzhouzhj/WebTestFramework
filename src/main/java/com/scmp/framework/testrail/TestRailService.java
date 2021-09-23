@@ -35,11 +35,11 @@ public interface TestRailService {
 
     @GET("index.php")
     @Headers({"Content-Type: application/json"})
-    Call<List<TestRunTest>> getTestRunTests(@QueryMap(encoded = true) Map<String, String> options);
+    Call<TestRunTestResult> getTestRunTests(@QueryMap(encoded = true) Map<String, String> options);
 
     @GET("index.php")
     @Headers({"Content-Type: application/json"})
-    Call<List<TestCase>> getTestCases(@QueryMap(encoded = true) Map<String, String> options);
+    Call<TestCaseResult> getTestCases(@QueryMap(encoded = true) Map<String, String> options);
 
     @GET("index.php")
     @Headers({"Content-Type: application/json"})

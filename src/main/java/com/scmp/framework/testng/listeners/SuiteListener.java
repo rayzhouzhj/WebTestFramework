@@ -4,10 +4,7 @@ import com.scmp.framework.annotations.testrail.TestRailTestCase;
 import com.scmp.framework.context.RunTimeContext;
 import com.scmp.framework.testrail.TestRailManager;
 import com.scmp.framework.testrail.TestRailStatus;
-import com.scmp.framework.testrail.models.TestCase;
-import com.scmp.framework.testrail.models.TestRun;
-import com.scmp.framework.testrail.models.TestRunResult;
-import com.scmp.framework.testrail.models.TestRunTest;
+import com.scmp.framework.testrail.models.*;
 import com.scmp.framework.utils.ConfigFileKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -144,7 +141,7 @@ public class SuiteListener implements ISuiteListener {
                 .getProperty(ConfigFileKeys.TESTRAIL_TEST_STATUS_FILTER, "")
                 .replace(" ", "");
 
-        List<TestRunTest> matchedTests =
+        TestRunTestResult matchedTests =
             TestRailManager.getInstance()
                 .getTestRunTests(existingTestRunData.getId(), statusFilter);
         instance.setGlobalVariables(FILTERED_TEST_OBJECT, matchedTests);
@@ -157,9 +154,9 @@ public class SuiteListener implements ISuiteListener {
     // Look up test case ids
     List<Integer> testCaseIdList;
     if (RunTimeContext.getInstance().isIncludeAllAutomatedTestCaseToTestRail()) {
-      List<TestCase> testCaseList = TestRailManager.getInstance().getAutomatedTestCases(projectId);
+      TestCaseResult testCaseList = TestRailManager.getInstance().getAutomatedTestCases(projectId);
       testCaseIdList =
-          testCaseList.stream().map(testCase -> testCase.getId()).collect(Collectors.toList());
+          testCaseList.getTestRunTestList().stream().map(testCase -> testCase.getId()).collect(Collectors.toList());
     } else {
       testCaseIdList = this.getAllTestRailTestCases(suite);
     }

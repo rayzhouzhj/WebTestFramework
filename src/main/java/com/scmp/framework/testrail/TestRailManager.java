@@ -80,7 +80,7 @@ public class TestRailManager {
     return response.body();
   }
 
-  public List<TestCase> getAutomatedTestCases(String projectId) throws IOException {
+  public TestCaseResult getAutomatedTestCases(String projectId) throws IOException {
     String CustomQuery = String.format(TestRailService.GET_TEST_CASES_API, projectId);
     TestRailService service = retrofit.create(TestRailService.class);
 
@@ -88,7 +88,7 @@ public class TestRailManager {
     data.put(CustomQuery, "");
     data.put(TestCase.TYPE_ID, TestCase.TYPE_AUTOMATED);
 
-    retrofit2.Response<List<TestCase>> response = service.getTestCases(data).execute();
+    retrofit2.Response<TestCaseResult> response = service.getTestCases(data).execute();
     if (!response.isSuccessful()) {
       frameworkLogger.error(
           "Request getTestCases Failed with Error Code: {}, Error Body: {}",
@@ -140,7 +140,7 @@ public class TestRailManager {
     return response.body();
   }
 
-  public List<TestRunTest> getTestRunTests(int testRunId, String statusFilterString) throws IOException {
+  public TestRunTestResult getTestRunTests(int testRunId, String statusFilterString) throws IOException {
     String CustomQuery = String.format(TestRailService.GET_TESTS_API, testRunId);
     TestRailService service = retrofit.create(TestRailService.class);
 
@@ -148,7 +148,7 @@ public class TestRailManager {
     data.put(CustomQuery, "");
     data.put("status_id", statusFilterString);
 
-    retrofit2.Response<List<TestRunTest>> response = service.getTestRunTests(data).execute();
+    retrofit2.Response<TestRunTestResult> response = service.getTestRunTests(data).execute();
     if (!response.isSuccessful()) {
       frameworkLogger.error(
               "Request getTestRunTests Failed with Error Code: {}, Error Body: {}",

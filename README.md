@@ -120,9 +120,11 @@ TestLogger logger = new TestLogger();
 *4.2.2*
 - **[Bug Fix]**
   - Bug fix for TestRail upgrade v7.2.1.3027(fixed on getTestCases and getTestRunTests)
+  
 *4.2.1*
 - **[Bug Fix]**
   - Bug fix for TestRail upgrade v7.2.1.3027(json response updated for test runs)
+  
 *4.2.0*
 - **[ENHANCEMENTS]**
   - Support RestAssured API test

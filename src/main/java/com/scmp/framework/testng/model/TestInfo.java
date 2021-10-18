@@ -11,6 +11,7 @@ import com.scmp.framework.testrail.TestRailDataHandler;
 import com.scmp.framework.testrail.TestRailStatus;
 import com.scmp.framework.testrail.models.TestRun;
 import com.scmp.framework.testrail.models.TestRunTest;
+import com.scmp.framework.testrail.models.TestRunTestResult;
 import com.scmp.framework.utils.ConfigFileReader;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
@@ -367,12 +368,12 @@ public class TestInfo {
 
     Object filteredTestsObject =
         RunTimeContext.getInstance().getGlobalVariables(FILTERED_TEST_OBJECT);
-    if (filteredTestsObject != null && filteredTestsObject instanceof List) {
-      List<TestRunTest> filteredTests = (List<TestRunTest>) filteredTestsObject;
+    if (filteredTestsObject != null && filteredTestsObject instanceof TestRunTestResult) {
+      TestRunTestResult filteredTests = (TestRunTestResult) filteredTestsObject;
 
       TestRailTestCase testRailTestCase = this.declaredMethod.getAnnotation(TestRailTestCase.class);
       Optional<TestRunTest> result =
-          filteredTests.parallelStream()
+          filteredTests.getTestRunTestList().parallelStream()
               .filter(test -> test.getCaseId() == testRailTestCase.id())
               .findFirst();
 

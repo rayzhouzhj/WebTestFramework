@@ -1,6 +1,6 @@
 package com.scmp.framework.model;
 
-public enum GoogleAnalysticsParameter {
+public enum GoogleAnalyticsParameter {
     Type_Of_Tracking("t"),
     Event_Action("ea"),
     Event_Category("ec"),
@@ -26,7 +26,7 @@ public enum GoogleAnalysticsParameter {
     User_Language_Code("ul");
 
     private String parameter;
-    GoogleAnalysticsParameter(String parameter) {
+    GoogleAnalyticsParameter(String parameter) {
         this.parameter = parameter;
     }
 

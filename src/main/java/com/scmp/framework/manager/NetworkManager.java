@@ -1,6 +1,7 @@
 package com.scmp.framework.manager;
 
-import com.scmp.framework.model.GoogleAnalystics;
+import com.scmp.framework.model.ChartbeatData;
+import com.scmp.framework.model.GoogleAnalytics;
 import org.json.JSONObject;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
@@ -30,9 +31,8 @@ public class NetworkManager {
         return messages;
     }
 
-    public static List<GoogleAnalystics> getGoogleAnalyticsRequests() {
-        List<GoogleAnalystics> gaData = Collections.synchronizedList(new ArrayList<>());
-        String pattern = "^https://www.google-analytics.com/([a-z]/)?collect\\?.+";
+    private static <T> List<T> getTrackingRequests(Class<T> cls, String pattern) {
+        List<T> trackingData = Collections.synchronizedList(new ArrayList<>());
         // Create a Pattern object
         Pattern regex = Pattern.compile(pattern);
 
@@ -51,11 +51,27 @@ public class NetworkManager {
                         Matcher matcher = regex.matcher(url);
                         if (matcher.matches()) {
                             System.out.println(entry.getMessage());
-                            gaData.add(new GoogleAnalystics(url));
+                            try {
+                                trackingData.add(cls.getConstructor(String.class).newInstance(url));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 });
 
-        return gaData;
+        return trackingData;
+    }
+
+    public static List<GoogleAnalytics> getGoogleAnalyticsRequests() {
+        List<GoogleAnalytics> gaData = Collections.synchronizedList(new ArrayList<>());
+        String pattern = "^https://www.google-analytics.com/([a-z]/)?collect\\?.+";
+        return getTrackingRequests(GoogleAnalytics.class, pattern);
+    }
+
+    public static List<ChartbeatData> getChartBeatRequests() {
+        List<GoogleAnalytics> gaData = Collections.synchronizedList(new ArrayList<>());
+        String pattern = "^https://ping.chartbeat.net/ping\\?.+";
+        return getTrackingRequests(ChartbeatData.class, pattern);
     }
 }

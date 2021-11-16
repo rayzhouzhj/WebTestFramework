@@ -117,6 +117,10 @@ TestLogger logger = new TestLogger();
 | `String captureScreen()` | Returning the file path of the screenshot |
 
 ## Changelog
+*4.2.4*
+- **[Enhancement]**
+  - Implemented Chartbeat requests inspection for data tracking
+
 *4.2.3*
 - **[Bug Fix]**
   - Bug fix for TestRail upgrade v7.2.1.3027(fixed on TestRail test case filter logic)

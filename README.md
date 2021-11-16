@@ -1,20 +1,37 @@
 # WebTestFramework
 
-[![](https://jitpack.io/v/rayzhouzhj/WebTestFramework.svg)](https://jitpack.io/#rayzhouzhj/WebTestFramework)
+[![](https://jitpack.io/v/scmp-contributor/WebTestFramework.svg)](https://jitpack.io/#scmp-contributor/WebTestFramework)
 
 ## Description:
 Test framework for Web testing integrated with TestNG and Extent Report.
 
-### Run Below command to create docker containers before test execution:
-```
-docker-compose up --scale selenium-chrome=5 --scale selenium-firefox=3
+### Test Entry Point [WebRunner.java](https://github.com/scmp-contributor/WebTestFramework/blob/master/src/test/java/com/github/test/demo/WebRunner.java)
+```java
+public class TestRunner 
+{
+    @Test
+    public static void testApp() throws Exception 
+    {
+        TestExecutor parallelThread = new TestExecutor();
+        boolean hasFailures = parallelThread.runner("com.github.test.demo");
+        
+        Assert.assertFalse(hasFailures, "Testcases execution failed.");
+    }
+}
 ```
 
-### Config below properties to setup the test framework(config.properties):
+### How To Start The Test
+```bash
+URL=<your testing url> mvn clean test -Dtest=TestRunner
+# To override the configs from config.properties, e.g. overriding INCLUDE_GROUPS
+URL=<your testing url> INCLUDE_GROUPS=<your runtime include groups> mvn clean test -Dtest=WebRunner
 ```
+
+#### Config below properties to setup the test framework([config.properties](https://github.com/scmp-contributor/WebTestFramework/blob/master/config.properties)):
+```properties
 ############################## WEB ##########################################
 # If more than one browser is provided in BROWSER_TYPE
-# test will be run on different browsers in parallel thread
+# test will be run on different browsers on parallel thread
 # if `random` is set, chrome and firefox will be random assigned unless
 # the test is annotated by FirefoxOnly or ChromeOnly
 # Available options: chrome,firefox,random
@@ -26,44 +43,123 @@ HOST_URL=http://localhost:4444/wd/hub
 FRAMEWORK=testng
 THREAD_COUNT=3
 DATAPROVIDER_THREAD_COUNT=3
-MONGODB_SERVER=localhost
-MONGODB_PORT=27017
-MAX_RETRY_COUNT=0
+MAX_RETRY_COUNT=1
 REMOVE_FAILED_TEST_B4_RETRY=true
+PRELOAD_LOCAL_STORAGE_DATA=true
+LOCAL_STORAGE_DATA_PATH=data/configs/localstorage.properties
+
+######################## TESTRAIL #########################################
+TESTRAIL_SERVER=http://<server>/testrail/
+TESTRAIL_USER_NAME=XXXXXX
+TESTRAIL_API_KEY=XXXXXX
+# ${date} would be replaced with current date in format 1/20/2021
+# ${FEATURE_DESCRIPTION} will read data from environment variable
+TESTRAIL_TEST_RUN_NAME=Automated Test Run ${date} ${FEATURE_DESCRIPTION}
+TESTRAIL_PROJECT_ID=1
+# TESTRAIL_CREATE_NEW_TEST_RUN:
+# false: the framework will lookup existing TestRun from TestRail base on the
+# TESTRAIL_TEST_RUN_NAME if fails to find on TestRail, a new one will be created
+# true: always create a new test run
+TESTRAIL_CREATE_NEW_TEST_RUN=false
+# TESTRAIL_INCLUDE_ALL_AUTOMATED_TEST_CASES:
+# this field will be used when creating a new test run.
+# true: all automated test cases will be included
+# false: only the selected test from TestNG will be included
+TESTRAIL_INCLUDE_ALL_AUTOMATED_TEST_CASES=false
+TESTRAIL_UPLOAD_FLAG=false
 
 ######################## TEST ###############################################
-#EXCLUDE_GROUPS=Installation
-INCLUDE_GROUPS=DEBUG
+EXCLUDE_GROUPS=INVALID
+INCLUDE_GROUPS=RETRY
+URL=https://www.example.com
+FEATURE_DESCRIPTION=
 
-######################## DEBUG ###############################################
-# DRIVER_HOME ==> Path for webdriver, e.g. chromedriver and geckodriver
-DRIVER_HOME=/Users/ray.zhou/Documents/WebDriver
-# With debug mode ON, browser will be launched locally using driver in DRIVER_HOME
-DEBUG_MODE=OFF
-```
-
-### Run below command to start test execution:
-```
-URL=<your testing url> mvn clean test -Dtest=WebRunner
+######################## DEBUG ##############################################
+# DRIVER_HOME ==> Path to store webdriver, drivers will be downloaded base on your platform and browser version
+DRIVER_HOME=drivers
+# With local execution mode(debug mode) ON, browser will be launched locally using driver in DRIVER_HOME
+LOCAL_EXECUTION=ON
 ```
 
-### Visual Testing
-#### Install [pixelmatch](https://github.com/mapbox/pixelmatch)
-```
-npm install pixelmatch
-```
+### Useful Annotations
+| Annotation Name | Description |
+|------|------|
+| `IncognitoPrivateMode` | Incognito for Chrome and private mode for Firefox |
+| `AcceptUntrustedCertificates` | Accept untrusted certificates |
+| `CaptureNetworkTraffic4Chrome` | Capture newwork log for GA testing |
+| `ChromeArguments` | Extra chrome arguments <br/> @ChromeArguments(options = {"--incognito"}) |
+| `FirefoxArguments` | Extra firefox arguments <br/> @FirefoxArguments(options = {"--private"}) |
+| `HeadlessMode` | Headless mode for both firefox and chrome |
+| `RetryCount` | Retry count of the test, it will override the config retry count |
+| `Device` | Custom the screen size <br/> @Device(device = DeviceName.iPhoneX) |
+| `ChromeOnly` | Override the browser config, run test on chrome only |
+| `FirefoxOnly` | Override the browser config, run test on firefox only |
+| `Test` | TestNG annotation, test case indication <br/> @Test(groups = {DESKTOP, LOGIN, GA, REGRESSION}) |
+| `Author` | Author of the test case, it will show up in report |
+| `LocalStorageData` | LocalStorage data to be specified on CustomLocalStorage <br/> @LocalStorageData(key = "key", value = "value") |
+| `CustomLocalStorage` | LocalStorage data to load on testing page <br/> @CustomLocalStorage(path = "path/to/config.properties", data = {@LocalStorageData()}, loadDefault=true) |
+| `TestRailTestCase` | To indicate the test case on TestRail <br/> @TestRailTestCase(id = id, testRailUrl="url for the case") |
+| `LaunchBrowser` | Whether to launch browser, set false for API only test case <br/> @LaunchBrowser(status = true) |
 
-#### How to use it
+### Use Logging Function
 ```java
-PixelMatch.PixelMatchResult matchResult = new PixelMatch()
-                                             .match(actualScreenPNG, expectedResultPNG, outputPNGFile);
-
-if (matchResult.IsMatched) {
-    logger.logPassWithScreenshot("Passed");
-} else {
-    logger.logFailWithImage("error in visual testing", output);
-}
+// To initialize the test logger
+TestLogger logger = new TestLogger();
 ```
-#### Pixelmatch result in report
-<img src="https://github.com/rayzhouzhj/WebTestFramework/blob/master/for-readme/report.png" width="300" style="padding-left: 50px"><img src="https://github.com/rayzhouzhj/WebTestFramework/blob/master/for-readme/pixelmatchresult.png" width="300">
+| Function Name | Description |
+|------|------|
+| `logInfo(message)` | Log info to report |
+| `logInfoWithScreenshot(message)` | Log info to report with screenshot of current page |
+| `logPass(message)` | Log a test pass for one step |
+| `logPassWithScreenshot(message)` | Log a test pass for one step with screenshot |
+| `logFail(message)` | With screenshot by default, will NOT stop current test |
+| `logFatalError(message)` | With screenshot by default, will STOP current test |
+| `String captureScreen()` | Returning the file path of the screenshot |
 
+## Changelog
+*4.2.4*
+- **[Enhancement]**
+  - Implemented Chartbeat requests inspection for data tracking
+
+*4.2.3*
+- **[Bug Fix]**
+  - Bug fix for TestRail upgrade v7.2.1.3027(fixed on TestRail test case filter logic)
+  
+*4.2.2*
+- **[Bug Fix]**
+  - Bug fix for TestRail upgrade v7.2.1.3027(fixed on getTestCases and getTestRunTests)
+  
+*4.2.1*
+- **[Bug Fix]**
+  - Bug fix for TestRail upgrade v7.2.1.3027(json response updated for test runs)
+  
+*4.2.0*
+- **[ENHANCEMENTS]**
+  - Support RestAssured API test
+  - Support logging for Json data  
+  - Added annotation @LaunchBrowser to control whether to launch browser
+  
+*4.1.3*
+- **[Bug Fix]**
+  - TestRail Attachment Id changed from Int to String
+
+*4.1.2*
+- **[ENHANCEMENTS]**
+  - Support TestRail rerun test cases on specific status
+  
+*4.1.1*
+- **[DEPENDENCY UPDATES]**
+    - Fixed `testNG` version 6.14.3
+  
+*4.1.0*
+- **[ENHANCEMENTS]**
+    - Integrated with TestRail
+    - Implemented logback for logging
+    - Cleanup unused codes
+- **[DEPENDENCY UPDATES]**
+    - added `retrofit`2.9.0.
+    - added `converter-gson` 2.9.0
+    - added `lombok` 1.18.16
+    - added `slf4j-api` 1.7.30
+    - added `logback-classic` 1.2.3  
+    - upgraded `gson` to 2.8.6

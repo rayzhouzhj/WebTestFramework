@@ -1,17 +1,16 @@
 package com.github.test.demo;
 
-import com.rayzhou.framework.annotations.Authors;
-import com.rayzhou.framework.annotations.screens.Device;
-import com.rayzhou.framework.test.BaseTest;
-import com.rayzhou.framework.utils.PixelMatch;
+import com.scmp.framework.annotations.Authors;
+import com.scmp.framework.annotations.screens.Device;
+import com.scmp.framework.test.BaseTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.Test;
 
-import com.rayzhou.framework.annotations.ChromeArguments;
-import com.rayzhou.framework.annotations.HeadlessMode;
-import com.rayzhou.framework.annotations.screens.DeviceName;
-import com.rayzhou.framework.manager.WebDriverManager;
+import com.scmp.framework.annotations.ChromeArguments;
+import com.scmp.framework.annotations.HeadlessMode;
+import com.scmp.framework.annotations.screens.DeviceName;
+import com.scmp.framework.manager.WebDriverManager;
 import com.github.test.demo.pom.Browser;
 
 public class WebTest extends BaseTest {
@@ -36,54 +35,6 @@ public class WebTest extends BaseTest {
     @Authors(name = "Ray")
     public void testRetry2() {
         assert 2 == value++;
-    }
-
-    @Test(groups = "DEBUG1")
-    public void testPixelMatchPassedCase() {
-        init("testPixelMatchPassedCase");
-
-        String expected_result = "resources/screenshots/testPixelMatchPassedCase/expected_result.png";
-        Browser.GoogleHome.launch();
-        Browser.GoogleHome.waitForPageLoad();
-        sleep(5000);
-
-        String actualScreenLayout = logger.captureScreen();
-        sleep(5000);
-
-        String output = logger.getImagePath("output");
-        PixelMatch.PixelMatchResult matchResult = new PixelMatch().match(actualScreenLayout, expected_result, output);
-        logger.logInfo(matchResult.toString());
-
-        if (matchResult.IsMatched) {
-            logger.logPassWithScreenshot("Passed");
-        } else {
-            logger.logFailWithImage("error in visual testing", output);
-        }
-    }
-
-    @Test(groups = "DEBUG1")
-    public void testPixelMatchFailedCase() {
-        init("testPixelMatchFailedCase");
-
-        Browser.GoogleHome.launch();
-        Browser.GoogleHome.waitForPageLoad();
-        sleep(5000);
-
-        String fileBeforeChange = logger.logScreenshot();
-        sleep(5000);
-
-        WebDriverManager.getDriver().executeScript("document.querySelector(\"div#SIvCob\").setAttribute(\"style\", \"background-color:#cccccc\")");
-
-        String fileAfterChange = logger.captureScreen();
-        String output = logger.getImagePath("output");
-        PixelMatch.PixelMatchResult matchResult = new PixelMatch().match(fileBeforeChange, fileAfterChange, output);
-        logger.logInfo(matchResult.toString());
-
-        if (matchResult.IsMatched) {
-            logger.logPassWithScreenshot("Passed");
-        } else {
-            logger.logFailWithImage("error in visual testing", output);
-        }
     }
 
     @Device(width = 768, height = 1024)

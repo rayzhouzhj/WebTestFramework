@@ -9,4 +9,16 @@ public class TestCaseResult {
 
     @SerializedName("cases")
     List<TestRunTest> TestRunTestList;
+
+    @SerializedName("offset")
+    int offset;
+
+    @SerializedName("limit")
+    int limit;
+
+    @SerializedName("size")
+    int size;
+
+    @SerializedName("_links")
+    PagingLinks pagingLinks;
 }

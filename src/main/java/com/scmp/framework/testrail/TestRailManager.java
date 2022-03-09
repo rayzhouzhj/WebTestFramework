@@ -80,13 +80,14 @@ public class TestRailManager {
     return response.body();
   }
 
-  public TestCaseResult getAutomatedTestCases(String projectId) throws IOException {
+  public TestCaseResult getAutomatedTestCases(String projectId, Integer offset) throws IOException {
     String CustomQuery = String.format(TestRailService.GET_TEST_CASES_API, projectId);
     TestRailService service = retrofit.create(TestRailService.class);
 
     Map<String, String> data = new LinkedHashMap<>();
     data.put(CustomQuery, "");
     data.put(TestCase.TYPE_ID, TestCase.TYPE_AUTOMATED);
+    data.put("offset", offset.toString());
 
     retrofit2.Response<TestCaseResult> response = service.getTestCases(data).execute();
     if (!response.isSuccessful()) {
@@ -98,6 +99,27 @@ public class TestRailManager {
     }
 
     return response.body();
+  }
+
+  public List<TestRunTest> getAllAutomatedTestCases(String projectId) throws IOException {
+
+    List<TestRunTest> allResults = new ArrayList<>();
+    int offset = 0;
+    boolean withNextPage = true;
+    while (withNextPage) {
+      TestCaseResult result = this.getAutomatedTestCases(projectId, offset);
+      if (result.getTestRunTestList().size() > 0) {
+        allResults.addAll(result.getTestRunTestList());
+      }
+
+      if(result.getPagingLinks().getNext() != null) {
+        offset += result.getSize();
+      } else {
+        withNextPage = false;
+      }
+    }
+
+    return allResults;
   }
 
   public List<TestResult> getTestResultsForTestCase(int runId, int testcaseId) throws IOException {

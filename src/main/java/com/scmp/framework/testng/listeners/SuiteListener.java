@@ -154,9 +154,8 @@ public class SuiteListener implements ISuiteListener {
     // Look up test case ids
     List<Integer> testCaseIdList;
     if (RunTimeContext.getInstance().isIncludeAllAutomatedTestCaseToTestRail()) {
-      TestCaseResult testCaseList = TestRailManager.getInstance().getAutomatedTestCases(projectId);
-      testCaseIdList =
-          testCaseList.getTestRunTestList().stream().map(testCase -> testCase.getId()).collect(Collectors.toList());
+      List<TestRunTest> testCaseList = TestRailManager.getInstance().getAllAutomatedTestCases(projectId);
+      testCaseIdList = testCaseList.stream().map(testCase -> testCase.getId()).collect(Collectors.toList());
     } else {
       testCaseIdList = this.getAllTestRailTestCases(suite);
     }

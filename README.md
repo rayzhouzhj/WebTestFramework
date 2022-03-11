@@ -5,7 +5,7 @@
 ## Description:
 Test framework for Web testing integrated with TestNG and Extent Report.
 
-### Test Entry Point [WebRunner.java](https://github.com/scmp-contributor/WebTestFramework/blob/master/src/test/java/com/github/test/demo/WebRunner.java)
+### Test Entry Point [TestRunner.java](https://github.com/scmp-contributor/WebTestFramework/blob/master/src/test/java/com/github/test/demo/TestRunner.java)
 ```java
 public class TestRunner 
 {

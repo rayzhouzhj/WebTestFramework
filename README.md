@@ -117,9 +117,13 @@ TestLogger logger = new TestLogger();
 | `String captureScreen()` | Returning the file path of the screenshot |
 
 ## Changelog
+*4.2.6*
+- **[Bug Fix]**
+  - Fixed TestRail API Update: get all test run test cases with paging
+
 *4.2.5*
 - **[Bug Fix]**
-  - Fixed TestRail API Updagte: get all test cases with paging
+  - Fixed TestRail API Update: get all test cases with paging
   
 *4.2.4*
 - **[Enhancement]**

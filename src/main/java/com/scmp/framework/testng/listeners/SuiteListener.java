@@ -141,9 +141,9 @@ public class SuiteListener implements ISuiteListener {
                 .getProperty(ConfigFileKeys.TESTRAIL_TEST_STATUS_FILTER, "")
                 .replace(" ", "");
 
-        TestRunTestResult matchedTests =
+        List<TestRunTest> matchedTests =
             TestRailManager.getInstance()
-                .getTestRunTests(existingTestRunData.getId(), statusFilter);
+                .getAllTestRunTests(existingTestRunData.getId(), statusFilter);
         instance.setGlobalVariables(FILTERED_TEST_OBJECT, matchedTests);
 
         return;

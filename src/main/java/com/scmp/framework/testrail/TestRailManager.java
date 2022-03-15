@@ -162,13 +162,14 @@ public class TestRailManager {
     return response.body();
   }
 
-  public TestRunTestResult getTestRunTests(int testRunId, String statusFilterString) throws IOException {
+  public TestRunTestResult getTestRunTests(int testRunId, String statusFilterString, Integer offset) throws IOException {
     String CustomQuery = String.format(TestRailService.GET_TESTS_API, testRunId);
     TestRailService service = retrofit.create(TestRailService.class);
 
     Map<String, String> data = new LinkedHashMap<>();
     data.put(CustomQuery, "");
     data.put("status_id", statusFilterString);
+    data.put("offset", offset.toString());
 
     retrofit2.Response<TestRunTestResult> response = service.getTestRunTests(data).execute();
     if (!response.isSuccessful()) {
@@ -180,6 +181,27 @@ public class TestRailManager {
     }
 
     return response.body();
+  }
+
+  public List<TestRunTest> getAllTestRunTests(int testRunId, String statusFilterString) throws IOException {
+
+    List<TestRunTest> allResults = new ArrayList<>();
+    int offset = 0;
+    boolean withNextPage = true;
+    while (withNextPage) {
+      TestRunTestResult result = this.getTestRunTests(testRunId, statusFilterString, offset);
+      if (result.getTestRunTestList().size() > 0) {
+        allResults.addAll(result.getTestRunTestList());
+      }
+
+      if(result.getPagingLinks().getNext() != null) {
+        offset += result.getSize();
+      } else {
+        withNextPage = false;
+      }
+    }
+
+    return allResults;
   }
 
   public TestRun addTestRun(String projectId, String testRunName, List<Integer> includeTestCaseIds)

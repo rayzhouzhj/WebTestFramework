@@ -180,9 +180,8 @@ public abstract class BasePage extends BasePageElement {
     public int getScrollTop(String cssSelector) {
         Long scollTop = (Long)this.getDriver().executeScript("" +
                         "var cssSelector = arguments[0];" +
-                        "var delta = arguments[1];" +
                         "var element = document.querySelector(cssSelector);" +
-                        "return element.scrollTop;",
+                        "return parseInt(element.scrollTop);",
                 cssSelector);
 
         return scollTop.intValue();

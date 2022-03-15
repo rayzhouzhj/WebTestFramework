@@ -368,14 +368,12 @@ public class TestInfo {
 
     Object filteredTestsObject =
         RunTimeContext.getInstance().getGlobalVariables(FILTERED_TEST_OBJECT);
-    if (filteredTestsObject != null && filteredTestsObject instanceof TestRunTestResult) {
-      TestRunTestResult filteredTests = (TestRunTestResult) filteredTestsObject;
+    if (filteredTestsObject != null && filteredTestsObject instanceof List) {
+      List<TestRunTest> filteredTests = (List<TestRunTest>) filteredTestsObject;
 
       TestRailTestCase testRailTestCase = this.declaredMethod.getAnnotation(TestRailTestCase.class);
       Optional<TestRunTest> result =
-          filteredTests.getTestRunTestList().parallelStream()
-              .filter(test -> test.getCaseId() == testRailTestCase.id())
-              .findFirst();
+          filteredTests.parallelStream().filter(test -> test.getCaseId() == testRailTestCase.id()).findFirst();
 
       if (result.isPresent()) {
         return true;

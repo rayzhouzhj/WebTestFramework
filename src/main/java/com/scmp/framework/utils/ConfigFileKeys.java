@@ -14,6 +14,7 @@ public class ConfigFileKeys {
     public static String REMOVE_FAILED_TEST_B4_RETRY = "REMOVE_FAILED_TEST_B4_RETRY";
     public static String PRELOAD_LOCAL_STORAGE_DATA = "PRELOAD_LOCAL_STORAGE_DATA";
     public static String LOCAL_STORAGE_DATA_PATH = "LOCAL_STORAGE_DATA_PATH";
+    public static String DEFAULT_EXTENSION_PATH = "DEFAULT_EXTENSION_PATH";
     public static String TESTRAIL_SERVER = "TESTRAIL_SERVER";
     public static String TESTRAIL_USER_NAME = "TESTRAIL_USER_NAME";
     public static String TESTRAIL_API_KEY = "TESTRAIL_API_KEY";

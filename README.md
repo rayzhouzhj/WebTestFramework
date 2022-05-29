@@ -47,6 +47,8 @@ MAX_RETRY_COUNT=1
 REMOVE_FAILED_TEST_B4_RETRY=true
 PRELOAD_LOCAL_STORAGE_DATA=true
 LOCAL_STORAGE_DATA_PATH=data/configs/localstorage.properties
+DEFAULT_LOCAL_EXTENSION_PATH=
+DEFAULT_REMOTE_EXTENSION_PATH=
 
 ######################## TESTRAIL #########################################
 TESTRAIL_SERVER=http://<server>/testrail/
@@ -100,6 +102,7 @@ LOCAL_EXECUTION=ON
 | `CustomLocalStorage` | LocalStorage data to load on testing page <br/> @CustomLocalStorage(path = "path/to/config.properties", data = {@LocalStorageData()}, loadDefault=true) |
 | `TestRailTestCase` | To indicate the test case on TestRail <br/> @TestRailTestCase(id = id, testRailUrl="url for the case") |
 | `LaunchBrowser` | Whether to launch browser, set false for API only test case <br/> @LaunchBrowser(status = true) |
+| `CustomProxy` | Whether to launch browser, set false for API only test case <br/> @CustomProxy(factory = `Class of Proxy Factory`, name = `name of the proxy`) |
 
 ### Use Logging Function
 ```java
@@ -117,6 +120,13 @@ TestLogger logger = new TestLogger();
 | `String captureScreen()` | Returning the file path of the screenshot |
 
 ## Changelog
+*4.2.7*
+- **[Enhancement]**
+  - Implemented logic to preload default Chrome extension
+  - Integrated with browsermob proxy
+- **[Dependency Update]**
+  - added `browsermob-core`2.1.5
+    
 *4.2.6*
 - **[Bug Fix]**
   - Fixed TestRail API Update: get all test run test cases with paging

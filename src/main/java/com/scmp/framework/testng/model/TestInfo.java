@@ -286,7 +286,7 @@ public class TestInfo {
 				try {
 					IProxyFactory proxyObj = (IProxyFactory) proxyCls.getConstructor().newInstance();
 					proxy = proxyObj.getProxy(customProxy.name());
-					if(proxy == null) {
+					if (proxy==null) {
 						throw new RuntimeException("Custom Proxy cannot be null!");
 					}
 
@@ -307,13 +307,9 @@ public class TestInfo {
 		}
 
 		// Load default extension
-		if(!RunTimeContext.getInstance().getProperty(DEFAULT_EXTENSION_PATH, "").isEmpty()) {
-			String path = RunTimeContext.getInstance().getProperty(DEFAULT_EXTENSION_PATH);
-			if (Files.exists(Paths.get(path))) {
-				options.addArguments("load-extension=" + path);
-			} else {
-				throw new RuntimeException("Invalid default extension path: " + path);
-			}
+		String extensionPath = RunTimeContext.getInstance().getDefaultExtensionPath();
+		if (!extensionPath.isEmpty()) {
+			options.addArguments("load-extension=" + extensionPath);
 		}
 
 		return options;

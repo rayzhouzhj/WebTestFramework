@@ -149,4 +149,12 @@ public class RunTimeContext {
   public ZoneId getZoneId() {
     return ZoneId.of("Asia/Hong_Kong");
   }
+
+  public String getDefaultExtensionPath() {
+    if(this.isLocalExecutionMode()) {
+      return this.getProperty(ConfigFileKeys.DEFAULT_LOCAL_EXTENSION_PATH, "");
+    } else {
+      return this.getProperty(ConfigFileKeys.DEFAULT_REMOTE_EXTENSION_PATH, "");
+    }
+  }
 }

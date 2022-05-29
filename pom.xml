@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.scmp-contributor</groupId>
 	<artifactId>WebTestFramework</artifactId>
-	<version>4.2.6</version>
+	<version>4.2.7</version>
 	<packaging>jar</packaging>
 
     <properties>
@@ -113,6 +113,11 @@
 			<groupId>com.github.rayzhouzhj</groupId>
 			<artifactId>JSONassert</artifactId>
 			<version>jsonassert-1.5.1</version>
+		</dependency>
+		<dependency>
+			<groupId>net.lightbody.bmp</groupId>
+			<artifactId>browsermob-core</artifactId>
+			<version>2.1.5</version>
 		</dependency>
 	</dependencies>
 </project>

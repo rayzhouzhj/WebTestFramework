@@ -50,7 +50,7 @@ public abstract class BaseApp {
     }
 
     public String getURL() {
-        String url = this.driver.getCurrentUrl().replace("?action=preview", "");
+        String url = this.driver.getCurrentUrl();
         if(url.endsWith("/")) {
             return url.substring(0, url.length() - 1);
         }

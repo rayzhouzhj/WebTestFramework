@@ -63,7 +63,6 @@ public abstract class BasePage extends BasePageElement {
 
     public String getPath() {
         String path = this.PATH;
-        path = path.replace("?action=preview", "");
         if(path.endsWith("/")) {
             return path.substring(0, path.length() - 1);
         }
@@ -72,7 +71,6 @@ public abstract class BasePage extends BasePageElement {
 
     public String getURL() {
         String url = RunTimeContext.getInstance().getURL() + this.PATH;
-        url = url.replace("?action=preview", "");
         if(url.endsWith("/")) {
             return url.substring(0, url.length() - 1);
         }

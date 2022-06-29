@@ -22,7 +22,7 @@ public class WebTest extends BaseTest {
         // Init a browser instance using webdriver
         Browser = new Browser(WebDriverManager.getDriver());
 
-        System.out.println(methodName + " Receive Driver, start testing");
+        logger.logInfo(methodName + " Receive Driver, start testing");
     }
 
     @Test(groups = {"RETRY"}, description = "Test Description")
@@ -67,7 +67,7 @@ public class WebTest extends BaseTest {
         Browser.GoogleSearchResult.waitForPageLoad();
         Thread.sleep(2000);  // Let the user actually see something!
 
-        System.out.println("testGoogleSearch2 Completed");
+        logger.logInfo("testGoogleSearch2 Completed");
     }
 
     @Test(groups = "DEBUG")
@@ -81,7 +81,7 @@ public class WebTest extends BaseTest {
         driver.findElement(By.id("lst-ib")).sendKeys("selenium");
         Thread.sleep(2000);  // Let the user actually see something!
 
-        System.out.println("testGoogleSearchFailCase1 Completed");
+        logger.logInfo("testGoogleSearchFailCase1 Completed");
     }
 
     @Test(groups = "DEBUG")
@@ -96,7 +96,7 @@ public class WebTest extends BaseTest {
         driver.findElement(By.id("lst-ib")).sendKeys("selenium");
         Thread.sleep(2000);  // Let the user actually see something!
 
-        System.out.println("testGoogleSearchFailCase2 Completed");
+        logger.logInfo("testGoogleSearchFailCase2 Completed");
     }
 
 }

@@ -7,111 +7,88 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public abstract class BasePage 
-{
+import java.time.Duration;
+
+public abstract class BasePage {
 	public RemoteWebDriver driver;
-	
-	public BasePage(RemoteWebDriver driver) 
-	{
+
+	public BasePage(RemoteWebDriver driver) {
 		this.driver = driver;
 	}
-	
+
 	public abstract void launch();
-	
-	public void sleep(long millis)
-	{
-		try 
-		{
+
+	public void sleep(long millis) {
+		try {
 			Thread.sleep(millis);
-		}
-		catch (InterruptedException e) 
-		{
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
-	
-    public abstract boolean waitForPageLoad();
-    
-    public boolean waitForVisible(WebElement element)
-    {
-    	return waitForVisible(element, 60);
-    }
-    
-    public boolean waitForVisible(WebElement element, long seconds)
-    {
-    	try
-    	{
-           new WebDriverWait(driver, seconds).until(ExpectedConditions.visibilityOf(element));
-           
-           return true;
-    	}
-    	catch(Exception e)
-    	{
-    		return false;
-    	}
-    }
 
-    public boolean waitForElementToBeClickable(WebElement element, long seconds)
-    {
-        try
-        {
-            new WebDriverWait(driver, seconds).until(ExpectedConditions.elementToBeClickable(element));
+	public abstract boolean waitForPageLoad();
 
-            return true;
-        }
-        catch(Exception e)
-        {
-            return false;
-        }
-    }
-    
-    public boolean waitForPageToLoad(WebElement element) 
-    {
-        return waitForPageToLoad(element, 15);
-    }
+	public boolean waitForVisible(WebElement element) {
+		return waitForVisible(element, 60);
+	}
 
-    public boolean waitForPageToLoad(WebElement element, int secondsToWait) 
-    {
-        try
-    	{
-        	WebDriverWait wait = new WebDriverWait(driver, secondsToWait);
-            wait.until(ExpectedConditions.elementToBeClickable(element));
-           
-           return true;
-    	}
-    	catch(Exception e)
-    	{
-    		return false;
-    	}
-        
-    }
-    
-    public void waitForElementToDisAppear(String id) 
-    {
-        WebDriverWait wait = new WebDriverWait(driver, 15);
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id(id)));
-    }
+	public boolean waitForVisible(WebElement element, long seconds) {
+		try {
+			new WebDriverWait(driver, Duration.ofSeconds(seconds))
+					.until(ExpectedConditions.visibilityOf(element));
 
-    public WebElement waitForElement(WebElement arg) 
-    {
-        waitForPageToLoad(arg);
-        WebElement el = arg;
-        
-        return el;
-    }
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 
-    public boolean isElementPresent(By by) 
-    {
-        try 
-        {
-            driver.findElement(by);
-            
-            return true;
-        } 
-        catch (NoSuchElementException e) 
-        {
-            return false;
-        }
+	public boolean waitForElementToBeClickable(WebElement element, long seconds) {
+		try {
+			new WebDriverWait(driver, Duration.ofSeconds(seconds)).until(ExpectedConditions.elementToBeClickable(element));
 
-    }
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public boolean waitForPageToLoad(WebElement element) {
+		return waitForPageToLoad(element, 15);
+	}
+
+	public boolean waitForPageToLoad(WebElement element, int secondsToWait) {
+		try {
+			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(secondsToWait));
+			wait.until(ExpectedConditions.elementToBeClickable(element));
+
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+
+	}
+
+	public void waitForElementToDisAppear(String id) {
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+		wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id(id)));
+	}
+
+	public WebElement waitForElement(WebElement arg) {
+		waitForPageToLoad(arg);
+		WebElement el = arg;
+
+		return el;
+	}
+
+	public boolean isElementPresent(By by) {
+		try {
+			driver.findElement(by);
+
+			return true;
+		} catch (NoSuchElementException e) {
+			return false;
+		}
+
+	}
 }

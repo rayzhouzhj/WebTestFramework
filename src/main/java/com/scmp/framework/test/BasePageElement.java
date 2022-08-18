@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.time.Duration;
 
 public abstract class BasePageElement {
   private static final Logger frameworkLogger = LoggerFactory.getLogger(BasePageElement.class);
@@ -43,7 +44,7 @@ public abstract class BasePageElement {
 
   public boolean waitForVisible(WebElement element, long seconds) {
     try {
-      new WebDriverWait(driver, seconds).until(ExpectedConditions.visibilityOf(element));
+      new WebDriverWait(driver, Duration.ofSeconds(seconds)).until(ExpectedConditions.visibilityOf(element));
 
       return true;
     } catch (Exception e) {
@@ -57,7 +58,7 @@ public abstract class BasePageElement {
 
   public boolean waitForElementToBeClickable(WebElement element, long seconds) {
     try {
-      new WebDriverWait(driver, seconds).until(ExpectedConditions.elementToBeClickable(element));
+      new WebDriverWait(driver, Duration.ofSeconds(seconds)).until(ExpectedConditions.elementToBeClickable(element));
 
       return true;
     } catch (Exception e) {
@@ -66,13 +67,13 @@ public abstract class BasePageElement {
   }
 
   public void waitForElementToDisAppear(String id) {
-    WebDriverWait wait = new WebDriverWait(driver, 15);
+    WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
     wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id(id)));
   }
 
   public boolean waitForElementToDisAppear(WebElement element) {
     try {
-      new WebDriverWait(driver, 15).until(ExpectedConditions.invisibilityOf(element));
+      new WebDriverWait(driver, Duration.ofSeconds(15)).until(ExpectedConditions.invisibilityOf(element));
 
       return true;
     } catch (Exception e) {
@@ -80,11 +81,10 @@ public abstract class BasePageElement {
     }
   }
 
-  public WebElement waitForElement(WebElement arg) {
-    waitForElementToLoad(arg);
-    WebElement el = arg;
+  public WebElement waitForElement(WebElement element) {
+    waitForElementToLoad(element);
 
-    return el;
+    return element;
   }
 
   public boolean isIframeLoaded(WebElement element) {
@@ -93,7 +93,7 @@ public abstract class BasePageElement {
 
   public boolean isIframeLoaded(WebElement element, int secondToWait) {
     try {
-      new WebDriverWait(driver, secondToWait)
+      new WebDriverWait(driver, Duration.ofSeconds(secondToWait))
           .until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(element));
 
       return true;

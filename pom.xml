@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.scmp-contributor</groupId>
 	<artifactId>WebTestFramework</artifactId>
-	<version>4.2.7</version>
+	<version>4.2.8</version>
 	<packaging>jar</packaging>
 
     <properties>
@@ -30,9 +30,14 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>31.1-jre</version>
+		</dependency>
+		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
-			<version>3.141.59</version>
+			<version>4.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

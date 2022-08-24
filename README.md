@@ -120,6 +120,11 @@ TestLogger logger = new TestLogger();
 | `String captureScreen()` | Returning the file path of the screenshot |
 
 ## Changelog
+*4.2.8*
+- **[Dependency Update]**
+  - Updated `guava` 31.1-jre
+  - Updated `selenium-java` 4.0.0
+  
 *4.2.7*
 - **[Enhancement]**
   - Implemented logic to preload default Chrome extension

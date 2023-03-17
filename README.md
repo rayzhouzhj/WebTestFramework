@@ -121,8 +121,8 @@ TestLogger logger = new TestLogger();
 
 ## Changelog
 *4.2.9*
-- **[Fix webdriver 403 forbidden error]**
-  - Add chromeOptions
+- **[Bug Fix]**
+  - Add chromeOptions to fix webdriver 403 forbidden error
 
 *4.2.8*
 - **[Dependency Update]**

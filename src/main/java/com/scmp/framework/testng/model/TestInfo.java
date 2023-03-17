@@ -245,6 +245,7 @@ public class TestInfo {
 
 	public ChromeOptions getChromeOptions() {
 		ChromeOptions options = new ChromeOptions();
+		options.addArguments("--remote-allow-origins=*");
 
 		// Get Chrome options/arguments
 		ChromeArguments chromeArguments = this.declaredMethod.getAnnotation(ChromeArguments.class);

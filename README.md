@@ -120,6 +120,10 @@ TestLogger logger = new TestLogger();
 | `String captureScreen()` | Returning the file path of the screenshot |
 
 ## Changelog
+*4.2.9*
+- **[Bug Fix]**
+  - Add chromeOptions to fix webdriver 403 forbidden error
+
 *4.2.8*
 - **[Dependency Update]**
   - Updated `guava` 31.1-jre

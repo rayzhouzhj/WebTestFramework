@@ -245,7 +245,7 @@ public class TestInfo {
 
 	public ChromeOptions getChromeOptions() {
 		ChromeOptions options = new ChromeOptions();
-		options.addArguments("--remote-allow-origins=*"); //Temporary solution for fixing this bug: https://stackoverflow.com/questions/75678572/java-io-ioexception-invalid-status-code-403-text-forbidden
+		options.addArguments("--remote-allow-origins=*");
 
 		// Get Chrome options/arguments
 		ChromeArguments chromeArguments = this.declaredMethod.getAnnotation(ChromeArguments.class);

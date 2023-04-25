@@ -245,7 +245,23 @@ public class TestInfo {
 
 	public ChromeOptions getChromeOptions() {
 		ChromeOptions options = new ChromeOptions();
-		// Temporary solution for fixing the bug: https://stackoverflow.com/questions/75678572/java-io-ioexception-invalid-status-code-403-text-forbidden
+
+        // If the test is not tagged skip chrome options, use Global_Chrome_Options which has options separated by comma
+        if (this.declaredMethod.getAnnotation(SkipGlobalChromeOptions.class) == null) {
+            String global_chrome_options = RunTimeContext.getInstance().getProperty(GLOBAL_CHROME_OPTIONS);
+
+            // Only add arguments if global_chrome_options has something
+            if (global_chrome_options != null && !global_chrome_options.isEmpty()) {
+
+                String[] parsedOptions = global_chrome_options.split(",");
+
+                for (String parsedOption : parsedOptions) {
+                    options.addArguments(parsedOption);
+                }
+            }
+        }
+
+        // Temporary solution for fixing the bug: https://stackoverflow.com/questions/75678572/java-io-ioexception-invalid-status-code-403-text-forbidden
 		options.addArguments("--remote-allow-origins=*");
 
 		// Get Chrome options/arguments

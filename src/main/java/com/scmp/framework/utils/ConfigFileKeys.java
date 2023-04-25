@@ -32,4 +32,5 @@ public class ConfigFileKeys {
     public static String FEATURE_DESCRIPTION = "FEATURE_DESCRIPTION";
     public static String DEBUG_MODE = "DEBUG_MODE";
     public static String LOCAL_EXECUTION = "LOCAL_EXECUTION";
+    public static String GLOBAL_CHROME_OPTIONS = "Global_Chrome_Options";
 }

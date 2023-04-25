@@ -262,7 +262,7 @@ public class TestInfo {
         }
 
         // Temporary solution for fixing the bug: https://stackoverflow.com/questions/75678572/java-io-ioexception-invalid-status-code-403-text-forbidden
-		options.addArguments("--remote-allow-origins=*");
+//		options.addArguments("--remote-allow-origins=*");
 
 		// Get Chrome options/arguments
 		ChromeArguments chromeArguments = this.declaredMethod.getAnnotation(ChromeArguments.class);

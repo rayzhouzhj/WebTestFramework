@@ -120,6 +120,11 @@ TestLogger logger = new TestLogger();
 | `String captureScreen()` | Returning the file path of the screenshot |
 
 ## Changelog
+*4.2.10*
+- **[Enhancement]**
+  - Added GLOBAL_CHROME_OPTIONS in config.properties
+  - Added @SkipGlobalChromeOptions for skip using GLOBAL_CHROME_OPTION config file properties
+  
 *4.2.9*
 - **[Bug Fix]**
   - Add chromeOptions to fix webdriver 403 forbidden error

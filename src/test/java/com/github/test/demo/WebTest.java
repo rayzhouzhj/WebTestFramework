@@ -1,6 +1,7 @@
 package com.github.test.demo;
 
 import com.scmp.framework.annotations.Authors;
+import com.scmp.framework.annotations.SkipGlobalChromeOptions;
 import com.scmp.framework.annotations.screens.Device;
 import com.scmp.framework.test.BaseTest;
 import org.openqa.selenium.By;
@@ -97,6 +98,39 @@ public class WebTest extends BaseTest {
         Thread.sleep(2000);  // Let the user actually see something!
 
         logger.logInfo("testGoogleSearchFailCase2 Completed");
+    }
+
+    @Test(groups = "DEBUG_GLOBAL_CHROME_OPTION")
+    public void testGlobalChromeOptionCase1() throws InterruptedException {
+        // This test case will run in private mode, according to the config setting
+        System.out.println("testGlobalChromeOptionCase1");
+
+        WebDriver driver = WebDriverManager.getDriver();
+        System.out.println("testGlobalChromeOptionCase1 Receive Driver, start testing");
+
+        driver.get("https://www.google.com");
+        Thread.sleep(2000);  // Let the user actually see something!
+        driver.findElement(By.className("gLFyf")).sendKeys("selenium");
+        Thread.sleep(2000);  // Let the user actually see something!
+
+        logger.logInfo("testGlobalChromeOptionCase1 Completed");
+    }
+
+    @Test(groups = "DEBUG_GLOBAL_CHROME_OPTION")
+    @SkipGlobalChromeOptions
+    public void testGlobalChromeOptionCase2() throws InterruptedException {
+        // This test case will run not in private mode, as global config is skipped
+        System.out.println("testGlobalChromeOptionCase2");
+
+        WebDriver driver = WebDriverManager.getDriver();
+        System.out.println("testGlobalChromeOptionCase1 Receive Driver, start testing");
+
+        driver.get("https://www.google.com");
+        Thread.sleep(2000);  // Let the user actually see something!
+        driver.findElement(By.className("gLFyf")).sendKeys("selenium");
+        Thread.sleep(2000);  // Let the user actually see something!
+
+        logger.logInfo("testGlobalChromeOptionCase2 Completed");
     }
 
 }

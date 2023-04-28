@@ -84,25 +84,26 @@ LOCAL_EXECUTION=ON
 ```
 
 ### Useful Annotations
-| Annotation Name | Description |
-|------|------|
-| `IncognitoPrivateMode` | Incognito for Chrome and private mode for Firefox |
-| `AcceptUntrustedCertificates` | Accept untrusted certificates |
-| `CaptureNetworkTraffic4Chrome` | Capture newwork log for GA testing |
-| `ChromeArguments` | Extra chrome arguments <br/> @ChromeArguments(options = {"--incognito"}) |
-| `FirefoxArguments` | Extra firefox arguments <br/> @FirefoxArguments(options = {"--private"}) |
-| `HeadlessMode` | Headless mode for both firefox and chrome |
-| `RetryCount` | Retry count of the test, it will override the config retry count |
-| `Device` | Custom the screen size <br/> @Device(device = DeviceName.iPhoneX) |
-| `ChromeOnly` | Override the browser config, run test on chrome only |
-| `FirefoxOnly` | Override the browser config, run test on firefox only |
-| `Test` | TestNG annotation, test case indication <br/> @Test(groups = {DESKTOP, LOGIN, GA, REGRESSION}) |
-| `Author` | Author of the test case, it will show up in report |
-| `LocalStorageData` | LocalStorage data to be specified on CustomLocalStorage <br/> @LocalStorageData(key = "key", value = "value") |
-| `CustomLocalStorage` | LocalStorage data to load on testing page <br/> @CustomLocalStorage(path = "path/to/config.properties", data = {@LocalStorageData()}, loadDefault=true) |
-| `TestRailTestCase` | To indicate the test case on TestRail <br/> @TestRailTestCase(id = id, testRailUrl="url for the case") |
-| `LaunchBrowser` | Whether to launch browser, set false for API only test case <br/> @LaunchBrowser(status = true) |
-| `CustomProxy` | Whether to launch browser, set false for API only test case <br/> @CustomProxy(factory = `Class of Proxy Factory`, name = `name of the proxy`) |
+| Annotation Name                | Description                                                                                                                                             |
+|--------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `IncognitoPrivateMode`         | Incognito for Chrome and private mode for Firefox                                                                                                       |
+| `AcceptUntrustedCertificates`  | Accept untrusted certificates                                                                                                                           |
+| `CaptureNetworkTraffic4Chrome` | Capture newwork log for GA testing                                                                                                                      |
+| `ChromeArguments`              | Extra chrome arguments <br/> @ChromeArguments(options = {"--incognito"})                                                                                |
+| `FirefoxArguments`             | Extra firefox arguments <br/> @FirefoxArguments(options = {"--private"})                                                                                |
+| `HeadlessMode`                 | Headless mode for both firefox and chrome                                                                                                               |
+| `RetryCount`                   | Retry count of the test, it will override the config retry count                                                                                        |
+| `Device`                       | Custom the screen size <br/> @Device(device = DeviceName.iPhoneX)                                                                                       |
+| `ChromeOnly`                   | Override the browser config, run test on chrome only                                                                                                    |
+| `FirefoxOnly`                  | Override the browser config, run test on firefox only                                                                                                   |
+| `Test`                         | TestNG annotation, test case indication <br/> @Test(groups = {DESKTOP, LOGIN, GA, REGRESSION})                                                          |
+| `Author`                       | Author of the test case, it will show up in report                                                                                                      |
+| `LocalStorageData`             | LocalStorage data to be specified on CustomLocalStorage <br/> @LocalStorageData(key = "key", value = "value")                                           |
+| `CustomLocalStorage`           | LocalStorage data to load on testing page <br/> @CustomLocalStorage(path = "path/to/config.properties", data = {@LocalStorageData()}, loadDefault=true) |
+| `TestRailTestCase`             | To indicate the test case on TestRail <br/> @TestRailTestCase(id = id, testRailUrl="url for the case")                                                  |
+| `LaunchBrowser`                | Whether to launch browser, set false for API only test case <br/> @LaunchBrowser(status = true)                                                         |
+| `CustomProxy`                  | Whether to launch browser, set false for API only test case <br/> @CustomProxy(factory = `Class of Proxy Factory`, name = `name of the proxy`)          |
+| `SkipGlobalChromeOptions`      | Skip using GLOBAL_CHROME_OPTIONS in config.properties                                                                                                   |
 
 ### Use Logging Function
 ```java

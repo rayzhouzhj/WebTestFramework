@@ -27,6 +27,8 @@ import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.testng.TestNG;
 import org.testng.xml.XmlClass;
 import org.testng.xml.XmlSuite;
@@ -39,16 +41,17 @@ import com.scmp.framework.utils.Figlet;
 import static com.scmp.framework.utils.Constants.*;
 
 public class TestExecutor {
+	@Autowired
 	private final RunTimeContext context;
-	private ArrayList<String> items = new ArrayList<>();
+	private final ArrayList<String> items = new ArrayList<>();
 
 	private static final Logger frameworkLogger = LoggerFactory.getLogger(TestExecutor.class);
 
-	public TestExecutor() {
+	public TestExecutor(RunTimeContext context) {
 
-		context = RunTimeContext.getInstance();
+		this.context = context;
 
-		if (RunTimeContext.getInstance().isLocalExecutionMode()) {
+		if (this.context.isLocalExecutionMode()) {
 			prepareWebDriver();
 		}
 	}

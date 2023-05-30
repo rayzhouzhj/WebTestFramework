@@ -12,9 +12,11 @@ import com.scmp.framework.utils.ConfigFileKeys;
 import com.scmp.framework.utils.ConfigFileReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import static com.scmp.framework.utils.Constants.TARGET_PATH;
 
+@Component
 public class RunTimeContext {
   private static RunTimeContext instance;
   private ThreadLocal<HashMap<String, Object>> testLevelVariables = new ThreadLocal<>();

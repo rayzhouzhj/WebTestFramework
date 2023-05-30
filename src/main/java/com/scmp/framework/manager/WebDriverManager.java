@@ -11,7 +11,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.remote.BrowserType;
+import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,7 @@ public class WebDriverManager {
     // For Debug Mode, launch local driver
     else {
 
-      if (browser.getBrowserName().equals(BrowserType.CHROME)) {
+      if (browser.getBrowserName().equals(Browser.CHROME.browserName())) {
         frameworkLogger.info("Launch local Chrome Browser");
         System.setProperty(
             CHROME_DRIVER_SYSTEM_PROPERTY_NAME,

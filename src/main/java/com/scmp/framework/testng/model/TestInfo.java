@@ -64,7 +64,7 @@ public class TestInfo {
 		// Init TestRail handler
 		if (this.isTestMethod()
 				&& !this.isSkippedTest()
-				&& runTimeContext.isUploadToTestRail()) {
+				&& runTimeContext.getFrameworkConfigs().isTestRailUploadTestResult()) {
 			TestRailTestCase testRailCase = this.declaredMethod.getAnnotation(TestRailTestCase.class);
 			TestRun testRun = (TestRun) runTimeContext.getGlobalVariables(TEST_RUN_OBJECT);
 			if (testRailCase!=null && testRun!=null) {

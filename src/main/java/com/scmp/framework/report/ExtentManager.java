@@ -10,7 +10,6 @@ import com.aventstack.extentreports.reporter.ExtentHtmlReporter;
 import com.aventstack.extentreports.reporter.configuration.ChartLocation;
 import com.aventstack.extentreports.reporter.configuration.Theme;
 import com.scmp.framework.context.RunTimeContext;
-import com.scmp.framework.utils.ConfigFileKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,21 +35,18 @@ public class ExtentManager {
 			extent = new ExtentReports();
 			extent.attachReporter(getHtmlReporter());
 
-			String browserType = runTimeContext.getProperty(ConfigFileKeys.BROWSER_TYPE);
-			String threadCount = runTimeContext.getProperty(ConfigFileKeys.THREAD_COUNT);
-			String excludeGroups =
-					runTimeContext.getProperty(ConfigFileKeys.EXCLUDE_GROUPS);
-			String includeGroups =
-					runTimeContext.getProperty(ConfigFileKeys.INCLUDE_GROUPS);
-			String url = runTimeContext.getProperty(ConfigFileKeys.URL);
-			String featureDesc =
-					runTimeContext.getProperty(ConfigFileKeys.FEATURE_DESCRIPTION);
+			String browserType = runTimeContext.getFrameworkConfigs().getBrowserType();
+			int threadCount = runTimeContext.getFrameworkConfigs().getThreadCount();
+			String excludeGroups = runTimeContext.getFrameworkConfigs().getExcludeGroups();
+			String includeGroups = runTimeContext.getFrameworkConfigs().getIncludeGroups();
+			String url = runTimeContext.getFrameworkConfigs().getUrl();
+			String featureDesc = runTimeContext.getFrameworkConfigs().getFeatureDescription();
 
 			extent.setSystemInfo("URL", url);
 			extent.setSystemInfo("Include Groups", includeGroups);
 			extent.setSystemInfo("Exclude Groups", excludeGroups);
 			extent.setSystemInfo("Browser Type", browserType);
-			extent.setSystemInfo("Tread Count", threadCount);
+			extent.setSystemInfo("Tread Count", String.valueOf(threadCount));
 			extent.setSystemInfo("Feature", featureDesc);
 
 			List<Status> statusHierarchy =
@@ -72,7 +68,7 @@ public class ExtentManager {
 
 	private ExtentHtmlReporter getHtmlReporter() {
 		ExtentHtmlReporter htmlReporter = new ExtentHtmlReporter(filePath);
-		String extentXML = runTimeContext.getProperty(ConfigFileKeys.EXTENT_XML_PATH);
+		String extentXML = runTimeContext.getFrameworkConfigs().getExtentXMLPath();
 
 		boolean loadDefaultConfig = true;
 		if (extentXML!=null && !extentXML.isEmpty()) {

@@ -3,7 +3,6 @@ package com.scmp.framework.manager;
 import java.net.URL;
 import java.time.Duration;
 
-import com.scmp.framework.utils.ConfigFileKeys;
 import com.scmp.framework.context.RunTimeContext;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
@@ -46,7 +45,7 @@ public class WebDriverManager {
 		// For Execution Mode
 		if (!context.isLocalExecutionMode()) {
 			currentDriverSession =
-					new RemoteWebDriver(new URL(context.getProperty(ConfigFileKeys.HOST_URL)), browser);
+					new RemoteWebDriver(new URL(context.getFrameworkConfigs().getHostUrl()), browser);
 		}
 		// For Debug Mode, launch local driver
 		else {

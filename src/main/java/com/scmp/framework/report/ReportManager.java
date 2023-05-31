@@ -117,7 +117,7 @@ public class ReportManager {
 				this.addTag("RETRIED");
 			}
 
-			if (runTimeContext.removeFailedTestB4Retry()
+			if (runTimeContext.getFrameworkConfigs().isRemoveFailedTestB4Retry()
 					&& result.getStatus()==ITestResult.FAILURE
 					&& ((RetryAnalyzer) analyzer).isRetriedRequired(result)) {
 				this.removeTest();

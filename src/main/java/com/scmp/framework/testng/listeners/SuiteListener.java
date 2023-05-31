@@ -1,17 +1,14 @@
 package com.scmp.framework.testng.listeners;
 
-import com.scmp.framework.TestFramework;
 import com.scmp.framework.annotations.testrail.TestRailTestCase;
 import com.scmp.framework.context.ApplicationContextProvider;
 import com.scmp.framework.context.RunTimeContext;
 import com.scmp.framework.testrail.TestRailManager;
 import com.scmp.framework.testrail.TestRailStatus;
 import com.scmp.framework.testrail.models.*;
-import com.scmp.framework.utils.ConfigFileKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.testng.ISuite;
 import org.testng.ISuiteListener;
 import org.testng.ITestNGMethod;
@@ -45,7 +42,7 @@ public class SuiteListener implements ISuiteListener {
 	@Override
 	public void onStart(ISuite suite) {
 
-		if (runTimeContext.isUploadToTestRail()) {
+		if (runTimeContext.getFrameworkConfigs().isTestRailUploadTestResult()) {
 			try {
 				initTestRail();
 				createTestRun(suite);
@@ -81,14 +78,13 @@ public class SuiteListener implements ISuiteListener {
 	private void initTestRail() {
 		frameworkLogger.info("Initializing TestRailManager...");
 
-		String baseUrl = runTimeContext.getProperty(ConfigFileKeys.TESTRAIL_SERVER);
-		String userName = runTimeContext.getProperty(ConfigFileKeys.TESTRAIL_USER_NAME);
-		String password = runTimeContext.getProperty(ConfigFileKeys.TESTRAIL_API_KEY);
+		String baseUrl = runTimeContext.getFrameworkConfigs().getTestRailServer();
+		String userName = runTimeContext.getFrameworkConfigs().getTestRailUserName();
+		String password = runTimeContext.getFrameworkConfigs().getTestRailAPIKey();
 
 		TestRailManager.init(baseUrl, userName, password);
 
-		String inProgressId =
-				runTimeContext.getProperty(ConfigFileKeys.TESTRAIL_STATUS_IN_PROGRESS_ID);
+		String inProgressId = runTimeContext.getFrameworkConfigs().getTestRailStatusInProgressId();
 		if (inProgressId!=null && Pattern.compile("[0-9]+").matcher(inProgressId).matches()) {
 			TestRailStatus.IN_PROGRESS = Integer.parseInt(inProgressId);
 		} else {
@@ -102,7 +98,7 @@ public class SuiteListener implements ISuiteListener {
 	private void createTestRun(ISuite suite) throws IOException {
 		frameworkLogger.info("Creating Test Run in TestRail...");
 
-		String projectId = runTimeContext.getProperty(ConfigFileKeys.TESTRAIL_PROJECT_ID);
+		String projectId = runTimeContext.getFrameworkConfigs().getTestRailProjectId();
 
 		if (projectId==null || !Pattern.compile("[0-9]+").matcher(projectId).matches()) {
 			throw new IllegalArgumentException(
@@ -112,7 +108,7 @@ public class SuiteListener implements ISuiteListener {
 		LocalDate today = LocalDate.now(runTimeContext.getZoneId());
 		String timestamp = String.valueOf(today.minusDays(7).atStartOfDay(runTimeContext.getZoneId()).toEpochSecond());
 		String todayDateString = today.format(DateTimeFormatter.ofPattern("M/dd/yyy"));
-		String testRunName = runTimeContext.getProperty(ConfigFileKeys.TESTRAIL_TEST_RUN_NAME, "");
+		String testRunName = runTimeContext.getFrameworkConfigs().getTestRailTestRunName();
 
 		if (testRunName.isEmpty()) {
 			// Default Test Run Name
@@ -123,12 +119,12 @@ public class SuiteListener implements ISuiteListener {
 							.replace("${date}", todayDateString)
 							.replace(
 									"${FEATURE_DESCRIPTION}",
-									runTimeContext.getProperty(ConfigFileKeys.FEATURE_DESCRIPTION, ""));
+									runTimeContext.getFrameworkConfigs().getFeatureDescription());
 		}
 
 		final String finalTestRunName = testRunName.trim();
 
-		if (!runTimeContext.isCreateNewTestRunInTestRail()) {
+		if (!runTimeContext.getFrameworkConfigs().isTestRailCreateNewTestRun()) {
 			TestRunResult testRunResult = TestRailManager.getInstance().getTestRuns(projectId, timestamp);
 			Optional<TestRun> existingTestRun =
 					testRunResult.getTestRunList().stream()
@@ -144,10 +140,8 @@ public class SuiteListener implements ISuiteListener {
 						existingTestRunData.getName());
 				runTimeContext.setGlobalVariables(TEST_RUN_OBJECT, existingTestRunData);
 
-				String statusFilter =
-						runTimeContext
-								.getProperty(ConfigFileKeys.TESTRAIL_TEST_STATUS_FILTER, "")
-								.replace(" ", "");
+				String statusFilter = runTimeContext.getFrameworkConfigs()
+						.getTestRailTestStatusFilter().replace(" ", "");
 
 				List<TestRunTest> matchedTests =
 						TestRailManager.getInstance()
@@ -161,9 +155,9 @@ public class SuiteListener implements ISuiteListener {
 		// Create a new test run
 		// Look up test case ids
 		List<Integer> testCaseIdList;
-		if (runTimeContext.isIncludeAllAutomatedTestCaseToTestRail()) {
+		if (runTimeContext.getFrameworkConfigs().isTestRailIncludeAllAutomatedTestCases()) {
 			List<TestRunTest> testCaseList = TestRailManager.getInstance().getAllAutomatedTestCases(projectId);
-			testCaseIdList = testCaseList.stream().map(testCase -> testCase.getId()).collect(Collectors.toList());
+			testCaseIdList = testCaseList.stream().map(TestRunTest::getId).collect(Collectors.toList());
 		} else {
 			testCaseIdList = this.getAllTestRailTestCases(suite);
 		}

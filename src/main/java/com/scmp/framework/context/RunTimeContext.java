@@ -8,30 +8,32 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.scmp.framework.utils.ConfigFileKeys;
-import com.scmp.framework.utils.ConfigFileReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import static com.scmp.framework.utils.Constants.TARGET_PATH;
 
 @Component
+@PropertySource("file:config.properties")
 public class RunTimeContext {
 	private final ThreadLocal<HashMap<String, Object>> testLevelVariables = new ThreadLocal<>();
 	private final ConcurrentHashMap<String, Object> globalVariables = new ConcurrentHashMap<>();
-	private final ConfigFileReader configFileReader;
 	private static final Logger frameworkLogger = LoggerFactory.getLogger(RunTimeContext.class);
+	private final Environment env;
+	private final FrameworkConfigs frameworkConfigs;
 
-	public RunTimeContext() {
+	@Autowired
+	public RunTimeContext(Environment env, FrameworkConfigs frameworkConfigs) {
+		this.env = env;
+		this.frameworkConfigs = frameworkConfigs;
+	}
 
-		String configFile = "config.properties";
-		if (System.getenv().containsKey("CONFIG_FILE")) {
-			configFile = System.getenv().get("CONFIG_FILE");
-			frameworkLogger.info("Using config file from " + configFile);
-		}
-
-		this.configFileReader = new ConfigFileReader(configFile);
+	public FrameworkConfigs getFrameworkConfigs() {
+		return this.frameworkConfigs;
 	}
 
 	public static String currentDateAndTime() {
@@ -67,20 +69,15 @@ public class RunTimeContext {
 	}
 
 	public String getProperty(String name) {
-		return this.getProperty(name, null);
+		return this.getProperty(name, "");
 	}
 
 	public String getProperty(String key, String defaultValue) {
-		String value = System.getenv(key);
-		if (value==null || value.isEmpty()) {
-			value = configFileReader.getProperty(key, defaultValue);
-		}
-
-		return value;
+		return env.getProperty(key, defaultValue);
 	}
 
 	public String getURL() {
-		String url = this.getProperty(ConfigFileKeys.URL, "");
+		String url = this.getFrameworkConfigs().getUrl();
 		if (url.endsWith("/")) {
 			url = url.substring(0, url.length() - 1);
 		}
@@ -111,31 +108,7 @@ public class RunTimeContext {
 	}
 
 	public boolean isLocalExecutionMode() {
-		String isDebugMode = this.getProperty(ConfigFileKeys.DEBUG_MODE, "OFF");
-		String isLocalExecutionMode = this.getProperty(ConfigFileKeys.LOCAL_EXECUTION, "OFF");
-
-		return "ON".equalsIgnoreCase(isLocalExecutionMode) || "ON".equalsIgnoreCase(isDebugMode);
-	}
-
-	public boolean removeFailedTestB4Retry() {
-		return "true"
-				.equalsIgnoreCase(this.getProperty(ConfigFileKeys.REMOVE_FAILED_TEST_B4_RETRY, "false"));
-	}
-
-	public boolean isUploadToTestRail() {
-		return "true".equalsIgnoreCase(this.getProperty(ConfigFileKeys.TESTRAIL_UPLOAD_FLAG, "false"));
-	}
-
-	public boolean isCreateNewTestRunInTestRail() {
-		return "true"
-				.equalsIgnoreCase(
-						this.getProperty(ConfigFileKeys.TESTRAIL_CREATE_NEW_TEST_RUN, "false"));
-	}
-
-	public boolean isIncludeAllAutomatedTestCaseToTestRail() {
-		return "true"
-				.equalsIgnoreCase(
-						this.getProperty(ConfigFileKeys.TESTRAIL_INCLUDE_ALL_AUTOMATED_TEST_CASES, "false"));
+		return "ON".equalsIgnoreCase(this.frameworkConfigs.getLocalExecutionMode());
 	}
 
 	public ZoneId getZoneId() {
@@ -144,9 +117,9 @@ public class RunTimeContext {
 
 	public String getDefaultExtensionPath() {
 		if (this.isLocalExecutionMode()) {
-			return this.getProperty(ConfigFileKeys.DEFAULT_LOCAL_EXTENSION_PATH, "");
+			return this.frameworkConfigs.getDefaultLocalExtensionPath();
 		} else {
-			return this.getProperty(ConfigFileKeys.DEFAULT_REMOTE_EXTENSION_PATH, "");
+			return this.frameworkConfigs.getDefaultRemoteExtensionPath();
 		}
 	}
 }

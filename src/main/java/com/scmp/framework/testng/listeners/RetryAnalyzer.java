@@ -3,15 +3,12 @@ package com.scmp.framework.testng.listeners;
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.scmp.framework.TestFramework;
 import com.scmp.framework.annotations.RetryCount;
 import com.scmp.framework.context.ApplicationContextProvider;
 import com.scmp.framework.testng.model.RetryMethod;
-import com.scmp.framework.utils.ConfigFileKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
@@ -75,13 +72,7 @@ public class RetryAnalyzer implements IRetryAnalyzer {
 						RetryCount ta = m.getAnnotation(RetryCount.class);
 						maxRetryCount = ta.maxRetryCount();
 					} else {
-						try {
-							maxRetryCount =
-									Integer.parseInt(
-											runTimeContext.getProperty(ConfigFileKeys.MAX_RETRY_COUNT));
-						} catch (Exception e) {
-							maxRetryCount = 0;
-						}
+							maxRetryCount = runTimeContext.getFrameworkConfigs().getMaxRetryCount();
 					}
 
 					break;

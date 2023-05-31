@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.testng.*;
 
-import com.scmp.framework.report.ReportManager;
+import com.scmp.framework.report.ReportService;
 
 import static com.scmp.framework.utils.Constants.TEST_INFO_OBJECT;
 
@@ -23,13 +23,13 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 
 	private final WebDriverManager driverManager;
 	private final RunTimeContext runTimeContext;
-	private final ReportManager reportManager;
+	private final ReportService reportService;
 
 	public InvokedMethodListener() {
 		ApplicationContext context = ApplicationContextProvider.getApplicationContext();
 		driverManager = context.getBean(WebDriverManager.class);
 		runTimeContext = context.getBean(RunTimeContext.class);
-		reportManager = context.getBean(ReportManager.class);
+		reportService = context.getBean(ReportService.class);
 	}
 
 	/**
@@ -40,12 +40,12 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 	private void setupReporterForTest(TestInfo testInfo) {
 		try {
 			// Create test node for test class in test report
-			reportManager.setupReportForTestSet(testInfo);
-			reportManager.setTestResult(testInfo.getTestResult());
+			reportService.setupReportForTestSet(testInfo);
+			reportService.setTestResult(testInfo.getTestResult());
 
 			// Create test case in test report
-			reportManager.setTestInfo(testInfo);
-			reportManager.setSetupStatus(true);
+			reportService.setTestInfo(testInfo);
+			reportService.setSetupStatus(true);
 		} catch (Exception e) {
 			frameworkLogger.error("Ops!", e);
 		}
@@ -107,7 +107,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 			setupReporterForTest(testInfo);
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			reportManager.setSetupStatus(false);
+			reportService.setSetupStatus(false);
 			Assert.fail("Fails to setup test driver.");
 		}
 	}
@@ -132,7 +132,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 		frameworkLogger.info("Completed running test [" + methodName + "]");
 
 		// If fails to set up test
-		if (!reportManager.getSetupStatus()) {
+		if (!reportService.getSetupStatus()) {
 			if (testInfo.needLaunchBrowser()) {
 				driverManager.stopWebDriver();
 			}
@@ -141,7 +141,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 		}
 
 		try {
-			reportManager.endLogTestResults(testResult);
+			reportService.endLogTestResults(testResult);
 			// Clear all runtime variables
 			runTimeContext.clearRunTimeVariables();
 

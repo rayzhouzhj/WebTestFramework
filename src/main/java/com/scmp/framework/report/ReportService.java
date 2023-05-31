@@ -26,8 +26,8 @@ import static com.scmp.framework.utils.Constants.TARGET_PATH;
  * ReportManager - Handles all Reporting activities e.g. communication with ExtentManager, etc
  */
 @Component
-public class ReportManager {
-	private static final Logger frameworkLogger = LoggerFactory.getLogger(ReportManager.class);
+public class ReportService {
+	private static final Logger frameworkLogger = LoggerFactory.getLogger(ReportService.class);
 	private final ThreadLocal<TestInfo> testInfo = new ThreadLocal<>();
 	private final ThreadLocal<ExtentTest> parentTestClass = new ThreadLocal<>();
 	private final ThreadLocal<ExtentTest> currentTestMethod = new ThreadLocal<>();
@@ -38,7 +38,7 @@ public class ReportManager {
 	private final ExtentTestService extentTestService;
 
 	@Autowired
-	private ReportManager(RunTimeContext runTimeContext, ExtentTestService extentTestService, ScreenShotManager screenshotManager) {
+	private ReportService(RunTimeContext runTimeContext, ExtentTestService extentTestService, ScreenShotManager screenshotManager) {
 		this.runTimeContext = runTimeContext;
 		this.screenshotManager = screenshotManager;
 		this.extentTestService = extentTestService;

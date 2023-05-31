@@ -1,6 +1,6 @@
 package com.scmp.framework.test;
 
-import com.scmp.framework.report.ReportManager;
+import com.scmp.framework.report.ReportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,62 +11,62 @@ import org.testng.Assert;
 public class TestLogger {
 
 	private static final Logger frameworkLogger = LoggerFactory.getLogger(TestLogger.class);
-	private final ReportManager reportManager;
+	private final ReportService reportService;
 
 	@Autowired
-	public TestLogger(ReportManager reportManager) {
-		this.reportManager = reportManager;
+	public TestLogger(ReportService reportService) {
+		this.reportService = reportService;
 	}
 
 	public String captureScreen() {
-		return reportManager.captureScreenShot();
+		return reportService.captureScreenShot();
 	}
 
 	public String getImagePath(String imageName) {
-		return reportManager.getImagePath(imageName);
+		return reportService.getImagePath(imageName);
 	}
 
 	public void attachImage(String image) {
-		reportManager.attachImage(image);
+		reportService.attachImage(image);
 	}
 
 	public String logScreenshot() {
-		return reportManager.logScreenshot();
+		return reportService.logScreenshot();
 	}
 
 	public void logInfo(String message) {
 		frameworkLogger.info(message);
-		reportManager.logInfo(message);
+		reportService.logInfo(message);
 	}
 
 	public void logInfoWithScreenshot(String message) {
 		frameworkLogger.info(message);
-		reportManager.logInfoWithScreenshot(message);
+		reportService.logInfoWithScreenshot(message);
 	}
 
 	public void logPass(String message) {
 		frameworkLogger.info("[PASSED] " + message);
-		reportManager.logPass(message);
+		reportService.logPass(message);
 	}
 
 	public void logPassWithScreenshot(String message) {
 		frameworkLogger.info("[PASSED] " + message);
-		reportManager.logPassWithScreenshot(message);
+		reportService.logPassWithScreenshot(message);
 	}
 
 	public void logFail(String message) {
 		frameworkLogger.error("[FAILED] " + message);
-		reportManager.logFail(message);
+		reportService.logFail(message);
 	}
 
 	public void logFailWithoutScreenshot(String message) {
 		frameworkLogger.error("[FAILED] " + message);
-		reportManager.logFailWithoutScreenshot(message);
+		reportService.logFailWithoutScreenshot(message);
 	}
 
 	public void logFailWithImage(String message, String imagePath) {
 		frameworkLogger.error("[FAILED] " + message);
-		reportManager.logFailWithImage(message, imagePath);
+		reportService.logFailWithImage(message, imagePath);
 	}
 
 	public void logFatalError(String message) {
@@ -76,6 +76,6 @@ public class TestLogger {
 
 	public void logJson(String json, String fileName) {
 		frameworkLogger.info(json);
-		reportManager.logJson(json, fileName);
+		reportService.logJson(json, fileName);
 	}
 }

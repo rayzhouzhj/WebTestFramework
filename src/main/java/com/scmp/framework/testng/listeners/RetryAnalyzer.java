@@ -19,7 +19,7 @@ import com.scmp.framework.context.RunTimeContext;
 
 public class RetryAnalyzer implements IRetryAnalyzer {
 	private static final Logger frameworkLogger = LoggerFactory.getLogger(RetryAnalyzer.class);
-	private ConcurrentHashMap<String, RetryMethod> retryMap = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<String, RetryMethod> retryMap = new ConcurrentHashMap<>();
 
 	private final RunTimeContext runTimeContext;
 

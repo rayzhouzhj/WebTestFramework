@@ -115,12 +115,12 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>1.2.3</version>
+			<version>1.2.9</version>
 		</dependency>
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
-			<version>3.1.0</version>
+			<version>4.5.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.rayzhouzhj</groupId>

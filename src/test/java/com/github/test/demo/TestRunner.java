@@ -5,20 +5,17 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.scmp.framework.executor.TestExecutor;
 
-@SpringBootTest
-public class TestRunner {
+@SpringBootTest(classes = com.scmp.framework.TestFramework.class)
+public class TestRunner extends AbstractTestNGSpringContextTests {
 
 	@Autowired
-	private final TestExecutor testExecutor;
-
-	public TestRunner(TestExecutor testExecutor) {
-		this.testExecutor = testExecutor;
-	}
+	private TestExecutor testExecutor;
 
 	@Test
 	public void testApp() throws Exception {

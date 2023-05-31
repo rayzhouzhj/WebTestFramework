@@ -1,16 +1,14 @@
 package com.github.test.demo;
 
 import com.scmp.framework.annotations.LaunchBrowser;
-import com.scmp.framework.test.TestLogger;
+import com.scmp.framework.test.BaseTest;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.testng.annotations.Test;
 
 import static org.hamcrest.Matchers.*;
 
-public class APITest {
-
-	TestLogger logger = new TestLogger();
+public class APITest extends BaseTest {
 
 	@Test(groups = {"test1", "groups_to_exclude", "api"})
 	@LaunchBrowser(status = false)

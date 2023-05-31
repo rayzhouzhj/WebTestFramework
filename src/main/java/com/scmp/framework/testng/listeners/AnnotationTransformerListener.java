@@ -15,14 +15,14 @@ import java.util.Optional;
 import static com.scmp.framework.utils.Constants.FILTERED_TEST_OBJECT;
 
 public class AnnotationTransformerListener implements IAnnotationTransformer {
-  @Override
-  public void transform(
-      ITestAnnotation iTestAnnotation, Class aClass, Constructor constructor, Method method) {
+	@Override
+	public void transform(
+			ITestAnnotation iTestAnnotation, Class aClass, Constructor constructor, Method method) {
 
-    // Handle Retry
-    IRetryAnalyzer retry = iTestAnnotation.getRetryAnalyzer();
-    if (retry == null) {
-      iTestAnnotation.setRetryAnalyzer(RetryAnalyzer.class);
-    }
-  }
+		// Handle Retry
+		IRetryAnalyzer retry = iTestAnnotation.getRetryAnalyzer();
+		if (retry==null) {
+			iTestAnnotation.setRetryAnalyzer(RetryAnalyzer.class);
+		}
+	}
 }

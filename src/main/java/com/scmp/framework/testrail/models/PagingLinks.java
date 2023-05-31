@@ -8,9 +8,9 @@ import java.util.List;
 @Data
 public class PagingLinks {
 
-    @SerializedName("next")
-    String next;
+	@SerializedName("next")
+	String next;
 
-    @SerializedName("prev")
-    String previous;
+	@SerializedName("prev")
+	String previous;
 }

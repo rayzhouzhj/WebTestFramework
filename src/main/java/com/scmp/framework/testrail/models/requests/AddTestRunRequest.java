@@ -11,12 +11,12 @@ import java.util.List;
 @AllArgsConstructor
 public class AddTestRunRequest {
 
-    @SerializedName("name")
-    private String name;
+	@SerializedName("name")
+	private String name;
 
-    @SerializedName("include_all")
-    private Boolean includeAll;
+	@SerializedName("include_all")
+	private Boolean includeAll;
 
-    @SerializedName("case_ids")
-    private List<Integer> testCaseIds;
+	@SerializedName("case_ids")
+	private List<Integer> testCaseIds;
 }

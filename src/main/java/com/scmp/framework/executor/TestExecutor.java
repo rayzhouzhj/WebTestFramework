@@ -28,7 +28,7 @@ import org.reflections.util.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Component;
 import org.testng.TestNG;
 import org.testng.xml.XmlClass;
 import org.testng.xml.XmlSuite;
@@ -40,13 +40,14 @@ import com.scmp.framework.utils.Figlet;
 
 import static com.scmp.framework.utils.Constants.*;
 
+@Component
 public class TestExecutor {
-	@Autowired
 	private final RunTimeContext context;
 	private final ArrayList<String> items = new ArrayList<>();
 
 	private static final Logger frameworkLogger = LoggerFactory.getLogger(TestExecutor.class);
 
+	@Autowired
 	public TestExecutor(RunTimeContext context) {
 
 		this.context = context;
@@ -132,7 +133,7 @@ public class TestExecutor {
 		// Available browser types
 		// Chrome, Firefox, Random (if random, either chrome or firefox will be assigned)
 		String[] browsers =
-				RunTimeContext.getInstance().getProperty(ConfigFileKeys.BROWSER_TYPE).split(",");
+				context.getProperty(ConfigFileKeys.BROWSER_TYPE).split(",");
 		for (String browser : browsers) {
 			XmlSuite suite = constructXmlSuite(browser, test, methods);
 			String suiteFile = writeTestNGFile(suite, "testsuite" + "-" + browser);
@@ -244,7 +245,7 @@ public class TestExecutor {
 		String suiteXML = System.getProperty("user.dir") + "/target/" + fileName + ".xml";
 
 		try {
-			FileWriter writer = new FileWriter(new File(suiteXML));
+			FileWriter writer = new FileWriter(suiteXML);
 			writer.write(suite.toXml());
 			writer.flush();
 			writer.close();

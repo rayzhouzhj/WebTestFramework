@@ -7,9 +7,9 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class CustomStepResult {
-    @SerializedName("content")
-    private String content;
+	@SerializedName("content")
+	private String content;
 
-    @SerializedName("status_id")
-    private int statusId;
+	@SerializedName("status_id")
+	private int statusId;
 }

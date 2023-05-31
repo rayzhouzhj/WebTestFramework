@@ -107,19 +107,11 @@ public class SuiteListener implements ISuiteListener {
 
 		LocalDate today = LocalDate.now(runTimeContext.getZoneId());
 		String timestamp = String.valueOf(today.minusDays(7).atStartOfDay(runTimeContext.getZoneId()).toEpochSecond());
-		String todayDateString = today.format(DateTimeFormatter.ofPattern("M/dd/yyy"));
 		String testRunName = runTimeContext.getFrameworkConfigs().getTestRailTestRunName();
 
 		if (testRunName.isEmpty()) {
 			// Default Test Run Name
 			testRunName = String.format("Automated Test Run %s", today);
-		} else {
-			testRunName =
-					testRunName
-							.replace("${date}", todayDateString)
-							.replace(
-									"${FEATURE_DESCRIPTION}",
-									runTimeContext.getFrameworkConfigs().getFeatureDescription());
 		}
 
 		final String finalTestRunName = testRunName.trim();

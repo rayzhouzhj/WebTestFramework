@@ -112,7 +112,7 @@ public class RunTimeContext {
 	}
 
 	public ZoneId getZoneId() {
-		return ZoneId.of("Asia/Hong_Kong");
+		return ZoneId.of(frameworkConfigs.getZoneId());
 	}
 
 	public String getDefaultExtensionPath() {

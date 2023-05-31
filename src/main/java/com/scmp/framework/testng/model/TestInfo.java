@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 
-import static com.scmp.framework.utils.ConfigFileKeys.*;
 import static com.scmp.framework.utils.Constants.FILTERED_TEST_OBJECT;
 import static com.scmp.framework.utils.Constants.TEST_RUN_OBJECT;
 
@@ -238,7 +237,7 @@ public class TestInfo {
 
 		// If the test is not tagged skip chrome options, use Global_Chrome_Options which has options separated by comma
 		if (this.declaredMethod.getAnnotation(SkipGlobalChromeOptions.class)==null) {
-			String global_chrome_options = runTimeContext.getProperty(GLOBAL_CHROME_OPTIONS);
+			String global_chrome_options = runTimeContext.getFrameworkConfigs().getGlobalChromeOptions();
 
 			// Only add arguments if global_chrome_options has something
 			if (global_chrome_options!=null && !global_chrome_options.isEmpty()) {
@@ -379,18 +378,13 @@ public class TestInfo {
 	public Map<String, String> getCustomLocalStorage() {
 
 		Map<String, String> customData = new HashMap<>();
-		boolean loadDefaultData =
-				"true"
-						.equalsIgnoreCase(
-								runTimeContext.getProperty(PRELOAD_LOCAL_STORAGE_DATA, "false"));
-		CustomLocalStorage customLocalStorage =
-				this.declaredMethod.getAnnotation(CustomLocalStorage.class);
-		loadDefaultData =
-				customLocalStorage!=null && customLocalStorage.loadDefault() || loadDefaultData;
+		boolean loadDefaultData = runTimeContext.getFrameworkConfigs().isPreloadLocalStorageData();
+		CustomLocalStorage customLocalStorage =	this.declaredMethod.getAnnotation(CustomLocalStorage.class);
+		loadDefaultData = customLocalStorage!=null && customLocalStorage.loadDefault() || loadDefaultData;
 
 		// Load default data
 		if (loadDefaultData) {
-			String filePath = runTimeContext.getProperty(LOCAL_STORAGE_DATA_PATH);
+			String filePath = runTimeContext.getFrameworkConfigs().getLocalStorageDataPath();
 			customData.putAll(new ConfigFileReader(filePath).getAllProperties());
 		}
 

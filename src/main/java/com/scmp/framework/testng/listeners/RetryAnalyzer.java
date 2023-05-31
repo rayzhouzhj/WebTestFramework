@@ -3,11 +3,15 @@ package com.scmp.framework.testng.listeners;
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.scmp.framework.TestFramework;
 import com.scmp.framework.annotations.RetryCount;
+import com.scmp.framework.context.ApplicationContextProvider;
 import com.scmp.framework.testng.model.RetryMethod;
 import com.scmp.framework.utils.ConfigFileKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
@@ -17,7 +21,11 @@ public class RetryAnalyzer implements IRetryAnalyzer {
   private static final Logger frameworkLogger = LoggerFactory.getLogger(RetryAnalyzer.class);
   private ConcurrentHashMap<String, RetryMethod> retryMap = new ConcurrentHashMap<>();
 
-  public RetryAnalyzer() {}
+  private final RunTimeContext runTimeContext;
+  public RetryAnalyzer() {
+    ApplicationContext context = ApplicationContextProvider.getApplicationContext();
+    runTimeContext = context.getBean(RunTimeContext.class);
+  }
 
   public boolean isRetriedMethod(ITestResult iTestResult) {
     return this.getRetryMethod(iTestResult).isRetried();
@@ -69,7 +77,7 @@ public class RetryAnalyzer implements IRetryAnalyzer {
             try {
               maxRetryCount =
                   Integer.parseInt(
-                      RunTimeContext.getInstance().getProperty(ConfigFileKeys.MAX_RETRY_COUNT));
+                          runTimeContext.getProperty(ConfigFileKeys.MAX_RETRY_COUNT));
             } catch (Exception e) {
               maxRetryCount = 0;
             }

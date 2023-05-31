@@ -1,7 +1,9 @@
 package com.scmp.framework.testng.listeners;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import com.scmp.framework.context.ApplicationContextProvider;
 import com.scmp.framework.context.RunTimeContext;
 import com.scmp.framework.testng.model.TestInfo;
 import com.scmp.framework.manager.WebDriverManager;
@@ -9,8 +11,8 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.testng.*;
-import org.testng.annotations.Test;
 
 import com.scmp.framework.report.ExtentManager;
 import com.scmp.framework.report.ReportManager;
@@ -20,10 +22,17 @@ import static com.scmp.framework.utils.Constants.TEST_INFO_OBJECT;
 
 public final class InvokedMethodListener implements IInvokedMethodListener {
     private static final Logger frameworkLogger = LoggerFactory.getLogger(InvokedMethodListener.class);
-    private WebDriverManager driverManager;
+
+    private final WebDriverManager driverManager;
+    private final RunTimeContext runTimeContext;
+
+    static final AtomicInteger counter = new AtomicInteger(0);
 
     public InvokedMethodListener() {
-        driverManager = new WebDriverManager();
+        System.out.println("init count " + counter.getAndIncrement());
+        ApplicationContext context = ApplicationContextProvider.getApplicationContext();
+        driverManager = context.getBean(WebDriverManager.class);
+        runTimeContext = context.getBean(RunTimeContext.class);
     }
 
     /**
@@ -60,7 +69,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
             // Setup web driver
             driverManager.startDriverInstance(browserOptions, deviceDimension);
         } catch (Exception ex1) {
-            if (!RunTimeContext.getInstance().isLocalExecutionMode()) {
+            if (!runTimeContext.isLocalExecutionMode()) {
                 try {
                     driverManager.stopWebDriver();
                     // Wait 30 seconds and retry driver setup
@@ -85,11 +94,11 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
     public void beforeInvocation(IInvokedMethod method, ITestResult testResult) {
 
         // Clear all runtime variables
-        RunTimeContext.getInstance().clearRunTimeVariables();
+        runTimeContext.clearRunTimeVariables();
 
         TestInfo testInfo = new TestInfo(method, testResult);
         // Save TestInfo to runtime memory
-        RunTimeContext.getInstance().setTestLevelVariables(TEST_INFO_OBJECT, testInfo);
+        runTimeContext.setTestLevelVariables(TEST_INFO_OBJECT, testInfo);
 
         // Skip beforeInvocation if current method is not with Annotation Test, or
         // Current Test need to be skipped
@@ -117,7 +126,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
     @Override
     public void afterInvocation(IInvokedMethod method, ITestResult testResult) {
 
-        TestInfo testInfo = (TestInfo) RunTimeContext.getInstance().getTestLevelVariables(TEST_INFO_OBJECT);
+        TestInfo testInfo = (TestInfo) runTimeContext.getTestLevelVariables(TEST_INFO_OBJECT);
         // Skip beforeInvocation if current method is not with Annotation Test, or
         // Current Test need to be skipped
         if (!testInfo.isTestMethod() || testInfo.isSkippedTest()) {
@@ -143,7 +152,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
             ExtentManager.getExtent().flush();
 
             // Clear all runtime variables
-            RunTimeContext.getInstance().clearRunTimeVariables();
+            runTimeContext.clearRunTimeVariables();
 
             // Stop driver
             if(testInfo.needLaunchBrowser()) {

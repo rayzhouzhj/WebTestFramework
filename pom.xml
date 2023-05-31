@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.scmp-contributor</groupId>
 	<artifactId>WebTestFramework</artifactId>
-	<version>4.2.10</version>
+	<version>5.0.0</version>
 	<packaging>jar</packaging>
 
     <properties>
@@ -139,7 +139,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

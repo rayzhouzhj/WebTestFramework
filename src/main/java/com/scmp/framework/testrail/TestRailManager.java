@@ -298,7 +298,7 @@ public class TestRailManager {
 		data.put(CustomQuery, "");
 
 		File file = new File(imagePath);
-		RequestBody requestFile = RequestBody.create(file, MediaType.parse("multipart/form-data"));
+		RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
 		MultipartBody.Part imageToUpload =
 				MultipartBody.Part.createFormData("attachment", file.getName(), requestFile);
 
@@ -325,7 +325,7 @@ public class TestRailManager {
 		data.put(CustomQuery, "");
 
 		File file = new File(imagePath);
-		RequestBody requestFile = RequestBody.create(file, MediaType.parse("multipart/form-data"));
+		RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
 		MultipartBody.Part imageToUpload =
 				MultipartBody.Part.createFormData("attachment", file.getName(), requestFile);
 

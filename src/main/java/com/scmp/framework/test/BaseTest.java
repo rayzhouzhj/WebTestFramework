@@ -11,10 +11,12 @@ import java.util.Random;
 public class BaseTest {
 	private static final Logger frameworkLogger = LoggerFactory.getLogger(BaseTest.class);
 	protected final TestLogger logger;
+	public RunTimeContext runTimeContext;
 
 	public BaseTest() {
 		ApplicationContext context = ApplicationContextProvider.getApplicationContext();
 		logger = context.getBean(TestLogger.class);
+		runTimeContext = context.getBean(RunTimeContext.class);
 	}
 
 	public String getRandomNumberString(int length) {

@@ -19,12 +19,10 @@ public class TestRunner extends AbstractTestNGSpringContextTests {
 
 	@Test
 	public void testApp() throws Exception {
-		List<String> tests = new ArrayList<>();
-		tests.add("APITest");
 
 		List<String> packages = new ArrayList<>();
 		packages.add("com.github.test.demo");
-		boolean hasFailures = testExecutor.runTests(packages, tests);
+		boolean hasFailures = testExecutor.runTests(packages);
 
 		Assert.assertFalse(hasFailures, "Testcases execution failed.");
 	}

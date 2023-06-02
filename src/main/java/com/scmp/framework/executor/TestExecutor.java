@@ -5,17 +5,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import com.scmp.framework.testng.listeners.SuiteListener;
 import com.scmp.framework.testng.listeners.InvokedMethodListener;
@@ -76,30 +72,20 @@ public class TestExecutor {
 	}
 
 	/**
-	 * Run tests under specific packages
-	 * @param packages packages
-	 * @return test result
-	 * @throws Exception
-	 */
-	public boolean runTests(List<String> packages) throws Exception {
-		return runTests(packages, new ArrayList<>());
-	}
-
-	/**
 	 * Run tests under specific packages and defined test classes
+	 *
 	 * @param packages Package list
-	 * @param userDefinedTestClasses userDefinedTestClasses classes
 	 * @return userDefinedTestClasses status, passed / failed
 	 * @throws Exception exception
 	 */
-	public boolean runTests(List<String> packages, List<String> userDefinedTestClasses) throws Exception {
+	public boolean runTests(List<String> packages) throws Exception {
 		System.out.println("***************************************************");
 		this.packageList.addAll(packages);
 
 		URL testPackagesUrl;
 		List<URL> testPackagesUrls = new ArrayList<>();
 		String testClassPackagePath =
-				"file:"	+ TARGET_PATH + File.separator + "test-classes"	+ File.separator;
+				"file:" + TARGET_PATH + File.separator + "test-classes" + File.separator;
 
 		// Add URL for each userDefinedTestClasses package
 		for (String packageName : packageList) {
@@ -107,7 +93,7 @@ public class TestExecutor {
 			testPackagesUrls.add(testPackagesUrl);
 		}
 
-		// Find userDefinedTestClasses class by annotation: org.testng.annotations.Test.class
+		// Find test class by annotation: org.testng.annotations.Test.class
 		Reflections reflections =
 				new Reflections(new ConfigurationBuilder().setUrls(testPackagesUrls).setScanners(new MethodAnnotationsScanner()));
 		Set<Method> testNGTests = reflections.getMethodsAnnotatedWith(org.testng.annotations.Test.class);
@@ -121,7 +107,7 @@ public class TestExecutor {
 		// Chrome, Firefox, Random (if random, either chrome or firefox will be assigned)
 		String[] browsers = context.getFrameworkConfigs().getBrowserType().split(",");
 		for (String browser : browsers) {
-			XmlSuite suite = constructXmlSuite(browser, userDefinedTestClasses, methods);
+			XmlSuite suite = constructXmlSuite(browser, methods);
 			String suiteFile = writeTestNGFile(suite, "testsuite" + "-" + browser);
 
 			FutureTask<Boolean> futureTask = new FutureTask<>(new TestExecutorService(suiteFile));
@@ -159,13 +145,12 @@ public class TestExecutor {
 
 	/**
 	 * Create the xml testng suite for execution
+	 *
 	 * @param browser browser name
-	 * @param userDefinedTestClasses all test names
 	 * @param methods test methods
 	 * @return XML suite
 	 */
-	public XmlSuite constructXmlSuite(
-			String browser, List<String> userDefinedTestClasses, Map<String, List<Method>> methods) {
+	public XmlSuite constructXmlSuite(String browser, Map<String, List<Method>> methods) {
 		ArrayList<String> listeners = new ArrayList<>();
 		ArrayList<String> groupsInclude = new ArrayList<>();
 		ArrayList<String> groupsExclude = new ArrayList<>();
@@ -207,7 +192,7 @@ public class TestExecutor {
 		test.setExcludedGroups(groupsExclude);
 
 		// Add test class and methods
-		test.setXmlClasses(createXmlClasses(userDefinedTestClasses, methods));
+		test.setXmlClasses(createXmlClasses(methods));
 
 		return suite;
 	}
@@ -215,40 +200,24 @@ public class TestExecutor {
 	/**
 	 * Create TestNG XML Class
 	 * (not handling methods, methods will be controlled by includes and excludes rules)
-	 * @param userDefinedTestClasses test classes defined
+	 *
 	 * @param methods all available test methods
 	 * @return TestNG XML class list
 	 */
-	public 	List<XmlClass> createXmlClasses(List<String> userDefinedTestClasses, Map<String, List<Method>> methods) {
+	public List<XmlClass> createXmlClasses(Map<String, List<Method>> methods) {
 
-		List<XmlClass> xmlClasses = new ArrayList<>();
-
-		for (String className : methods.keySet()) {
-			// If not runner class
+		return methods.keySet().stream().map(className -> {
 			if (!className.contains("TestRunner")) {
-				// If no user defined test class, add all detected test class
-				if (userDefinedTestClasses.size()==0) {
-					xmlClasses.add(new XmlClass(className));
-				} else {
-					// Only add test class if it is in the user defined test class list
-					for (String testClass : userDefinedTestClasses) {
-						for (String packageName : packageList) {
-							String fullTestClassName = packageName.concat("." + testClass);
-							if (fullTestClassName.equals(className)) {
-								xmlClasses.add(new XmlClass(className));
-							}
-						}
-					}
-				}
+				return new XmlClass(className);
 			}
-		}
-
-		return xmlClasses;
+			return null;
+		}).filter(Objects::nonNull).collect(Collectors.toList());
 	}
 
 	/**
 	 * Write the XML suite to target folder
-	 * @param suite XML suite
+	 *
+	 * @param suite    XML suite
 	 * @param fileName file name to be created
 	 * @return full file path of the xml file
 	 */
@@ -271,25 +240,26 @@ public class TestExecutor {
 
 	/**
 	 * Create a test class, test methods mapping
+	 *
 	 * @param methods all testng tests
 	 * @return test class, test method map
 	 */
 	public Map<String, List<Method>> createTestsMap(Set<Method> methods) {
 		Map<String, List<Method>> testsMap = new HashMap<>();
 		methods.forEach(
-						method -> {
-							// Get method list from specific test class
-							String className =
-									method.getDeclaringClass().getPackage().getName()
+				method -> {
+					// Get method list from specific test class
+					String className =
+							method.getDeclaringClass().getPackage().getName()
 									+ "."
 									+ method.getDeclaringClass().getSimpleName();
 
-							// If the method list is empty, initialize it and add it to test class map
-							List<Method> methodsList =
-									testsMap.computeIfAbsent(className, k -> new ArrayList<>());
-							// Add method to list
-							methodsList.add(method);
-						});
+					// If the method list is empty, initialize it and add it to test class map
+					List<Method> methodsList =
+							testsMap.computeIfAbsent(className, k -> new ArrayList<>());
+					// Add method to list
+					methodsList.add(method);
+				});
 
 		return testsMap;
 	}

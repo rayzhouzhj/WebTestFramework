@@ -1,21 +1,10 @@
 package com.scmp.framework.executor;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import com.scmp.framework.testng.listeners.SuiteListener;
-import com.scmp.framework.testng.listeners.InvokedMethodListener;
+import com.scmp.framework.context.RunTimeContext;
 import com.scmp.framework.testng.listeners.AnnotationTransformerListener;
+import com.scmp.framework.testng.listeners.InvokedMethodListener;
+import com.scmp.framework.testng.listeners.SuiteListener;
+import com.scmp.framework.utils.Figlet;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
@@ -30,8 +19,14 @@ import org.testng.xml.XmlSuite;
 import org.testng.xml.XmlSuite.ParallelMode;
 import org.testng.xml.XmlTest;
 
-import com.scmp.framework.context.RunTimeContext;
-import com.scmp.framework.utils.Figlet;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 import static com.scmp.framework.utils.Constants.*;
 

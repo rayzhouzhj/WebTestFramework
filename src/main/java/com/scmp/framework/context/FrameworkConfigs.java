@@ -9,7 +9,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -25,8 +24,8 @@ public class FrameworkConfigs {
 		String zoneId = env.getProperty("ZONE_ID", "Asia/Hong_Kong");
 		String today = LocalDate.now(ZoneId.of(zoneId)).format(DateTimeFormatter.ofPattern("M/dd/yyy"));
 		context.getEnvironment().getPropertySources()
-				.addLast(new MapPropertySource("runtimeProperties", Collections.singletonMap("date",  today)));
-	};
+				.addLast(new MapPropertySource("runtimeProperties", Collections.singletonMap("date", today)));
+	}
 
 	@Value("${ZONE_ID:Asia/Hong_Kong}")
 	private String zoneId;
@@ -76,7 +75,7 @@ public class FrameworkConfigs {
 	@Value("${TESTRAIL_API_KEY:#{''}}")
 	private String testRailAPIKey;
 
-	@Value(value="${TESTRAIL_TEST_RUN_NAME:#{''}}")
+	@Value(value = "${TESTRAIL_TEST_RUN_NAME:#{''}}")
 	private String testRailTestRunName;
 
 	@Value("${TESTRAIL_PROJECT_ID:#{''}}")

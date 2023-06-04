@@ -1,9 +1,5 @@
 package com.scmp.framework.report;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.reporter.ExtentHtmlReporter;
@@ -14,6 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 import static com.scmp.framework.utils.Constants.TARGET_PATH;
 

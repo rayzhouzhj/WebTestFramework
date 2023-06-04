@@ -1,6 +1,5 @@
 package com.github.test.demo.pom;
 
-import com.scmp.framework.TestFramework;
 import com.scmp.framework.context.ApplicationContextProvider;
 import com.scmp.framework.context.RunTimeContext;
 import org.openqa.selenium.By;
@@ -10,7 +9,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.time.Duration;
 

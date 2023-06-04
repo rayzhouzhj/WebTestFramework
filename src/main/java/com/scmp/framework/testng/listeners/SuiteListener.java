@@ -5,7 +5,9 @@ import com.scmp.framework.context.ApplicationContextProvider;
 import com.scmp.framework.context.RunTimeContext;
 import com.scmp.framework.testrail.TestRailManager;
 import com.scmp.framework.testrail.TestRailStatus;
-import com.scmp.framework.testrail.models.*;
+import com.scmp.framework.testrail.models.TestRun;
+import com.scmp.framework.testrail.models.TestRunResult;
+import com.scmp.framework.testrail.models.TestRunTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -15,7 +17,6 @@ import org.testng.ITestNGMethod;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;

@@ -1,8 +1,8 @@
 package com.scmp.framework.utils;
 
-import java.io.IOException;
-
 import com.github.lalyos.jfiglet.FigletFont;
+
+import java.io.IOException;
 
 public class Figlet {
 	public static void print(String text) {

@@ -1,12 +1,12 @@
 package com.scmp.framework.report;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.aventstack.extentreports.ExtentTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class ExtentTestService {

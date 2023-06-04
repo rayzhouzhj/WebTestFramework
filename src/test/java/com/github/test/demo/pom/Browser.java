@@ -1,9 +1,9 @@
 package com.github.test.demo.pom;
 
+import org.openqa.selenium.remote.RemoteWebDriver;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-
-import org.openqa.selenium.remote.RemoteWebDriver;
 
 public class Browser {
 	public GoogleHome GoogleHome;

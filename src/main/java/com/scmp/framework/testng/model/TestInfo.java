@@ -8,7 +8,7 @@ import com.scmp.framework.context.RunTimeContext;
 import com.scmp.framework.model.Browser;
 import com.scmp.framework.model.IProxyFactory;
 import com.scmp.framework.testng.listeners.RetryAnalyzer;
-import com.scmp.framework.testrail.TestRailDataHandler;
+import com.scmp.framework.testrail.TestRailDataService;
 import com.scmp.framework.testrail.TestRailStatus;
 import com.scmp.framework.testrail.models.TestRun;
 import com.scmp.framework.testrail.models.TestRunTest;
@@ -46,7 +46,7 @@ public class TestInfo {
 	private final ITestResult testResult;
 	private final Method declaredMethod;
 	private Browser browserType = null;
-	private TestRailDataHandler testRailDataHandler = null;
+	private TestRailDataService testRailDataService = null;
 	private LocalDateTime testStartTime = null;
 	private LocalDateTime testEndTime = null;
 	private Boolean isSkippedTest = null;
@@ -67,14 +67,14 @@ public class TestInfo {
 			TestRailTestCase testRailCase = this.declaredMethod.getAnnotation(TestRailTestCase.class);
 			TestRun testRun = (TestRun) runTimeContext.getGlobalVariables(TEST_RUN_OBJECT);
 			if (testRailCase!=null && testRun!=null) {
-				this.testRailDataHandler = new TestRailDataHandler(testRailCase.id(), testRun);
+				this.testRailDataService = new TestRailDataService(testRailCase.id(), testRun);
 			}
 		}
 	}
 
 	public void addTestResultForTestRail(int status, String content, String filePath) {
-		if (this.testRailDataHandler!=null) {
-			this.testRailDataHandler.addStepResult(status, content, filePath);
+		if (this.testRailDataService!=null) {
+			this.testRailDataService.addStepResult(status, content, filePath);
 		}
 	}
 
@@ -83,7 +83,7 @@ public class TestInfo {
 	}
 
 	public void uploadTestResultsToTestRail() {
-		if (this.testRailDataHandler!=null) {
+		if (this.testRailDataService!=null) {
 			int finalTestResult = TestRailStatus.Untested;
 			switch (this.testResult.getStatus()) {
 				case ITestResult.SUCCESS:
@@ -100,7 +100,7 @@ public class TestInfo {
 			}
 
 			long elapsed = Duration.between(this.testStartTime, this.testEndTime).getSeconds();
-			this.testRailDataHandler.uploadDataToTestRail(finalTestResult, elapsed);
+			this.testRailDataService.uploadDataToTestRail(finalTestResult, elapsed);
 		}
 	}
 
@@ -379,7 +379,7 @@ public class TestInfo {
 
 		Map<String, String> customData = new HashMap<>();
 		boolean loadDefaultData = runTimeContext.getFrameworkConfigs().isPreloadLocalStorageData();
-		CustomLocalStorage customLocalStorage =	this.declaredMethod.getAnnotation(CustomLocalStorage.class);
+		CustomLocalStorage customLocalStorage = this.declaredMethod.getAnnotation(CustomLocalStorage.class);
 		loadDefaultData = customLocalStorage!=null && customLocalStorage.loadDefault() || loadDefaultData;
 
 		// Load default data

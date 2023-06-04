@@ -5,6 +5,7 @@ import com.scmp.framework.model.GoogleAnalytics;
 import org.json.JSONObject;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,14 +16,14 @@ import java.util.regex.Pattern;
 
 public class NetworkManager {
 
-	public static void clearNetworkTraffic() {
-		getAllNetworkTraffic();
+	public static void clearNetworkTraffic(RemoteWebDriver driver) {
+		getAllNetworkTraffic(driver);
 	}
 
-	public static List<String> getAllNetworkTraffic() {
+	public static List<String> getAllNetworkTraffic(RemoteWebDriver driver) {
 		List<String> messages = new ArrayList<>();
 
-		LogEntries logs = WebDriverManager.getDriver().manage().logs().get("performance");
+		LogEntries logs = driver.manage().logs().get("performance");
 		for (Iterator<LogEntry> it = logs.iterator(); it.hasNext(); ) {
 			LogEntry entry = it.next();
 			messages.add(entry.getMessage());
@@ -31,12 +32,12 @@ public class NetworkManager {
 		return messages;
 	}
 
-	private static <T> List<T> getTrackingRequests(Class<T> cls, String pattern) {
+	private static <T> List<T> getTrackingRequests(RemoteWebDriver driver, Class<T> cls, String pattern) {
 		List<T> trackingData = Collections.synchronizedList(new ArrayList<>());
 		// Create a Pattern object
 		Pattern regex = Pattern.compile(pattern);
 
-		LogEntries logs = WebDriverManager.getDriver().manage().logs().get("performance");
+		LogEntries logs = driver.manage().logs().get("performance");
 		logs.getAll()
 				.parallelStream()
 				.forEach(entry -> {
@@ -63,15 +64,15 @@ public class NetworkManager {
 		return trackingData;
 	}
 
-	public static List<GoogleAnalytics> getGoogleAnalyticsRequests() {
+	public static List<GoogleAnalytics> getGoogleAnalyticsRequests(RemoteWebDriver driver) {
 		List<GoogleAnalytics> gaData = Collections.synchronizedList(new ArrayList<>());
 		String pattern = "^https://www.google-analytics.com/([a-z]/)?collect\\?.+";
-		return getTrackingRequests(GoogleAnalytics.class, pattern);
+		return getTrackingRequests(driver, GoogleAnalytics.class, pattern);
 	}
 
-	public static List<ChartbeatData> getChartBeatRequests() {
+	public static List<ChartbeatData> getChartBeatRequests(RemoteWebDriver driver) {
 		List<GoogleAnalytics> gaData = Collections.synchronizedList(new ArrayList<>());
 		String pattern = "^https://ping.chartbeat.net/ping\\?.+";
-		return getTrackingRequests(ChartbeatData.class, pattern);
+		return getTrackingRequests(driver, ChartbeatData.class, pattern);
 	}
 }

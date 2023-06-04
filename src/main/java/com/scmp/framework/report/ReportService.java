@@ -1,14 +1,12 @@
 package com.scmp.framework.report;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Path;
-
+import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
 import com.scmp.framework.context.RunTimeContext;
 import com.scmp.framework.testng.listeners.RetryAnalyzer;
 import com.scmp.framework.testng.model.TestInfo;
 import com.scmp.framework.testrail.TestRailStatus;
+import com.scmp.framework.utils.ScreenShotManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +14,10 @@ import org.springframework.stereotype.Component;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
-import com.aventstack.extentreports.ExtentTest;
-import com.aventstack.extentreports.Status;
-import com.scmp.framework.utils.ScreenShotManager;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
 
 import static com.scmp.framework.utils.Constants.TARGET_PATH;
 

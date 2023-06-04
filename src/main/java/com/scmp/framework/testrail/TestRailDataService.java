@@ -14,17 +14,17 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
-public class TestRailDataHandler {
-	private static final Logger frameworkLogger = LoggerFactory.getLogger(TestRailDataHandler.class);
+public class TestRailDataService {
+	private static final Logger frameworkLogger = LoggerFactory.getLogger(TestRailDataService.class);
 
-	private int testcaseId;
-	private TestRun testRun;
+	private final int testcaseId;
+	private final TestRun testRun;
 	private boolean isTestResultForUploadAttachmentsReady = false;
 	private TestResult testResultForUploadAttachments;
-	private List<CustomStepResult> testRailCustomStepResultList = new ArrayList<>();
-	private ConcurrentLinkedQueue<CustomStepResult> pendingTaskQueue = new ConcurrentLinkedQueue<>();
+	private final List<CustomStepResult> testRailCustomStepResultList = new ArrayList<>();
+	private final ConcurrentLinkedQueue<CustomStepResult> pendingTaskQueue = new ConcurrentLinkedQueue<>();
 
-	public TestRailDataHandler(int testcaseId, TestRun testRun) {
+	public TestRailDataService(int testcaseId, TestRun testRun) {
 		this.testcaseId = testcaseId;
 		this.testRun = testRun;
 

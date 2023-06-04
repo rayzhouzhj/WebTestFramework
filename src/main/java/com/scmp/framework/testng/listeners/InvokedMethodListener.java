@@ -1,11 +1,10 @@
 package com.scmp.framework.testng.listeners;
 
-import java.lang.reflect.Method;
-
 import com.scmp.framework.context.ApplicationContextProvider;
 import com.scmp.framework.context.RunTimeContext;
+import com.scmp.framework.manager.WebDriverService;
+import com.scmp.framework.report.ReportService;
 import com.scmp.framework.testng.model.TestInfo;
-import com.scmp.framework.manager.WebDriverManager;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.MutableCapabilities;
 import org.slf4j.Logger;
@@ -13,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.testng.*;
 
-import com.scmp.framework.report.ReportService;
+import java.lang.reflect.Method;
 
 import static com.scmp.framework.utils.Constants.TEST_INFO_OBJECT;
 
@@ -21,13 +20,13 @@ import static com.scmp.framework.utils.Constants.TEST_INFO_OBJECT;
 public final class InvokedMethodListener implements IInvokedMethodListener {
 	private static final Logger frameworkLogger = LoggerFactory.getLogger(InvokedMethodListener.class);
 
-	private final WebDriverManager driverManager;
+	private final WebDriverService webDriverService;
 	private final RunTimeContext runTimeContext;
 	private final ReportService reportService;
 
 	public InvokedMethodListener() {
 		ApplicationContext context = ApplicationContextProvider.getApplicationContext();
-		driverManager = context.getBean(WebDriverManager.class);
+		webDriverService = context.getBean(WebDriverService.class);
 		runTimeContext = context.getBean(RunTimeContext.class);
 		reportService = context.getBean(ReportService.class);
 	}
@@ -64,15 +63,15 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 
 		try {
 			// Setup web driver
-			driverManager.startDriverInstance(browserOptions, deviceDimension);
+			webDriverService.startDriverInstance(browserOptions, deviceDimension);
 		} catch (Exception ex1) {
 			if (!runTimeContext.isLocalExecutionMode()) {
-				driverManager.stopWebDriver();
+				webDriverService.stopWebDriver();
 				// Wait 30 seconds and retry driver setup
 				Thread.sleep(30000);
 
 				// Setup web driver
-				driverManager.startDriverInstance(browserOptions, deviceDimension);
+				webDriverService.startDriverInstance(browserOptions, deviceDimension);
 			} else {
 				throw ex1;
 			}
@@ -134,7 +133,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 		// If fails to set up test
 		if (!reportService.getSetupStatus()) {
 			if (testInfo.needLaunchBrowser()) {
-				driverManager.stopWebDriver();
+				webDriverService.stopWebDriver();
 			}
 
 			return;
@@ -147,7 +146,7 @@ public final class InvokedMethodListener implements IInvokedMethodListener {
 
 			// Stop driver
 			if (testInfo.needLaunchBrowser()) {
-				driverManager.stopWebDriver();
+				webDriverService.stopWebDriver();
 			}
 		} catch (Exception e) {
 			frameworkLogger.error("Ops!", e);

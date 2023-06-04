@@ -2,6 +2,7 @@ package com.scmp.framework.test;
 
 import com.scmp.framework.context.ApplicationContextProvider;
 import com.scmp.framework.context.RunTimeContext;
+import com.scmp.framework.manager.WebDriverService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -11,12 +12,22 @@ import java.util.Random;
 public class BaseTest {
 	private static final Logger frameworkLogger = LoggerFactory.getLogger(BaseTest.class);
 	protected final TestLogger logger;
-	public RunTimeContext runTimeContext;
+	private final RunTimeContext runTimeContext;
+	private final WebDriverService webDriverService;
 
 	public BaseTest() {
 		ApplicationContext context = ApplicationContextProvider.getApplicationContext();
 		logger = context.getBean(TestLogger.class);
 		runTimeContext = context.getBean(RunTimeContext.class);
+		webDriverService = context.getBean(WebDriverService.class);
+	}
+
+	public RunTimeContext getRunTimeContext() {
+		return runTimeContext;
+	}
+
+	public WebDriverService getWebDriverService() {
+		return webDriverService;
 	}
 
 	public String getRandomNumberString(int length) {

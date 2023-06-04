@@ -1,14 +1,8 @@
 package com.scmp.framework.utils;
 
-import java.io.File;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-
 import com.aventstack.extentreports.Status;
 import com.scmp.framework.context.RunTimeContext;
-import com.scmp.framework.manager.WebDriverManager;
+import com.scmp.framework.manager.WebDriverService;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -17,25 +11,33 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+
 @Component
 public class ScreenShotManager {
 	private static final Logger frameworkLogger = LoggerFactory.getLogger(ScreenShotManager.class);
 
 	private final RunTimeContext context;
+	private final WebDriverService webDriverService;
 
 	@Autowired
-	public ScreenShotManager(RunTimeContext context) {
+	public ScreenShotManager(RunTimeContext context, WebDriverService webDriverService) {
+		this.webDriverService = webDriverService;
 		this.context = context;
 	}
 
 	public synchronized String captureScreenShot(Status status, String className, String methodName) {
 		// If driver is not setup properly
-		if (WebDriverManager.getDriver()==null) {
+		if (webDriverService.getDriver()==null) {
 			return "";
 		}
 
 		File scrFile =
-				((TakesScreenshot) WebDriverManager.getDriver()).getScreenshotAs(OutputType.FILE);
+				((TakesScreenshot) webDriverService.getDriver()).getScreenshotAs(OutputType.FILE);
 		String screenShotNameWithTimeStamp = currentDateAndTime();
 
 		return copyScreenshotToTarget(

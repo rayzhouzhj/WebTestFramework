@@ -1,15 +1,14 @@
 package com.github.test.demo;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.scmp.framework.executor.TestExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.scmp.framework.executor.TestExecutor;
+import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootTest(classes = com.scmp.framework.TestFramework.class)
 public class TestRunner extends AbstractTestNGSpringContextTests {

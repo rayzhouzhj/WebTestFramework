@@ -3,6 +3,8 @@ package com.scmp.framework.test;
 import com.scmp.framework.context.ApplicationContextProvider;
 import com.scmp.framework.context.RunTimeContext;
 import com.scmp.framework.manager.WebDriverService;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -26,8 +28,8 @@ public class BaseTest {
 		return runTimeContext;
 	}
 
-	public WebDriverService getWebDriverService() {
-		return webDriverService;
+	public RemoteWebDriver getDriver() {
+		return webDriverService.getDriver();
 	}
 
 	public String getRandomNumberString(int length) {

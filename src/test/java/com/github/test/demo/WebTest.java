@@ -21,7 +21,7 @@ public class WebTest extends BaseTest {
 		System.out.println(methodName);
 
 		// Init a browser instance using webdriver
-		Browser = new Browser(getWebDriverService().getDriver());
+		Browser = new Browser(getDriver());
 
 		logger.logInfo(methodName + " Receive Driver, start testing");
 	}
@@ -71,7 +71,7 @@ public class WebTest extends BaseTest {
 	@Test(groups = "DEBUG")
 	public void testGoogleSearchFailCase1() throws InterruptedException {
 		System.out.println("testGoogleSearchFailCase1");
-		WebDriver driver = getWebDriverService().getDriver();
+		WebDriver driver = getDriver();
 		System.out.println("testGoogleSearch3 Receive Driver, start testing");
 
 		driver.get("https://www.yahoo.com");
@@ -86,7 +86,7 @@ public class WebTest extends BaseTest {
 	public void testGoogleSearchFailCase2() throws InterruptedException {
 		System.out.println("testGoogleSearchFailCase2");
 
-		WebDriver driver = getWebDriverService().getDriver();
+		WebDriver driver = getDriver();
 		System.out.println("testGoogleSearch4 Receive Driver, start testing");
 
 		driver.get("https://www.facebook.com");
@@ -102,7 +102,7 @@ public class WebTest extends BaseTest {
 		// This test case will run in private mode, according to the config setting
 		System.out.println("testGlobalChromeOptionCase1");
 
-		WebDriver driver = getWebDriverService().getDriver();
+		WebDriver driver = getDriver();
 		System.out.println("testGlobalChromeOptionCase1 Receive Driver, start testing");
 
 		driver.get("https://www.google.com");
@@ -119,7 +119,7 @@ public class WebTest extends BaseTest {
 		// This test case will run not in private mode, as global config is skipped
 		System.out.println("testGlobalChromeOptionCase2");
 
-		WebDriver driver = getWebDriverService().getDriver();
+		WebDriver driver = getDriver();
 		System.out.println("testGlobalChromeOptionCase1 Receive Driver, start testing");
 
 		driver.get("https://www.google.com");

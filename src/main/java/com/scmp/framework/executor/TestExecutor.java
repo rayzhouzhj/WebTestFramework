@@ -111,7 +111,7 @@ public class TestExecutor {
 			executor.submit(futureTask);
 		}
 
-		// Wait for the userDefinedTestClasses completion
+		// Wait for the test completion
 		while (true) {
 			boolean isDone = true;
 			for (FutureTask<Boolean> futureTask : list) {

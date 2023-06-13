@@ -1,4 +1,4 @@
-package com.scmp.framework.manager;
+package com.scmp.framework.services;
 
 import com.scmp.framework.context.RunTimeContext;
 import org.openqa.selenium.Dimension;

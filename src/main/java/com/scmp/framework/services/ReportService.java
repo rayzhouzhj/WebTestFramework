@@ -1,12 +1,12 @@
-package com.scmp.framework.report;
+package com.scmp.framework.services;
 
 import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.Status;
 import com.scmp.framework.context.RunTimeContext;
+import com.scmp.framework.report.ExtentTestService;
 import com.scmp.framework.testng.listeners.RetryAnalyzer;
 import com.scmp.framework.testng.model.TestInfo;
 import com.scmp.framework.testrail.TestRailStatus;
-import com.scmp.framework.utils.ScreenShotManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,14 +32,14 @@ public class ReportService {
 	private final ThreadLocal<ExtentTest> currentTestMethod = new ThreadLocal<>();
 	private final ThreadLocal<ITestResult> testResult = new ThreadLocal<>();
 	private final ThreadLocal<Boolean> setupStatus = new ThreadLocal<>();
-	private final ScreenShotManager screenshotManager;
+	private final ScreenShotService screenshotService;
 	private final RunTimeContext runTimeContext;
 	private final ExtentTestService extentTestService;
 
 	@Autowired
-	private ReportService(RunTimeContext runTimeContext, ExtentTestService extentTestService, ScreenShotManager screenshotManager) {
+	private ReportService(RunTimeContext runTimeContext, ExtentTestService extentTestService, ScreenShotService screenshotService) {
 		this.runTimeContext = runTimeContext;
-		this.screenshotManager = screenshotManager;
+		this.screenshotService = screenshotService;
 		this.extentTestService = extentTestService;
 	}
 
@@ -72,7 +72,7 @@ public class ReportService {
 			// Add screenshot
 			try {
 				String screenShotAbsolutePath =
-						screenshotManager.captureScreenShot(
+						screenshotService.captureScreenShot(
 								Status.FAIL,
 								result.getInstance().getClass().getSimpleName(),
 								result.getMethod().getMethodName());
@@ -179,7 +179,7 @@ public class ReportService {
 	public String getImagePath(String imageName) {
 		String[] classAndMethod = getTestClassNameAndMethodName().split(",");
 		try {
-			return screenshotManager.getScreenshotPath(classAndMethod[0], classAndMethod[1], imageName);
+			return screenshotService.getScreenshotPath(classAndMethod[0], classAndMethod[1], imageName);
 		} catch (Exception e) {
 			frameworkLogger.error("Ops!", e);
 			return null;
@@ -205,7 +205,7 @@ public class ReportService {
 	private String logScreenshot(Status status) {
 		try {
 			String[] classAndMethod = getTestClassNameAndMethodName().split(",");
-			String screenShotAbsolutePath = screenshotManager.captureScreenShot(Status.INFO, classAndMethod[0], classAndMethod[1]);
+			String screenShotAbsolutePath = screenshotService.captureScreenShot(Status.INFO, classAndMethod[0], classAndMethod[1]);
 			String screenShotRelativePath = getRelativePathToReport(screenShotAbsolutePath);
 			this.currentTestMethod.get().log(status,
 					"<img data-featherlight=" + screenShotRelativePath + " width=\"10%\" src=" + screenShotRelativePath + " data-src=" + screenShotRelativePath + ">");
@@ -295,7 +295,7 @@ public class ReportService {
 	public String captureScreenShot() {
 		try {
 			String[] classAndMethod = getTestClassNameAndMethodName().split(",");
-			return screenshotManager.captureScreenShot(Status.INFO, classAndMethod[0], classAndMethod[1]);
+			return screenshotService.captureScreenShot(Status.INFO, classAndMethod[0], classAndMethod[1]);
 		} catch (Exception e) {
 			frameworkLogger.error("Ops!", e);
 		}

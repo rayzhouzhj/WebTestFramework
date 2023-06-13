@@ -1,6 +1,6 @@
 package com.scmp.framework.test;
 
-import com.scmp.framework.report.ReportService;
+import com.scmp.framework.services.ReportService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

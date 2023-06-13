@@ -1,8 +1,7 @@
-package com.scmp.framework.utils;
+package com.scmp.framework.services;
 
 import com.aventstack.extentreports.Status;
 import com.scmp.framework.context.RunTimeContext;
-import com.scmp.framework.manager.WebDriverService;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -18,14 +17,14 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 @Component
-public class ScreenShotManager {
-	private static final Logger frameworkLogger = LoggerFactory.getLogger(ScreenShotManager.class);
+public class ScreenShotService {
+	private static final Logger frameworkLogger = LoggerFactory.getLogger(ScreenShotService.class);
 
 	private final RunTimeContext context;
 	private final WebDriverService webDriverService;
 
 	@Autowired
-	public ScreenShotManager(RunTimeContext context, WebDriverService webDriverService) {
+	public ScreenShotService(RunTimeContext context, WebDriverService webDriverService) {
 		this.webDriverService = webDriverService;
 		this.context = context;
 	}

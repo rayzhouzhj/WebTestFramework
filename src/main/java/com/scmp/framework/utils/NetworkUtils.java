@@ -1,4 +1,4 @@
-package com.scmp.framework.manager;
+package com.scmp.framework.utils;
 
 import com.scmp.framework.model.ChartbeatData;
 import com.scmp.framework.model.GoogleAnalytics;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class NetworkManager {
+public class NetworkUtils {
 
 	public static void clearNetworkTraffic(RemoteWebDriver driver) {
 		getAllNetworkTraffic(driver);

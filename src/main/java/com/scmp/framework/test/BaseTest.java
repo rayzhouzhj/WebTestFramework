@@ -2,8 +2,7 @@ package com.scmp.framework.test;
 
 import com.scmp.framework.context.ApplicationContextProvider;
 import com.scmp.framework.context.RunTimeContext;
-import com.scmp.framework.manager.WebDriverService;
-import org.openqa.selenium.WebDriver;
+import com.scmp.framework.services.WebDriverService;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

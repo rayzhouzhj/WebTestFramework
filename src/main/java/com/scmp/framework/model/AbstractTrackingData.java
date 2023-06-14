@@ -38,7 +38,7 @@ public abstract class AbstractTrackingData {
 		String[] pairs = query.split("&");
 		for (String pair : pairs) {
 			int idx = pair.indexOf("=");
-			if(idx < 0) {
+			if (idx < 0) {
 				query_pairs.put(URLDecoder.decode(pair, "UTF-8"), "");
 			} else {
 				query_pairs.put(URLDecoder.decode(pair.substring(0, idx), "UTF-8"), URLDecoder.decode(pair.substring(idx + 1), "UTF-8"));

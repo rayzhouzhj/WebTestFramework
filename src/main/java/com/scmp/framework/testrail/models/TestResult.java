@@ -7,21 +7,21 @@ import java.util.List;
 
 @Data
 public class TestResult {
-    @SerializedName("id")
-    private int id;
+	@SerializedName("id")
+	private int id;
 
-    @SerializedName("test_id")
-    private int testId;
+	@SerializedName("test_id")
+	private int testId;
 
-    @SerializedName("status_id")
-    private int statusId;
+	@SerializedName("status_id")
+	private int statusId;
 
-    @SerializedName("comment")
-    private String comment;
+	@SerializedName("comment")
+	private String comment;
 
-    @SerializedName("elapsed")
-    private String elapsed;
+	@SerializedName("elapsed")
+	private String elapsed;
 
-    @SerializedName("custom_step_results")
-    private List<CustomStepResult> customStepResult;
+	@SerializedName("custom_step_results")
+	private List<CustomStepResult> customStepResult;
 }

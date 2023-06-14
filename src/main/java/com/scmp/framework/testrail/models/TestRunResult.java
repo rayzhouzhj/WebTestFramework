@@ -8,6 +8,6 @@ import java.util.List;
 @Data
 public class TestRunResult {
 
-    @SerializedName("runs")
-    List<TestRun> testRunList;
+	@SerializedName("runs")
+	List<TestRun> testRunList;
 }

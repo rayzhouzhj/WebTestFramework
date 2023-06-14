@@ -1,19 +1,25 @@
 package com.github.test.demo.pom;
 
+import com.scmp.framework.context.ApplicationContextProvider;
+import com.scmp.framework.context.RunTimeContext;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.context.ApplicationContext;
 
 import java.time.Duration;
 
 public abstract class BasePage {
 	public RemoteWebDriver driver;
+	public RunTimeContext runTimeContext;
 
 	public BasePage(RemoteWebDriver driver) {
 		this.driver = driver;
+		ApplicationContext context = ApplicationContextProvider.getApplicationContext();
+		runTimeContext = context.getBean(RunTimeContext.class);
 	}
 
 	public abstract void launch();

@@ -8,7 +8,9 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TestRailTestCase {
-    int id();
-    String description() default "";
-    String testRailUrl() default "";
+	int id();
+
+	String description() default "";
+
+	String testRailUrl() default "";
 }

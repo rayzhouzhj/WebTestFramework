@@ -8,7 +8,7 @@ import com.scmp.framework.context.RunTimeContext;
 import com.scmp.framework.model.Browser;
 import com.scmp.framework.model.IProxyFactory;
 import com.scmp.framework.testng.listeners.RetryAnalyzer;
-import com.scmp.framework.testrail.TestRailDataHandler;
+import com.scmp.framework.testrail.TestRailDataService;
 import com.scmp.framework.testrail.TestRailStatus;
 import com.scmp.framework.testrail.models.TestRun;
 import com.scmp.framework.testrail.models.TestRunTest;
@@ -30,8 +30,6 @@ import org.testng.annotations.Test;
 
 import java.lang.reflect.Method;
 import java.net.Inet4Address;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -40,52 +38,52 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 
-import static com.scmp.framework.utils.ConfigFileKeys.*;
 import static com.scmp.framework.utils.Constants.FILTERED_TEST_OBJECT;
 import static com.scmp.framework.utils.Constants.TEST_RUN_OBJECT;
 
 public class TestInfo {
-	private IInvokedMethod testNGInvokedMethod;
-	private ITestResult testResult;
-	private Method declaredMethod;
-
+	private final IInvokedMethod testNGInvokedMethod;
+	private final ITestResult testResult;
+	private final Method declaredMethod;
 	private Browser browserType = null;
-	private TestRailDataHandler testRailDataHandler = null;
+	private TestRailDataService testRailDataService = null;
 	private LocalDateTime testStartTime = null;
 	private LocalDateTime testEndTime = null;
 	private Boolean isSkippedTest = null;
+	private final RunTimeContext runTimeContext;
 
-	public TestInfo(IInvokedMethod methodName, ITestResult testResult) {
+	public TestInfo(IInvokedMethod methodName, ITestResult testResult, RunTimeContext runTimeContext) {
+		this.runTimeContext = runTimeContext;
 		this.testNGInvokedMethod = methodName;
 		this.testResult = testResult;
 		this.declaredMethod =
 				this.testNGInvokedMethod.getTestMethod().getConstructorOrMethod().getMethod();
-		this.testStartTime = LocalDateTime.now(RunTimeContext.getInstance().getZoneId());
+		this.testStartTime = LocalDateTime.now(runTimeContext.getZoneId());
 
 		// Init TestRail handler
 		if (this.isTestMethod()
 				&& !this.isSkippedTest()
-				&& RunTimeContext.getInstance().isUploadToTestRail()) {
+				&& runTimeContext.getFrameworkConfigs().isTestRailUploadTestResult()) {
 			TestRailTestCase testRailCase = this.declaredMethod.getAnnotation(TestRailTestCase.class);
-			TestRun testRun = (TestRun) RunTimeContext.getInstance().getGlobalVariables(TEST_RUN_OBJECT);
+			TestRun testRun = (TestRun) runTimeContext.getGlobalVariables(TEST_RUN_OBJECT);
 			if (testRailCase!=null && testRun!=null) {
-				this.testRailDataHandler = new TestRailDataHandler(testRailCase.id(), testRun);
+				this.testRailDataService = new TestRailDataService(testRailCase.id(), testRun);
 			}
 		}
 	}
 
 	public void addTestResultForTestRail(int status, String content, String filePath) {
-		if (this.testRailDataHandler!=null) {
-			this.testRailDataHandler.addStepResult(status, content, filePath);
+		if (this.testRailDataService!=null) {
+			this.testRailDataService.addStepResult(status, content, filePath);
 		}
 	}
 
 	public void setTestEndTime() {
-		this.testEndTime = LocalDateTime.now(RunTimeContext.getInstance().getZoneId());
+		this.testEndTime = LocalDateTime.now(runTimeContext.getZoneId());
 	}
 
 	public void uploadTestResultsToTestRail() {
-		if (this.testRailDataHandler!=null) {
+		if (this.testRailDataService!=null) {
 			int finalTestResult = TestRailStatus.Untested;
 			switch (this.testResult.getStatus()) {
 				case ITestResult.SUCCESS:
@@ -95,7 +93,6 @@ public class TestInfo {
 					finalTestResult = TestRailStatus.Failed;
 					break;
 				default:
-					finalTestResult = TestRailStatus.Untested;
 			}
 
 			if (this.testEndTime==null) {
@@ -103,20 +100,12 @@ public class TestInfo {
 			}
 
 			long elapsed = Duration.between(this.testStartTime, this.testEndTime).getSeconds();
-			this.testRailDataHandler.uploadDataToTestRail(finalTestResult, elapsed);
+			this.testRailDataService.uploadDataToTestRail(finalTestResult, elapsed);
 		}
 	}
 
 	public ITestResult getTestResult() {
 		return this.testResult;
-	}
-
-	public IInvokedMethod getTestNGInvokedMethod() {
-		return this.testNGInvokedMethod;
-	}
-
-	public Method getDeclaredMethod() {
-		return this.declaredMethod;
 	}
 
 	public String getClassName() {
@@ -170,7 +159,7 @@ public class TestInfo {
 	/**
 	 * Get browser type base on the annotation/configs of each test case
 	 *
-	 * @return
+	 * @return Browser
 	 */
 	public Browser getBrowserType() {
 		if (this.browserType!=null) {
@@ -219,7 +208,7 @@ public class TestInfo {
 	/**
 	 * Get testing device dimension
 	 *
-	 * @return
+	 * @return device dimension
 	 */
 	public Dimension getDeviceDimension() {
 		// Check the mobile screen size preference
@@ -246,22 +235,22 @@ public class TestInfo {
 	public ChromeOptions getChromeOptions() {
 		ChromeOptions options = new ChromeOptions();
 
-        // If the test is not tagged skip chrome options, use Global_Chrome_Options which has options separated by comma
-        if (this.declaredMethod.getAnnotation(SkipGlobalChromeOptions.class) == null) {
-            String global_chrome_options = RunTimeContext.getInstance().getProperty(GLOBAL_CHROME_OPTIONS);
+		// If the test is not tagged skip chrome options, use Global_Chrome_Options which has options separated by comma
+		if (this.declaredMethod.getAnnotation(SkipGlobalChromeOptions.class)==null) {
+			String global_chrome_options = runTimeContext.getFrameworkConfigs().getGlobalChromeOptions();
 
-            // Only add arguments if global_chrome_options has something
-            if (global_chrome_options != null && !global_chrome_options.isEmpty()) {
+			// Only add arguments if global_chrome_options has something
+			if (global_chrome_options!=null && !global_chrome_options.isEmpty()) {
 
-                String[] parsedOptions = global_chrome_options.split(",");
+				String[] parsedOptions = global_chrome_options.split(",");
 
-                for (String parsedOption : parsedOptions) {
-                    options.addArguments(parsedOption);
-                }
-            }
-        }
+				for (String parsedOption : parsedOptions) {
+					options.addArguments(parsedOption);
+				}
+			}
+		}
 
-        // Temporary solution for fixing the bug: https://stackoverflow.com/questions/75678572/java-io-ioexception-invalid-status-code-403-text-forbidden
+		// Temporary solution for fixing the bug: https://stackoverflow.com/questions/75678572/java-io-ioexception-invalid-status-code-403-text-forbidden
 		options.addArguments("--remote-allow-origins=*");
 
 		// Get Chrome options/arguments
@@ -325,7 +314,7 @@ public class TestInfo {
 		}
 
 		// Load default extension
-		String extensionPath = RunTimeContext.getInstance().getDefaultExtensionPath();
+		String extensionPath = runTimeContext.getDefaultExtensionPath();
 		if (!extensionPath.isEmpty()) {
 			options.addArguments("load-extension=" + extensionPath);
 		}
@@ -363,7 +352,7 @@ public class TestInfo {
 	/**
 	 * Get browser options base on the annotation/configs of each test case
 	 *
-	 * @return
+	 * @return Browser Options
 	 */
 	public MutableCapabilities getBrowserOption() {
 
@@ -384,25 +373,18 @@ public class TestInfo {
 	 * Get the local storage data from 1. config.properties: LOCAL_STORAGE_DATA_PATH 2.
 	 * CustomLocalStorage: path 3. CustomLocalStorage: LocalStorageData
 	 *
-	 * @return
+	 * @return Map for local storage configs
 	 */
 	public Map<String, String> getCustomLocalStorage() {
 
 		Map<String, String> customData = new HashMap<>();
-		boolean loadDefaultData =
-				"true"
-						.equalsIgnoreCase(
-								RunTimeContext.getInstance().getProperty(PRELOAD_LOCAL_STORAGE_DATA, "false"));
-		CustomLocalStorage customLocalStorage =
-				this.declaredMethod.getAnnotation(CustomLocalStorage.class);
-		loadDefaultData =
-				customLocalStorage!=null && customLocalStorage.loadDefault()
-						? customLocalStorage.loadDefault()
-						:loadDefaultData;
+		boolean loadDefaultData = runTimeContext.getFrameworkConfigs().isPreloadLocalStorageData();
+		CustomLocalStorage customLocalStorage = this.declaredMethod.getAnnotation(CustomLocalStorage.class);
+		loadDefaultData = customLocalStorage!=null && customLocalStorage.loadDefault() || loadDefaultData;
 
 		// Load default data
 		if (loadDefaultData) {
-			String filePath = RunTimeContext.getInstance().getProperty(LOCAL_STORAGE_DATA_PATH);
+			String filePath = runTimeContext.getFrameworkConfigs().getLocalStorageDataPath();
 			customData.putAll(new ConfigFileReader(filePath).getAllProperties());
 		}
 
@@ -413,7 +395,7 @@ public class TestInfo {
 		}
 
 		// Load custom data
-		if (customLocalStorage!=null && customLocalStorage.data().length > 0) {
+		if (customLocalStorage!=null) {
 			for (LocalStorageData data : customLocalStorage.data()) {
 				customData.put(data.key(), data.value());
 			}
@@ -425,19 +407,15 @@ public class TestInfo {
 	public boolean isInTestRailTestList() {
 
 		Object filteredTestsObject =
-				RunTimeContext.getInstance().getGlobalVariables(FILTERED_TEST_OBJECT);
-		if (filteredTestsObject!=null && filteredTestsObject instanceof List) {
+				runTimeContext.getGlobalVariables(FILTERED_TEST_OBJECT);
+		if (filteredTestsObject instanceof List) {
 			List<TestRunTest> filteredTests = (List<TestRunTest>) filteredTestsObject;
 
 			TestRailTestCase testRailTestCase = this.declaredMethod.getAnnotation(TestRailTestCase.class);
 			Optional<TestRunTest> result =
 					filteredTests.parallelStream().filter(test -> test.getCaseId()==testRailTestCase.id()).findFirst();
 
-			if (result.isPresent()) {
-				return true;
-			} else {
-				return false;
-			}
+			return result.isPresent();
 		}
 
 		return true;
@@ -453,10 +431,6 @@ public class TestInfo {
 
 	public boolean needLaunchBrowser() {
 		LaunchBrowser launchBrowser = this.declaredMethod.getAnnotation(LaunchBrowser.class);
-		if (launchBrowser!=null && !launchBrowser.status()) {
-			return false;
-		} else {
-			return true;
-		}
+		return launchBrowser==null || launchBrowser.status();
 	}
 }

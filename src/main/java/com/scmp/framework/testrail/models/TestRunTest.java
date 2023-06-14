@@ -6,18 +6,18 @@ import lombok.Data;
 @Data
 public class TestRunTest {
 
-    @SerializedName("id")
-    private int id;
+	@SerializedName("id")
+	private int id;
 
-    @SerializedName("case_id")
-    private int caseId;
+	@SerializedName("case_id")
+	private int caseId;
 
-    @SerializedName("status_id")
-    private int statusId;
+	@SerializedName("status_id")
+	private int statusId;
 
-    @SerializedName("run_id")
-    private int runId;
+	@SerializedName("run_id")
+	private int runId;
 
-    @SerializedName("title")
-    private String title;
+	@SerializedName("title")
+	private String title;
 }

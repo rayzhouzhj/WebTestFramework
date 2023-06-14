@@ -13,15 +13,15 @@ import java.util.List;
 @NoArgsConstructor
 public class AddTestResultRequest {
 
-    @SerializedName("status_id")
-    private int statusId;
+	@SerializedName("status_id")
+	private int statusId;
 
-    @SerializedName("comment")
-    private String comment;
+	@SerializedName("comment")
+	private String comment;
 
-    @SerializedName("elapsed")
-    private String elapsed;
+	@SerializedName("elapsed")
+	private String elapsed;
 
-    @SerializedName("custom_step_results")
-    private List<CustomStepResult> customStepResult;
+	@SerializedName("custom_step_results")
+	private List<CustomStepResult> customStepResult;
 }

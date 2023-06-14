@@ -1,5 +1,12 @@
 package com.scmp.framework.context;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
 import java.io.File;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -8,153 +15,111 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.scmp.framework.utils.ConfigFileKeys;
-import com.scmp.framework.utils.ConfigFileReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static com.scmp.framework.utils.Constants.TARGET_PATH;
 
+@Component
+@PropertySource("file:config.properties")
 public class RunTimeContext {
-  private static RunTimeContext instance;
-  private ThreadLocal<HashMap<String, Object>> testLevelVariables = new ThreadLocal<>();
-  private ConcurrentHashMap<String, Object> globalVariables = new ConcurrentHashMap<>();
-  private ConfigFileReader configFileReader;
+	private final ThreadLocal<HashMap<String, Object>> testLevelVariables = new ThreadLocal<>();
+	private final ConcurrentHashMap<String, Object> globalVariables = new ConcurrentHashMap<>();
+	private static final Logger frameworkLogger = LoggerFactory.getLogger(RunTimeContext.class);
+	private final Environment env;
+	private final FrameworkConfigs frameworkConfigs;
 
-  private static final Logger frameworkLogger = LoggerFactory.getLogger(RunTimeContext.class);
+	@Autowired
+	public RunTimeContext(Environment env, FrameworkConfigs frameworkConfigs) {
+		this.env = env;
+		this.frameworkConfigs = frameworkConfigs;
+	}
 
-  private RunTimeContext() {
+	public FrameworkConfigs getFrameworkConfigs() {
+		return this.frameworkConfigs;
+	}
 
-    String configFile = "config.properties";
-    if (System.getenv().containsKey("CONFIG_FILE")) {
-      configFile = System.getenv().get("CONFIG_FILE");
-      frameworkLogger.info("Using config file from " + configFile);
-    }
+	public static String currentDateAndTime() {
+		LocalDateTime now = LocalDateTime.now();
+		DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE_TIME;
+		return now.truncatedTo(ChronoUnit.SECONDS).format(dtf).replace(":", "-");
+	}
 
-    this.configFileReader = new ConfigFileReader(configFile);
-  }
+	public void setGlobalVariables(String name, Object data) {
+		this.globalVariables.put(name, data);
+	}
 
-  public static synchronized RunTimeContext getInstance() {
-    if (instance == null) {
-      instance = new RunTimeContext();
-    }
+	public Object getGlobalVariables(String name) {
+		return this.globalVariables.get(name);
+	}
 
-    return instance;
-  }
+	public Object getTestLevelVariables(String name) {
+		return this.testLevelVariables.get().getOrDefault(name, null);
+	}
 
-  public static String currentDateAndTime() {
-    LocalDateTime now = LocalDateTime.now();
-    DateTimeFormatter dtf = DateTimeFormatter.ISO_DATE_TIME;
-    return now.truncatedTo(ChronoUnit.SECONDS).format(dtf).replace(":", "-");
-  }
+	public void setTestLevelVariables(String name, Object data) {
+		if (this.testLevelVariables.get()==null) {
+			this.testLevelVariables.set(new HashMap<>());
+		}
 
-  public void setGlobalVariables(String name, Object data) {
-    this.globalVariables.put(name, data);
-  }
+		this.testLevelVariables.get().put(name, data);
+	}
 
-  public Object getGlobalVariables(String name) {
-    return this.globalVariables.get(name);
-  }
+	public void clearRunTimeVariables() {
+		if (this.testLevelVariables.get()!=null) {
+			this.testLevelVariables.get().clear();
+		}
+	}
 
-  public Object getTestLevelVariables(String name) {
-    return this.testLevelVariables.get().getOrDefault(name, null);
-  }
+	public String getProperty(String name) {
+		return this.getProperty(name, "");
+	}
 
-  public void setTestLevelVariables(String name, Object data) {
-    if (this.testLevelVariables.get() == null) {
-      this.testLevelVariables.set(new HashMap<>());
-    }
+	public String getProperty(String key, String defaultValue) {
+		return env.getProperty(key, defaultValue);
+	}
 
-    this.testLevelVariables.get().put(name, data);
-  }
+	public String getURL() {
+		String url = this.getFrameworkConfigs().getUrl();
+		if (url.endsWith("/")) {
+			url = url.substring(0, url.length() - 1);
+		}
 
-  public void clearRunTimeVariables() {
-    if (this.testLevelVariables.get() != null) {
-      this.testLevelVariables.get().clear();
-    }
-  }
+		return url;
+	}
 
-  public String getProperty(String name) {
-    return this.getProperty(name, null);
-  }
+	public synchronized String getLogPath(String category, String className, String methodName) {
+		String path =
+				TARGET_PATH
+						+ File.separator
+						+ category
+						+ File.separator
+						+ className
+						+ File.separator
+						+ methodName;
 
-  public String getProperty(String key, String defaultValue) {
-    String value = System.getenv(key);
-    if (value == null || value.isEmpty()) {
-      value = configFileReader.getProperty(key, defaultValue);
-    }
+		File file = new File(path);
+		if (!file.exists()) {
+			if (file.mkdirs()) {
+				frameworkLogger.info("Directory [" + path + "] is created!");
+			} else {
+				frameworkLogger.error("Failed to create directory!");
+			}
+		}
 
-    return value;
-  }
+		return path;
+	}
 
-  public String getURL() {
-    String url = this.getProperty(ConfigFileKeys.URL, "");
-    if (url.endsWith("/")) {
-      url = url.substring(0, url.length() - 1);
-    }
+	public boolean isLocalExecutionMode() {
+		return "ON".equalsIgnoreCase(this.frameworkConfigs.getLocalExecutionMode());
+	}
 
-    return url;
-  }
+	public ZoneId getZoneId() {
+		return ZoneId.of(frameworkConfigs.getZoneId());
+	}
 
-  public synchronized String getLogPath(String category, String className, String methodName) {
-    String path =
-        TARGET_PATH
-            + File.separator
-            + category
-            + File.separator
-            + className
-            + File.separator
-            + methodName;
-
-    File file = new File(path);
-    if (!file.exists()) {
-      if (file.mkdirs()) {
-        frameworkLogger.info("Directory [" + path + "] is created!");
-      } else {
-        frameworkLogger.error("Failed to create directory!");
-      }
-    }
-
-    return path;
-  }
-
-  public boolean isLocalExecutionMode() {
-    String isDebugMode = this.getProperty(ConfigFileKeys.DEBUG_MODE, "OFF");
-    String isLocalExecutionMode = this.getProperty(ConfigFileKeys.LOCAL_EXECUTION, "OFF");
-
-    return "ON".equalsIgnoreCase(isLocalExecutionMode) || "ON".equalsIgnoreCase(isDebugMode);
-  }
-
-  public boolean removeFailedTestB4Retry() {
-    return "true"
-        .equalsIgnoreCase(this.getProperty(ConfigFileKeys.REMOVE_FAILED_TEST_B4_RETRY, "false"));
-  }
-
-  public boolean isUploadToTestRail() {
-    return "true".equalsIgnoreCase(this.getProperty(ConfigFileKeys.TESTRAIL_UPLOAD_FLAG, "false"));
-  }
-
-  public boolean isCreateNewTestRunInTestRail() {
-    return "true"
-        .equalsIgnoreCase(
-            this.getProperty(ConfigFileKeys.TESTRAIL_CREATE_NEW_TEST_RUN, "false"));
-  }
-
-  public boolean isIncludeAllAutomatedTestCaseToTestRail() {
-    return "true"
-            .equalsIgnoreCase(
-                    this.getProperty(ConfigFileKeys.TESTRAIL_INCLUDE_ALL_AUTOMATED_TEST_CASES, "false"));
-  }
-
-  public ZoneId getZoneId() {
-    return ZoneId.of("Asia/Hong_Kong");
-  }
-
-  public String getDefaultExtensionPath() {
-    if(this.isLocalExecutionMode()) {
-      return this.getProperty(ConfigFileKeys.DEFAULT_LOCAL_EXTENSION_PATH, "");
-    } else {
-      return this.getProperty(ConfigFileKeys.DEFAULT_REMOTE_EXTENSION_PATH, "");
-    }
-  }
+	public String getDefaultExtensionPath() {
+		if (this.isLocalExecutionMode()) {
+			return this.frameworkConfigs.getDefaultLocalExtensionPath();
+		} else {
+			return this.frameworkConfigs.getDefaultRemoteExtensionPath();
+		}
+	}
 }

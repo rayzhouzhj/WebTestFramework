@@ -6,29 +6,25 @@ import org.openqa.selenium.support.CacheLookup;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
-public class GoogleSearchResult extends BasePage
-{
+public class GoogleSearchResult extends BasePage {
 	public static final String URL = "https://www.google.com";
-	
+
 	@CacheLookup
 	@FindBy(id = "resultStats")
 	public WebElement ResultStats;
-	
-	public GoogleSearchResult(RemoteWebDriver driver) 
-	{
+
+	public GoogleSearchResult(RemoteWebDriver driver) {
 		super(driver);
 		PageFactory.initElements(driver, this);
 	}
 
 	@Override
-	public boolean waitForPageLoad() 
-	{
+	public boolean waitForPageLoad() {
 		return this.waitForVisible(ResultStats, 5);
 	}
 
 	@Override
-	public void launch() 
-	{
+	public void launch() {
 		driver.get(URL);
 	}
 }

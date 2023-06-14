@@ -8,14 +8,14 @@ import java.util.List;
 @Data
 public class TestRun {
 
-    @SerializedName("id")
-    private int id;
+	@SerializedName("id")
+	private int id;
 
-    @SerializedName("name")
-    private String name;
+	@SerializedName("name")
+	private String name;
 
-    @SerializedName("include_all")
-    private Boolean includeAll;
+	@SerializedName("include_all")
+	private Boolean includeAll;
 
-    private transient List<Integer> testCaseIds;
+	private transient List<Integer> testCaseIds;
 }

@@ -8,7 +8,9 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CustomLocalStorage {
-    String path() default "";
-    LocalStorageData[] data() default {};
-    boolean loadDefault() default false;
+	String path() default "";
+
+	LocalStorageData[] data() default {};
+
+	boolean loadDefault() default false;
 }

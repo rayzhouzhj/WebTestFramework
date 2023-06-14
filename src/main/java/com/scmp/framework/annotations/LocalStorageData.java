@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LocalStorageData {
-    String key() default "";
-    String value() default "";
+	String key() default "";
+
+	String value() default "";
 }

@@ -128,7 +128,7 @@ TestLogger logger = new TestLogger();
 - **[Dependency Update]**
   - Upgraded `logback-classic` 1.2.9
   - Upgraded `rest-assured` 4.5.1
-  - Added `rest-assured`
+  - Added `spring-boot-starter`
   - Added `spring-boot-starter-test`
   
 *4.2.10*

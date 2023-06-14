@@ -121,6 +121,16 @@ TestLogger logger = new TestLogger();
 | `String captureScreen()` | Returning the file path of the screenshot |
 
 ## Changelog
+*5.0.0*
+- **[Enhancement]**
+  - Implemented Sprint boot
+  - Simplified TestExecutor logic
+- **[Dependency Update]**
+  - Upgraded `logback-classic` 1.2.9
+  - Upgraded `rest-assured` 4.5.1
+  - Added `rest-assured`
+  - Added `spring-boot-starter-test`
+  
 *4.2.10*
 - **[Enhancement]**
   - Added GLOBAL_CHROME_OPTIONS in config.properties

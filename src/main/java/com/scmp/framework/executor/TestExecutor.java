@@ -57,13 +57,14 @@ public class TestExecutor {
 		}
 
 		System.setProperty(WDM_CACHE_PATH, context.getFrameworkConfigs().getDriverHome());
-		WebDriverManager.chromedriver().setup();
+		WebDriverManager manager = WebDriverManager.chromedriver();
+		manager.setup();
 		context.setGlobalVariables(
-				CHROME_DRIVER_PATH, WebDriverManager.chromedriver().getDownloadedDriverPath());
+				CHROME_DRIVER_PATH, manager.getDownloadedDriverPath());
 
 		WebDriverManager.firefoxdriver().setup();
 		context.setGlobalVariables(
-				FIREFOX_DRIVER_PATH, WebDriverManager.firefoxdriver().getDownloadedDriverPath());
+				FIREFOX_DRIVER_PATH, manager.getDownloadedDriverPath());
 	}
 
 	/**

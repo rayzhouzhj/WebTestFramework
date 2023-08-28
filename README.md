@@ -121,6 +121,9 @@ TestLogger logger = new TestLogger();
 | `String captureScreen()` | Returning the file path of the screenshot |
 
 ## Changelog
+*4.3.2*
+- **Fix web driver manager initialization in TestExecutor**
+
 *4.3.1*
 - **Update the version of web driver manager bonigarcia to 5.5.2**
 

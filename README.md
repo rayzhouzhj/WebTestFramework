@@ -124,7 +124,6 @@ TestLogger logger = new TestLogger();
 *4.3.1*
 - **Update the version of web driver manager bonigarcia to 5.5.2**
 
-
 *4.3.0*
 - **[Enhancement]**
   - Implemented Sprint boot

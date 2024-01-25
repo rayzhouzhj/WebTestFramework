@@ -121,6 +121,9 @@ TestLogger logger = new TestLogger();
 | `String captureScreen()` | Returning the file path of the screenshot |
 
 ## Changelog
+*4.3.3*
+- **Temp fix for the logback library conflicts**
+  
 *4.3.2*
 - **Fix web driver manager initialization in TestExecutor**
 

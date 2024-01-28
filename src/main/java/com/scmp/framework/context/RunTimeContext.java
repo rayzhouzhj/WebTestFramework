@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.scmp.framework.utils.Constants.TARGET_PATH;
 
 @Component
-@PropertySource("file:config.properties")
+@PropertySource("file:${spring.config.name:config.properties}")
 public class RunTimeContext {
 	private final ThreadLocal<HashMap<String, Object>> testLevelVariables = new ThreadLocal<>();
 	private final ConcurrentHashMap<String, Object> globalVariables = new ConcurrentHashMap<>();

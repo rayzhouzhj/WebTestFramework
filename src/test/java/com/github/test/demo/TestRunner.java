@@ -14,15 +14,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest(classes = com.scmp.framework.TestFramework.class)
-@TestPropertySource(properties = {
-		"spring.config.name=config.properties",
-		"project.test.packages=com.github.test.demo"
-})
 public class TestRunner extends AbstractTestNGSpringContextTests {
 
 	@Autowired
 	private TestExecutor testExecutor;
 
+	/* Please input below environment variables in order to load the correct config
+		spring.config.name=config.properties
+		project.test.packages=com.scmp.test.pwa
+ 	*/
 	@Value("${project.test.packages}")
 	private String testPackages;
 	@Test

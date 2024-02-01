@@ -127,15 +127,17 @@
 			<artifactId>rest-assured</artifactId>
 			<version>4.5.1</version>
 			<exclusions>
-				<exclusion>
-					<groupId>org.codehaus.groovy</groupId>
-					<artifactId>groovy</artifactId>
-				</exclusion>
+				<!-- Exclude Groovy because of classpath issue -->
 				<exclusion>
 					<groupId>org.codehaus.groovy</groupId>
 					<artifactId>groovy-xml</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy</artifactId>
+			<version>3.0.17</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.rayzhouzhj</groupId>

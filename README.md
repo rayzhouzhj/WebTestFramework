@@ -132,6 +132,10 @@ TestLogger logger = new TestLogger();
 
 ## Changelog
 *4.3.5*
+- **[Bug Fix]**
+  - Added back groovy-xml for RestAssured
+
+*4.3.5*
 - **[Enhancement]**
   - Updated with multiple projects support
 - **[Dependency Update]**
@@ -139,16 +143,16 @@ TestLogger logger = new TestLogger();
   - Upgraded `org.projectlombok` 1.18.30
 
 *4.3.4*
-- **Fixed logback library conflicts**
+- **[Bug Fix]**
+- Fixed logback library conflicts
 
-*4.3.3*
-- **Temp fix for the logback library conflicts**
-  
 *4.3.2*
-- **Fix web driver manager initialization in TestExecutor**
+- **[Bug Fix]**
+  - Fix web driver manager initialization in TestExecutor
 
 *4.3.1*
-- **Update the version of web driver manager bonigarcia to 5.5.2**
+- **[Enhancement]**
+  - Update the version of web driver manager bonigarcia to 5.5.2
 
 *4.3.0*
 - **[Enhancement]**

@@ -7,16 +7,26 @@ Test framework for Web testing integrated with TestNG and Extent Report.
 
 ### Test Entry Point [TestRunner.java](https://github.com/scmp-contributor/WebTestFramework/blob/master/src/test/java/com/github/test/demo/TestRunner.java)
 ```java
-public class TestRunner 
-{
-    @Test
-    public static void testApp() throws Exception 
-    {
-        TestExecutor parallelThread = new TestExecutor();
-        boolean hasFailures = parallelThread.runner("com.github.test.demo");
-        
-        Assert.assertFalse(hasFailures, "Testcases execution failed.");
-    }
+@SpringBootTest(classes = com.scmp.framework.TestFramework.class)
+public class TestRunner extends AbstractTestNGSpringContextTests {
+
+  @Autowired
+  private TestExecutor testExecutor;
+
+  /* Please input below environment variables in order to load the correct config
+      SPRING_CONFIG_NAME=config.properties
+      PROJECT_TEST_PACKAGES=com.github.test.demo
+   */
+  @Value("${project.test.packages}")
+  private String testPackages;
+  @Test
+  public void testApp() throws Exception {
+
+    List<String> packages = new ArrayList<>(StringUtils.commaDelimitedListToSet(testPackages));
+    boolean hasFailures = testExecutor.runTests(packages);
+
+    Assert.assertFalse(hasFailures, "Testcases execution failed.");
+  }
 }
 ```
 
@@ -121,6 +131,16 @@ TestLogger logger = new TestLogger();
 | `String captureScreen()` | Returning the file path of the screenshot |
 
 ## Changelog
+*4.3.5*
+- **[Enhancement]**
+  - Updated with multiple projects support
+- **[Dependency Update]**
+  - Upgraded `org.seleniumhq.selenium` 4.10.0
+  - Upgraded `org.projectlombok` 1.18.30
+
+*4.3.4*
+- **Fixed logback library conflicts**
+
 *4.3.3*
 - **Temp fix for the logback library conflicts**
   

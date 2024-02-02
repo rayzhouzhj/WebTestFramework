@@ -20,8 +20,8 @@ public class TestRunner extends AbstractTestNGSpringContextTests {
 	private TestExecutor testExecutor;
 
 	/* Please input below environment variables in order to load the correct config
-		spring.config.name=config.properties
-		project.test.packages=com.scmp.test.pwa
+        SPRING_CONFIG_NAME=config.properties
+        PROJECT_TEST_PACKAGES=com.github.test.demo
  	*/
 	@Value("${project.test.packages}")
 	private String testPackages;

@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 
 @Component
-@PropertySource("file:config.properties")
+@PropertySource("file:${spring.config.name:config.properties}")
 @Getter
 public class FrameworkConfigs {
 

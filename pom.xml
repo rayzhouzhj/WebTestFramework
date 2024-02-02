@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.scmp-contributor</groupId>
 	<artifactId>WebTestFramework</artifactId>
-	<version>4.3.4</version>
+	<version>4.3.5</version>
 	<packaging>jar</packaging>
 
     <properties>
@@ -38,6 +38,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.apache.httpcomponents.client5</groupId>
+			<artifactId>httpclient5</artifactId>
+			<version>5.2.1</version>
+		</dependency>
+		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>1.2.9</version>
@@ -50,7 +55,7 @@
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
-			<version>4.0.0</version>
+			<version>4.10.0</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -110,7 +115,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.16</version>
+			<version>1.18.30</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -121,6 +126,18 @@
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
 			<version>4.5.1</version>
+			<exclusions>
+				<!-- Exclude Groovy because of classpath issue -->
+				<exclusion>
+					<groupId>org.codehaus.groovy</groupId>
+					<artifactId>groovy-xml</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy</artifactId>
+			<version>3.0.17</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.rayzhouzhj</groupId>

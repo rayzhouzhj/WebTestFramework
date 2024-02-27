@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.scmp-contributor</groupId>
 	<artifactId>WebTestFramework</artifactId>
-	<version>4.3.6</version>
+	<version>4.3.7</version>
 	<packaging>jar</packaging>
 
     <properties>
@@ -90,7 +90,7 @@
 		<dependency>
 			<groupId>io.github.bonigarcia</groupId>
 			<artifactId>webdrivermanager</artifactId>
-			<version>5.5.2</version>
+			<version>5.6.4</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>

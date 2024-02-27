@@ -54,7 +54,6 @@ public abstract class BasePage extends BasePageElement {
 
 		// Reload the page
 		this.getDriver().get(this.getURL());
-		NetworkUtils.clearNetworkTraffic(getDriver());
 		this.waitForPageLoad();
 	}
 

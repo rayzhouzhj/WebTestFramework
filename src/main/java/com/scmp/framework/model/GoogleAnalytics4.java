@@ -1,6 +1,16 @@
 package com.scmp.framework.model;
 
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class GoogleAnalytics4 extends AbstractTrackingData {
+
+    List<String> parameters;
+
+    public GoogleAnalytics4(String original, List<String> parameters) {
+        super(original);
+        this.parameters = parameters;
+    }
 
     public GoogleAnalytics4(String original) {
         super(original);
@@ -11,7 +21,13 @@ public class GoogleAnalytics4 extends AbstractTrackingData {
     }
 
     public String getEventData(String key) {
-        return this.getValue(GoogleAnalytics4Parameter.EVENT_DATA + "." + key);
+
+        if(parameters != null){
+            String keyValue = parameters.stream().filter(parameter -> parameter.contains(GoogleAnalytics4Parameter.EVENT_DATA + "." + key)).findFirst().get();
+            return keyValue.split("=")[1];
+        }else{
+            return this.getValue(GoogleAnalytics4Parameter.EVENT_DATA + "." + key);
+        }
     }
 
     public String getDocumentLocation() {
@@ -38,12 +54,29 @@ public class GoogleAnalytics4 extends AbstractTrackingData {
 
         GoogleAnalytics4 that = (GoogleAnalytics4) o;
 
-        boolean isEqual = this.getVariables().entrySet().stream().allMatch(entry -> {
+        boolean isQueryEqual = this.getVariables().entrySet().stream().allMatch(entry -> {
             String key = entry.getKey();
             String value = entry.getValue();
             return value.equals(that.getVariables().get(key));
         });
 
-        return isEqual;
+        AtomicBoolean isParametersEqual = new AtomicBoolean(true);
+
+        if(this.parameters!= null && that.parameters != null){
+
+            if(that.parameters.size() == this.parameters.size()){
+                this.parameters.forEach(parameter -> {
+                    if(!that.parameters.contains(parameter)){
+                        isParametersEqual.set(false);
+                    }
+                });
+            }
+        }else if(this.parameters == null && that.parameters == null){
+            isParametersEqual.set(true);
+        }else{
+            isParametersEqual.set(false);
+        }
+
+        return isQueryEqual && isParametersEqual.get();
     }
 }

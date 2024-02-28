@@ -3,17 +3,16 @@ package com.scmp.framework.utils;
 import com.scmp.framework.model.ChartbeatData;
 import com.scmp.framework.model.GoogleAnalytics;
 import com.scmp.framework.model.GoogleAnalytics4;
+
 import org.json.JSONObject;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class NetworkUtils {
 
@@ -46,6 +45,38 @@ public class NetworkUtils {
 					JSONObject message = (JSONObject) json.get("message");
 					String method = (String) message.get("method");
 					if (method.equals("Network.requestWillBeSent")) {
+						JSONObject params = (JSONObject) message.get("params");
+						JSONObject request = (JSONObject) params.get("request");
+						String url = (String) request.get("url");
+
+						Matcher matcher = regex.matcher(url);
+						if (matcher.matches()) {
+							System.out.println(entry.getMessage());
+							try {
+								trackingData.add(cls.getConstructor(String.class).newInstance(url));
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					}
+				});
+
+		return trackingData;
+	}
+
+	private static Map<String, List<GoogleAnalytics4>> getGA4TrackingRequests(RemoteWebDriver driver, String pattern) {
+		Map<String, List<GoogleAnalytics4>> trackingData = new HashMap<>();
+		// Create a Pattern object
+		Pattern regex = Pattern.compile(pattern);
+
+		LogEntries logs = driver.manage().logs().get("performance");
+		logs.getAll()
+				.parallelStream()
+				.forEach(entry -> {
+					JSONObject json = new JSONObject(entry.getMessage());
+					JSONObject message = (JSONObject) json.get("message");
+					String method = (String) message.get("method");
+					if (method.equals("Network.requestWillBeSent")) {
 
 						JSONObject params = (JSONObject) message.get("params");
 						JSONObject request = (JSONObject) params.get("request");
@@ -53,7 +84,7 @@ public class NetworkUtils {
 
 						Matcher matcher = regex.matcher(url);
 						if (matcher.matches()) {
-							boolean hasPostData = cls.getName().equals(GoogleAnalytics4.class.getName())? (Boolean) request.get("hasPostData"): false;
+							boolean hasPostData = (Boolean) request.get("hasPostData");
 
 							try{
 								if(hasPostData && request.has("postData")){
@@ -61,12 +92,34 @@ public class NetworkUtils {
 
 									String[] events = postData.split("\r\n");
 
+									// Get all the events and add them into list
 									for(int i = 0; i < events.length; i++){
-										String modifiedUrl = url + "&" + events[i];
-										trackingData.add(cls.getConstructor(String.class).newInstance(modifiedUrl));
+										String[] parametersArr = events[i].split("&");
+										List<String> parametersList = Arrays.stream(parametersArr).collect(Collectors.toList());
+										String en = parametersArr[0].split("=")[1];
+
+										List<GoogleAnalytics4> ga4Datas = trackingData.get(en);
+
+										if(ga4Datas == null){
+											ga4Datas = new ArrayList<>();
+											trackingData.put(en, ga4Datas);
+										}
+
+										ga4Datas.add(new GoogleAnalytics4(url, parametersList));
 									}
+
 								} else {
-									trackingData.add(cls.getConstructor(String.class).newInstance(url));
+									GoogleAnalytics4 event = new GoogleAnalytics4(url);
+									String en = event.getEventName();
+
+									List<GoogleAnalytics4> ga4Datas = trackingData.get(en);
+
+									if(ga4Datas == null){
+										ga4Datas = new ArrayList<>();
+										trackingData.put(en, ga4Datas);
+									}
+
+									ga4Datas.add(event);
 								}
 							}catch (Exception e){
 								e.printStackTrace();
@@ -84,10 +137,10 @@ public class NetworkUtils {
 		return getTrackingRequests(driver, GoogleAnalytics.class, pattern);
 	}
 
-	public static List<GoogleAnalytics4> getGoogleAnalytics4Requests(RemoteWebDriver driver) {
+	public static Map<String, List<GoogleAnalytics4>> getGoogleAnalytics4Requests(RemoteWebDriver driver) {
 		List<GoogleAnalytics> gaData = Collections.synchronizedList(new ArrayList<>());
 		String pattern = "^https://analytics.google.com/([a-z]/)?collect\\?.+";
-		return getTrackingRequests(driver, GoogleAnalytics4.class, pattern);
+		return getGA4TrackingRequests(driver, pattern);
 	}
 
 	public static List<ChartbeatData> getChartBeatRequests(RemoteWebDriver driver) {

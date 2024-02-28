@@ -1,6 +1,7 @@
 package com.scmp.framework.model;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GoogleAnalytics4 extends AbstractTrackingData {
@@ -23,8 +24,13 @@ public class GoogleAnalytics4 extends AbstractTrackingData {
     public String getEventData(String key) {
 
         if(parameters != null){
-            String keyValue = parameters.stream().filter(parameter -> parameter.contains(GoogleAnalytics4Parameter.EVENT_DATA + "." + key)).findFirst().get();
-            return keyValue.split("=")[1];
+            Optional<String> keyValueOptional = parameters.stream().filter(parameter -> parameter.contains(GoogleAnalytics4Parameter.EVENT_DATA + "." + key)).findFirst();
+
+            if(keyValueOptional.isPresent()){
+                return keyValueOptional.get().split("=")[1];
+            }else{
+                return null;
+            }
         }else{
             return this.getValue(GoogleAnalytics4Parameter.EVENT_DATA + "." + key);
         }

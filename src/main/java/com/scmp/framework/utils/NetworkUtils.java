@@ -96,6 +96,12 @@ public class NetworkUtils {
 									for(int i = 0; i < events.length; i++){
 										String[] parametersArr = events[i].split("&");
 										List<String> parametersList = Arrays.stream(parametersArr).collect(Collectors.toList());
+
+										// More than one en after breaking each query
+										if(parametersList.stream().filter(p -> p.contains("en=")).count() > 1){
+											throw new Exception("More than one en in the query");
+										}
+
 										String en = parametersArr[0].split("=")[1];
 
 										List<GoogleAnalytics4> ga4Datas = trackingData.get(en);

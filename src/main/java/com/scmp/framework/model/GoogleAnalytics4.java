@@ -16,7 +16,13 @@ public class GoogleAnalytics4 extends AbstractTrackingData {
 
         Arrays.stream(parameters).forEach(parameter -> {
             String[] keyValue = parameter.split("=");
-            this.parameters.put(keyValue[0], keyValue[1]);
+
+            // Empty case
+            if(keyValue.length == 1){
+                this.parameters.put(keyValue[0], "");
+            }else{
+                this.parameters.put(keyValue[0], keyValue[1]);
+            }
         });
     }
 
@@ -25,13 +31,17 @@ public class GoogleAnalytics4 extends AbstractTrackingData {
     }
 
     public String getEventName() {
-        return this.getValue(GoogleAnalytics4Parameter.EVENT_NAME);
+        if(parameters != null){
+            return parameters.get(GoogleAnalytics4Parameter.EVENT_NAME.toString());
+        }else{
+            return this.getValue(GoogleAnalytics4Parameter.EVENT_NAME);
+        }
     }
 
     public String getEventData(String key) {
 
         if(parameters != null){
-            return parameters.get(key) != null? parameters.get(key): null;
+            return parameters.get(GoogleAnalytics4Parameter.EVENT_DATA + "." + key) != null? parameters.get(GoogleAnalytics4Parameter.EVENT_DATA + "." + key): null;
         }else{
             return this.getValue(GoogleAnalytics4Parameter.EVENT_DATA + "." + key);
         }
@@ -42,11 +52,7 @@ public class GoogleAnalytics4 extends AbstractTrackingData {
     }
 
     public String getValue(GoogleAnalytics4Parameter parameter) {
-        if(parameters != null){
-            return parameters.get(parameter.toString());
-        }else{
-            return this.getVariables().get(parameter.toString());
-        }
+        return this.getVariables().get(parameter.toString());
     }
 
     public String getValue(String parameter) {

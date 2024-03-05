@@ -1,16 +1,23 @@
 package com.scmp.framework.model;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 public class GoogleAnalytics4 extends AbstractTrackingData {
 
-    List<String> parameters;
+    Map<String, String> parameters;
 
-    public GoogleAnalytics4(String original, List<String> parameters) {
+    public GoogleAnalytics4(String original, String query) {
         super(original);
-        this.parameters = parameters;
+        this.parameters = new HashMap<>();
+
+        String[] parameters = query.split("&");
+
+        Arrays.stream(parameters).forEach(parameter -> {
+            String[] keyValue = parameter.split("=");
+            this.parameters.put(keyValue[0], keyValue[1]);
+        });
     }
 
     public GoogleAnalytics4(String original) {
@@ -24,13 +31,7 @@ public class GoogleAnalytics4 extends AbstractTrackingData {
     public String getEventData(String key) {
 
         if(parameters != null){
-            Optional<String> keyValueOptional = parameters.stream().filter(parameter -> parameter.contains(GoogleAnalytics4Parameter.EVENT_DATA + "." + key)).findFirst();
-
-            if(keyValueOptional.isPresent()){
-                return keyValueOptional.get().split("=")[1];
-            }else{
-                return null;
-            }
+            return parameters.get(key) != null? parameters.get(key): null;
         }else{
             return this.getValue(GoogleAnalytics4Parameter.EVENT_DATA + "." + key);
         }
@@ -41,7 +42,11 @@ public class GoogleAnalytics4 extends AbstractTrackingData {
     }
 
     public String getValue(GoogleAnalytics4Parameter parameter) {
-        return this.getVariables().get(parameter.toString());
+        if(parameters != null){
+            return parameters.get(parameter.toString());
+        }else{
+            return this.getVariables().get(parameter.toString());
+        }
     }
 
     public String getValue(String parameter) {
@@ -71,8 +76,8 @@ public class GoogleAnalytics4 extends AbstractTrackingData {
         if(this.parameters!= null && that.parameters != null){
 
             if(that.parameters.size() == this.parameters.size()){
-                this.parameters.forEach(parameter -> {
-                    if(!that.parameters.contains(parameter)){
+                this.parameters.keySet().forEach(key -> {
+                    if(!that.parameters.containsKey(key) && !that.parameters.get(key).equals(this.parameters.get(key))){
                         isParametersEqual.set(false);
                     }
                 });

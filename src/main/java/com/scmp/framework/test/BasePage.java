@@ -2,6 +2,7 @@ package com.scmp.framework.test;
 
 import com.scmp.framework.testng.model.TestInfo;
 import com.scmp.framework.utils.HTMLTags;
+import com.scmp.framework.utils.NetworkUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.html5.LocalStorage;

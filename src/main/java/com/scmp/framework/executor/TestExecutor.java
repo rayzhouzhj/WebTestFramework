@@ -62,7 +62,8 @@ public class TestExecutor {
 		context.setGlobalVariables(
 				CHROME_DRIVER_PATH, manager.getDownloadedDriverPath());
 
-		WebDriverManager.firefoxdriver().setup();
+		manager = WebDriverManager.firefoxdriver();
+		manager.setup();
 		context.setGlobalVariables(
 				FIREFOX_DRIVER_PATH, manager.getDownloadedDriverPath());
 	}
